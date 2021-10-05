@@ -13,7 +13,8 @@ public class StellarSearcher extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/MainWindow.fxml"));
         Parent root = loader.load();
 
-        MainWindowController searchWindowController = loader.getController();
+        MainWindowController mainWindowController = loader.getController();
+        mainWindowController.init();
 
         stage.setTitle("Main window");
 
