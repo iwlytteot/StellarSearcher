@@ -2,12 +2,18 @@ package controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 import model.Radius;
+
+import java.io.IOException;
 
 public class MainWindowController {
     @FXML
@@ -57,9 +63,42 @@ public class MainWindowController {
     }
 
     public void mastTableButtonAction(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/MastMissionWindow.fxml"));
+            Parent root = loader.load();
 
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+
+            MastMissionController mastMissionController = loader.getController();
+            mastMissionController.init();
+
+            stage.setTitle("MAST missions");
+            stage.setScene(scene);
+            stage.show();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void vizierTableButtonAction(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/VizierCataloguesWindow.fxml"));
+            Parent root = loader.load();
+
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+
+            VizierCataloguesWindow vizierCataloguesWindow = loader.getController();
+            vizierCataloguesWindow.init();
+
+            stage.setTitle("Vizier tables");
+            stage.setScene(scene);
+            stage.show();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

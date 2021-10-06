@@ -1,44 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainWindowController">
+<AnchorPane prefHeight="447.0" prefWidth="643.0" xmlns="http://javafx.com/javafx/15" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainWindowController">
    <children>
-      <Rectangle fx:id="rectLeft" arcHeight="10.0" arcWidth="10.0" fill="RED" height="120.0" layoutX="70.0" layoutY="90.0" stroke="#85515100" strokeType="INSIDE" strokeWidth="0.0" width="120.0" />
-      <Button fx:id="vizierButton" layoutX="76.0" layoutY="96.0" mnemonicParsing="false" onMouseClicked="#enterVizier" prefHeight="108.0" prefWidth="108.0" style="-fx-focus-color: transparent;" text="VizieR">
+      <Rectangle fx:id="rectLeft" arcHeight="10.0" arcWidth="10.0" fill="RED" height="120.0" layoutX="76.0" layoutY="90.0" stroke="#85515100" strokeType="INSIDE" strokeWidth="0.0" width="120.0" />
+      <Button fx:id="vizierButton" layoutX="82.0" layoutY="96.0" mnemonicParsing="false" onMouseClicked="#enterVizier" prefHeight="108.0" prefWidth="108.0" style="-fx-focus-color: transparent;" text="VizieR">
          <font>
             <Font size="21.0" />
          </font>
       </Button>
-      <Rectangle fx:id="rectMid" arcHeight="10.0" arcWidth="10.0" fill="RED" height="120.0" layoutX="240.0" layoutY="90.0" stroke="#85515100" strokeType="INSIDE" strokeWidth="0.0" width="120.0" />
-      <Rectangle fx:id="rectRight" arcHeight="10.0" arcWidth="10.0" fill="RED" height="120.0" layoutX="410.0" layoutY="90.0" stroke="#85515100" strokeType="INSIDE" strokeWidth="0.0" width="120.0" />
-      <Button fx:id="simbadButton" layoutX="246.0" layoutY="96.0" mnemonicParsing="false" onMouseClicked="#enterSimbad" prefHeight="108.0" prefWidth="108.0" style="-fx-focus-color: transparent;" text="Simbad">
+      <Rectangle fx:id="rectMid" arcHeight="10.0" arcWidth="10.0" fill="RED" height="120.0" layoutX="256.0" layoutY="90.0" stroke="#85515100" strokeType="INSIDE" strokeWidth="0.0" width="120.0" />
+      <Rectangle fx:id="rectRight" arcHeight="10.0" arcWidth="10.0" fill="RED" height="120.0" layoutX="438.0" layoutY="90.0" stroke="#85515100" strokeType="INSIDE" strokeWidth="0.0" width="120.0" />
+      <Button fx:id="simbadButton" layoutX="262.0" layoutY="96.0" mnemonicParsing="false" onMouseClicked="#enterSimbad" prefHeight="108.0" prefWidth="108.0" style="-fx-focus-color: transparent;" text="Simbad">
          <font>
             <Font size="21.0" />
          </font>
       </Button>
-      <Button fx:id="mastButton" layoutX="416.0" layoutY="96.0" mnemonicParsing="false" onMouseClicked="#enterMast" prefHeight="108.0" prefWidth="108.0" style="-fx-focus-color: transparent;" text="MAST">
+      <Button fx:id="mastButton" layoutX="444.0" layoutY="96.0" mnemonicParsing="false" onMouseClicked="#enterMast" prefHeight="108.0" prefWidth="108.0" style="-fx-focus-color: transparent;" text="MAST">
          <font>
             <Font size="21.0" />
          </font>
       </Button>
       <TextField fx:id="inputText" layoutX="130.0" layoutY="286.0" prefHeight="31.0" prefWidth="140.0" promptText="ID or Coordinates" />
       <TextField fx:id="radiusInput" layoutX="284.0" layoutY="286.0" prefHeight="31.0" prefWidth="140.0" promptText="radius" />
-      <Button layoutX="268.0" layoutY="331.0" mnemonicParsing="false" text="Search">
+      <Button layoutX="284.0" layoutY="331.0" mnemonicParsing="false" text="Search">
          <font>
             <Font size="15.0" />
          </font>
       </Button>
       <ComboBox fx:id="radiusBox" layoutX="424.0" layoutY="286.0" prefHeight="31.0" prefWidth="92.0" />
-      <Button fx:id="mastTableButton" layoutX="443.0" layoutY="224.0" mnemonicParsing="false" onAction="#mastTableButtonAction" text="tables">
+      <Button fx:id="mastTableButton" layoutX="471.0" layoutY="224.0" mnemonicParsing="false" onAction="#mastTableButtonAction" text="tables">
          <font>
             <Font size="14.0" />
          </font>
       </Button>
-      <Button fx:id="vizierTableButton" layoutX="103.0" layoutY="224.0" mnemonicParsing="false" onAction="#vizierTableButtonAction" text="tables">
+      <Button fx:id="vizierTableButton" layoutX="109.0" layoutY="224.0" mnemonicParsing="false" onAction="#vizierTableButtonAction" text="tables">
          <font>
             <Font size="14.0" />
          </font>
