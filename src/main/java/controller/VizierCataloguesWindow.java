@@ -9,6 +9,17 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import model.Catalogue;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 public class VizierCataloguesWindow {
     @FXML
     public Button addCatalogueVizierButton;
@@ -22,6 +33,17 @@ public class VizierCataloguesWindow {
     }
 
     public void addCatalogueVizier(ActionEvent actionEvent) {
+        var client = HttpClient.newHttpClient();
+        var request = HttpRequest
+                .newBuilder(URI.create("https://vizier.u-strasbg.fr/viz-bin/asu-tsv?-source=i/251&-meta.all"))
+                .GET()
+                .build();
+        try {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void backVizier(ActionEvent actionEvent) {
