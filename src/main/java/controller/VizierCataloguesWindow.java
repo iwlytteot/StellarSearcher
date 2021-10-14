@@ -33,17 +33,19 @@ public class VizierCataloguesWindow {
     }
 
     public void addCatalogueVizier(ActionEvent actionEvent) {
-        var client = HttpClient.newHttpClient();
-        var request = HttpRequest
-                .newBuilder(URI.create("https://vizier.u-strasbg.fr/viz-bin/asu-tsv?-source=i/251&-meta.all"))
-                .GET()
-                .build();
-        try {
-            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response.body());
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        new Thread(() -> {
+            var client = HttpClient.newHttpClient();
+            var request = HttpRequest
+                    .newBuilder(URI.create("https://vizier.u-strasbg.fr/viz-bin/asu-tsv?-source=i/251&-meta.all"))
+                    .GET()
+                    .build();
+            try {
+                var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                System.out.println(response.body());
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     public void backVizier(ActionEvent actionEvent) {

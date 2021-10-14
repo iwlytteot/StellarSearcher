@@ -54,7 +54,7 @@ public class Catalogue {
      */
     public static List<Catalogue> parseMetaData(String path) {
         try (InputStream inputStream = new FileInputStream(path);
-             Scanner sc = new Scanner(inputStream, StandardCharsets.UTF_8)) {
+            Scanner sc = new Scanner(inputStream, StandardCharsets.UTF_8)) {
 
             List<Catalogue> catalogues = new ArrayList<>();
             Catalogue currentCatalogue = new Catalogue();

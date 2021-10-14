@@ -10,6 +10,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Radius;
 
@@ -70,6 +71,8 @@ public class MainWindowController {
             Scene scene = new Scene(root);
             Stage stage = new Stage();
 
+            stage.initModality(Modality.APPLICATION_MODAL);
+
             MastMissionController mastMissionController = loader.getController();
             mastMissionController.init();
 
@@ -89,6 +92,8 @@ public class MainWindowController {
 
             Scene scene = new Scene(root);
             Stage stage = new Stage();
+
+            stage.initModality(Modality.APPLICATION_MODAL);
 
             VizierCataloguesWindow vizierCataloguesWindow = loader.getController();
             vizierCataloguesWindow.init();
