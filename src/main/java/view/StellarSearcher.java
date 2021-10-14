@@ -22,9 +22,6 @@ public class StellarSearcher extends Application {
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.show();
-
-        var result = Catalogue.parseMetaData("catalogue-metadata.tsv");
-        System.out.println(result.size());
     }
 
     public static void main(String[] args) {
