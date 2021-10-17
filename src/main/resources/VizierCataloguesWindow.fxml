@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VizierCataloguesWindow">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/15" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VizierCataloguesWindow">
    <children>
       <ListView fx:id="tableVizierList" layoutX="182.0" layoutY="109.0" prefHeight="240.0" prefWidth="238.0" />
       <Button fx:id="addCatalogueVizierButton" layoutX="351.0" layoutY="55.0" mnemonicParsing="false" onAction="#addCatalogueVizier" prefHeight="30.0" prefWidth="69.0" text="Add">

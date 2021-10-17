@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import model.Catalogue;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -25,28 +26,37 @@ public class VizierCataloguesWindow {
     @FXML
     public TextField inputVizierCatalogue;
     @FXML
-    public ListView<String> tableVizierList;
-
-    public void init() {
-        tableVizierList.getItems().addAll("I/246", "II/246");
-    }
+    public ListView<Catalogue> tableVizierList;
 
     public void addCatalogueVizier(ActionEvent actionEvent) {
         Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.WAIT));
+        Platform.runLater(() -> addCatalogueVizierButton.setDisable(true));
 
         if (!catalogueRequestService.isRunning()) {
             catalogueRequestService.reset();
         }
         catalogueRequestService.start();
+
+        System.out.println("Here");
+
     }
 
     public void backVizier(ActionEvent actionEvent) {
         var stage = (Stage) addCatalogueVizierButton.getScene().getWindow();
-        stage.close();
+        stage.hide();
+    }
+
+    private static void dialoguePopup(Exception e) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Request failed");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        });
     }
 
 
-    private final Service<Void> catalogueRequestService= new Service<>() {
+    private final Service<Void> catalogueRequestService = new Service<>() {
         @Override
         protected Task<Void> createTask() {
             return new Task<>() {
@@ -66,13 +76,10 @@ public class VizierCataloguesWindow {
                         myWriter.close();
 
                     } catch (IOException | InterruptedException e) {
-                        Platform.runLater(() -> {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setTitle("Request failed");
-                            alert.setContentText(e.getMessage());
-                            alert.showAndWait();
-                        });
+                        dialoguePopup(e);
                     }
+                    var catOutput = Catalogue.parseMetaData("catGetVizier.txt");
+                    Platform.runLater(() -> tableVizierList.getItems().addAll(catOutput));
                     return null;
                 }
             };
@@ -82,18 +89,25 @@ public class VizierCataloguesWindow {
         protected void succeeded() {
             super.succeeded();
             Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.DEFAULT));
+            Platform.runLater(() -> addCatalogueVizierButton.setDisable(false));
+
         }
 
         @Override
         protected void cancelled() {
             super.cancelled();
+            dialoguePopup(new Exception("Task was cancelled"));
             Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.DEFAULT));
+            Platform.runLater(() -> addCatalogueVizierButton.setDisable(false));
         }
 
         @Override
         protected void failed() {
             super.failed();
+            dialoguePopup(new Exception("Task has failed"));
             Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.DEFAULT));
+            Platform.runLater(() -> addCatalogueVizierButton.setDisable(false));
         }
+
     };
 }

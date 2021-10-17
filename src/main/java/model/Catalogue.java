@@ -41,6 +41,10 @@ public class Catalogue {
         this.tables.add(table);
     }
 
+    @Override
+    public String toString() {
+        return catalogueName;
+    }
 
     //maybe not the right place, just for saving code
     /**
@@ -124,7 +128,7 @@ public class Catalogue {
                     table.addColumn(line.substring(8, line.indexOf('\t', 8)));
                 }
 
-                if (line.contains("#INFO") && line.contains("Error=")) {
+                if (line.contains("#INFO") && line.contains("Error=") && !line.contains("Error= STOP")) {
                     throw new CatalogueQueryException(line);
                 }
 
@@ -143,5 +147,7 @@ public class Catalogue {
             throw new CatalogueQueryException(ex.getMessage());
         }
     }
+
+
 }
 

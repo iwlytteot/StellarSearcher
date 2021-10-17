@@ -96,7 +96,6 @@ public class MainWindowController {
             stage.initModality(Modality.APPLICATION_MODAL);
 
             VizierCataloguesWindow vizierCataloguesWindow = loader.getController();
-            vizierCataloguesWindow.init();
 
             stage.setTitle("Vizier tables");
             stage.setScene(scene);
