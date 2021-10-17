@@ -1,10 +1,12 @@
 package controller;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.MouseEvent;
@@ -37,8 +39,13 @@ public class MainWindowController {
     public Button vizierTableButton;
 
     private boolean vizierSearch = false, simbadSearch = false, mastSearch = false;
+    private Stage vizierStage;
+    private Stage mastStage;
 
     public void init() {
+        vizierStage = initFxml("/VizierCataloguesWindow.fxml", "Vizier catalogues");
+        mastStage = initFxml("/MastMissionWindow.fxml", "MAST missions");
+
         radiusBox.getItems().setAll(Radius.values());
         radiusBox.getSelectionModel().selectFirst();
 
@@ -64,30 +71,16 @@ public class MainWindowController {
     }
 
     public void mastTableButtonAction(ActionEvent actionEvent) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/MastMissionWindow.fxml"));
-            Parent root = loader.load();
-
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-
-            stage.initModality(Modality.APPLICATION_MODAL);
-
-            MastMissionController mastMissionController = loader.getController();
-            mastMissionController.init();
-
-            stage.setTitle("MAST missions");
-            stage.setScene(scene);
-            stage.show();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        mastStage.show();
     }
 
     public void vizierTableButtonAction(ActionEvent actionEvent) {
+        vizierStage.show();
+    }
+
+    private Stage initFxml(String resourcePath, String stageTitle) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/VizierCataloguesWindow.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
             Parent root = loader.load();
 
             Scene scene = new Scene(root);
@@ -95,14 +88,19 @@ public class MainWindowController {
 
             stage.initModality(Modality.APPLICATION_MODAL);
 
-            VizierCataloguesWindow vizierCataloguesWindow = loader.getController();
-
-            stage.setTitle("Vizier tables");
+            stage.setTitle(stageTitle);
             stage.setScene(scene);
-            stage.show();
+            return stage;
         }
         catch (IOException e) {
-            e.printStackTrace();
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setContentText("Error while loading application. Try restarting application. " +
+                        "In case everything fails, please contact developer");
+                alert.showAndWait();
+            });
         }
+        return null;
     }
 }

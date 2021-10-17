@@ -35,12 +35,12 @@
          </font>
       </Button>
       <ComboBox fx:id="radiusBox" layoutX="424.0" layoutY="286.0" prefHeight="31.0" prefWidth="92.0" />
-      <Button fx:id="mastTableButton" layoutX="471.0" layoutY="224.0" mnemonicParsing="false" onAction="#mastTableButtonAction" text="tables">
+      <Button fx:id="mastTableButton" layoutX="456.0" layoutY="224.0" mnemonicParsing="false" onAction="#mastTableButtonAction" text="catalogues">
          <font>
             <Font size="14.0" />
          </font>
       </Button>
-      <Button fx:id="vizierTableButton" layoutX="109.0" layoutY="224.0" mnemonicParsing="false" onAction="#vizierTableButtonAction" text="tables">
+      <Button fx:id="vizierTableButton" layoutX="94.0" layoutY="224.0" mnemonicParsing="false" onAction="#vizierTableButtonAction" text="catalogues">
          <font>
             <Font size="14.0" />
          </font>
