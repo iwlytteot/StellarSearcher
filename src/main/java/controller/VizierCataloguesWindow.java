@@ -6,12 +6,10 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import model.Catalogue;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,8 +25,20 @@ public class VizierCataloguesWindow {
     public TextField inputVizierCatalogue;
     @FXML
     public ListView<Catalogue> tableVizierList;
+    @FXML
+    public TextField maxCatResultInput;
+    @FXML
+    public Label invalidInputLabel;
 
     public void addCatalogueVizier(ActionEvent actionEvent) {
+        var input = NumberUtils.toInt(maxCatResultInput.getText());
+        if (input <= 0) {
+            invalidInputLabel.setText("Check your input");
+            return;
+        } else {
+            invalidInputLabel.setText("");
+        }
+
         Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.WAIT));
         Platform.runLater(() -> addCatalogueVizierButton.setDisable(true));
 
@@ -36,9 +46,6 @@ public class VizierCataloguesWindow {
             catalogueRequestService.reset();
         }
         catalogueRequestService.start();
-
-        System.out.println("Here");
-
     }
 
     public void backVizier(ActionEvent actionEvent) {
@@ -66,7 +73,8 @@ public class VizierCataloguesWindow {
                     var request = HttpRequest
                             .newBuilder(URI.create("https://vizier.u-strasbg.fr/viz-bin/asu-tsv?-source="
                                     + inputVizierCatalogue.getText() +
-                                    "&-meta.all&-meta.max=30"))
+                                    "&-meta.all&-meta.max="
+                                    + maxCatResultInput.getText()))
                             .GET()
                             .build();
                     try {
