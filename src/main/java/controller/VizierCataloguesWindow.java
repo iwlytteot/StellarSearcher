@@ -4,13 +4,19 @@ import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTreeCell;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import model.Catalogue;
 import model.Data;
+import model.Table;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,6 +25,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class VizierCataloguesWindow {
     @FXML
@@ -28,11 +35,14 @@ public class VizierCataloguesWindow {
     @FXML
     public TreeView<Data> treeView;
 
+    private HashMap<CheckBoxTreeItem<Data>, Stage> nodeFilters = new HashMap<>();
+
     public void init () {
         CheckBoxTreeItem<Data> root = new CheckBoxTreeItem<>(new Catalogue());
         treeView.setRoot(root);
         treeView.setShowRoot(false);
         treeView.setCellFactory(CheckBoxTreeCell.forTreeView());
+        treeView.setOnMouseClicked(eventHandler);
     }
 
     public void addCatalogueVizier(ActionEvent actionEvent) {
@@ -57,6 +67,45 @@ public class VizierCataloguesWindow {
             alert.setContentText(e.getMessage());
             alert.showAndWait();
         });
+    }
+
+    private final EventHandler<MouseEvent> eventHandler = new EventHandler<>() {
+        @Override
+        public void handle(MouseEvent event) {
+            if (event.getClickCount() == 2) {
+                var node = (CheckBoxTreeItem<Data>) treeView.getSelectionModel().getSelectedItem();
+                if (node.getValue() instanceof Table) {
+                    if (!nodeFilters.containsKey(node)) {
+                        nodeFilters.putIfAbsent(node,
+                                initFxml(
+                                        "Filter window - " + node.getValue().getName(),
+                                        (Table) node.getValue()));
+                    }
+                nodeFilters.get(node).show();
+                }
+            }
+        }
+    };
+
+    private Stage initFxml(String stageTitle, Table table) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/FilterWindow.fxml"));
+            Parent root = loader.load();
+
+            FilterWindowController filterWindowController = loader.getController();
+            filterWindowController.init(table);
+
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+
+            stage.setScene(scene);
+            stage.setTitle(stageTitle);
+            return stage;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 

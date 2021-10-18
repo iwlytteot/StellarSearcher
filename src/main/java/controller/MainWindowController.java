@@ -82,7 +82,7 @@ public class MainWindowController {
 
     private Stage initFxml(String resourcePath, String stageTitle, boolean callInit) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
+            FXMLLoader loader = new FXMLLoader(MainWindowController.class.getResource(resourcePath));
             Parent root = loader.load();
 
             if (callInit) {
