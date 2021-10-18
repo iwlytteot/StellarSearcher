@@ -35,7 +35,7 @@ public class VizierCataloguesWindow {
     @FXML
     public TreeView<Data> treeView;
 
-    private HashMap<CheckBoxTreeItem<Data>, Stage> nodeFilters = new HashMap<>();
+    private final HashMap<CheckBoxTreeItem<Data>, Stage> nodeFilters = new HashMap<>();
 
     public void init () {
         CheckBoxTreeItem<Data> root = new CheckBoxTreeItem<>(new Catalogue());
