@@ -7,9 +7,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.stage.Stage;
 import model.Catalogue;
-import org.apache.commons.lang3.math.NumberUtils;
+import model.Data;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 
 public class VizierCataloguesWindow {
     @FXML
@@ -24,21 +26,16 @@ public class VizierCataloguesWindow {
     @FXML
     public TextField inputVizierCatalogue;
     @FXML
-    public ListView<Catalogue> tableVizierList;
-    @FXML
-    public TextField maxCatResultInput;
-    @FXML
-    public Label invalidInputLabel;
+    public TreeView<Data> treeView;
+
+    public void init () {
+        CheckBoxTreeItem<Data> root = new CheckBoxTreeItem<>(new Catalogue());
+        treeView.setRoot(root);
+        treeView.setShowRoot(false);
+        treeView.setCellFactory(CheckBoxTreeCell.forTreeView());
+    }
 
     public void addCatalogueVizier(ActionEvent actionEvent) {
-        var input = NumberUtils.toInt(maxCatResultInput.getText());
-        if (input <= 0) {
-            invalidInputLabel.setText("Check your input");
-            return;
-        } else {
-            invalidInputLabel.setText("");
-        }
-
         Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.WAIT));
         Platform.runLater(() -> addCatalogueVizierButton.setDisable(true));
 
@@ -73,8 +70,7 @@ public class VizierCataloguesWindow {
                     var request = HttpRequest
                             .newBuilder(URI.create("https://vizier.u-strasbg.fr/viz-bin/asu-tsv?-source="
                                     + inputVizierCatalogue.getText() +
-                                    "&-meta.all&-meta.max="
-                                    + maxCatResultInput.getText()))
+                                    "&-meta.all&-meta.max=500"))
                             .GET()
                             .build();
                     try {
@@ -87,7 +83,14 @@ public class VizierCataloguesWindow {
                         dialoguePopup(e);
                     }
                     var catOutput = Catalogue.parseMetaData("catGetVizier.txt");
-                    Platform.runLater(() -> tableVizierList.getItems().addAll(catOutput));
+                    for (var catalogue : catOutput) {
+                        CheckBoxTreeItem<Data> catalogueNode = new CheckBoxTreeItem<>(catalogue);
+                        var temp = new ArrayList<CheckBoxTreeItem<Data>>();
+                        catalogue.getTables().forEach(e -> temp.add(new CheckBoxTreeItem<>(e)));
+                        catalogueNode.getChildren().addAll(temp);
+                        catalogueNode.setSelected(true);
+                        Platform.runLater(() -> treeView.getRoot().getChildren().add(catalogueNode));
+                    }
                     return null;
                 }
             };

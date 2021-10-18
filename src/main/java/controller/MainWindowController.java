@@ -17,6 +17,8 @@ import javafx.stage.Stage;
 import model.Radius;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class MainWindowController {
     @FXML
@@ -43,8 +45,8 @@ public class MainWindowController {
     private Stage mastStage;
 
     public void init() {
-        vizierStage = initFxml("/VizierCataloguesWindow.fxml", "Vizier catalogues");
-        mastStage = initFxml("/MastMissionWindow.fxml", "MAST missions");
+        vizierStage = initFxml("/VizierCataloguesWindow.fxml", "Vizier catalogues", true);
+        mastStage = initFxml("/MastMissionWindow.fxml", "MAST missions", false);
 
         radiusBox.getItems().setAll(Radius.values());
         radiusBox.getSelectionModel().selectFirst();
@@ -78,10 +80,15 @@ public class MainWindowController {
         vizierStage.show();
     }
 
-    private Stage initFxml(String resourcePath, String stageTitle) {
+    private Stage initFxml(String resourcePath, String stageTitle, boolean callInit) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
             Parent root = loader.load();
+
+            if (callInit) {
+                Method initMethod = Class.forName(loader.getController().getClass().getName()).getMethod("init");
+                initMethod.invoke(loader.getController());
+            }
 
             Scene scene = new Scene(root);
             Stage stage = new Stage();
@@ -100,6 +107,8 @@ public class MainWindowController {
                         "In case everything fails, please contact developer");
                 alert.showAndWait();
             });
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
         }
         return null;
     }

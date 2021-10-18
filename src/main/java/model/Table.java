@@ -2,26 +2,8 @@ package model;
 
 import java.util.HashMap;
 
-public class Table {
-    String tableName;
-    String tableInfo;
+public class Table extends Data {
     HashMap<String, String> columns = new HashMap<>();
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
-
-    public String getTableInfo() {
-        return tableInfo;
-    }
-
-    public void setTableInfo(String tableInfo) {
-        this.tableInfo = tableInfo;
-    }
 
     public HashMap<String, String> getColumns() {
         return columns;
@@ -33,6 +15,11 @@ public class Table {
 
     public void addColumn(String columnName) {
         columns.put(columnName, "");
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }
 

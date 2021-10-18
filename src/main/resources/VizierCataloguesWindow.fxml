@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
-
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/15" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.VizierCataloguesWindow">
    <children>
-      <ListView fx:id="tableVizierList" layoutX="182.0" layoutY="109.0" prefHeight="240.0" prefWidth="238.0" />
+      <TreeView fx:id="treeView" layoutX="182.0" layoutY="109.0" prefHeight="240.0" prefWidth="238.0" />
       <Button fx:id="addCatalogueVizierButton" layoutX="351.0" layoutY="40.0" mnemonicParsing="false" onAction="#addCatalogueVizier" prefHeight="30.0" prefWidth="69.0" text="Add">
          <font>
             <Font size="14.0" />
@@ -21,12 +19,5 @@
             <Font size="14.0" />
          </font>
       </Button>
-      <TextField fx:id="maxCatResultInput" layoutX="281.0" layoutY="76.0" prefHeight="30.0" prefWidth="47.0" />
-      <Label layoutX="182.0" layoutY="82.0" text="Maximum results" />
-      <Label fx:id="invalidInputLabel" layoutX="372.0" layoutY="83.0" textFill="RED">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
    </children>
 </AnchorPane>

@@ -8,26 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Catalogue {
-    String catalogueName;
-    String catalogueInfo;
+public class Catalogue extends Data{
     ArrayList<Table> tables = new ArrayList<>();
-
-    public String getCatalogueName() {
-        return catalogueName;
-    }
-
-    public void setCatalogueName(String catalogueName) {
-        this.catalogueName = catalogueName;
-    }
-
-    public String getCatalogueInfo() {
-        return catalogueInfo;
-    }
-
-    public void setCatalogueInfo(String catalogueInfo) {
-        this.catalogueInfo = catalogueInfo;
-    }
 
     public ArrayList<Table> getTables() {
         return tables;
@@ -43,7 +25,7 @@ public class Catalogue {
 
     @Override
     public String toString() {
-        return catalogueName;
+        return getName();
     }
 
     //maybe not the right place, just for saving code
@@ -90,7 +72,7 @@ public class Catalogue {
 
                     // dealing with bug when catalogue info contains also table info..
                     if (!tableInfoBugged.isEmpty()) {
-                        table.setTableInfo(tableInfoBugged);
+                        table.setInfo(tableInfoBugged);
                         tableInfoBugged = "";
                     }
 
@@ -99,9 +81,9 @@ public class Catalogue {
 
                 if (line.contains("#Name:")) {
                     if (isCatalogue) {
-                        currentCatalogue.setCatalogueName(line.substring(7));
+                        currentCatalogue.setName(line.substring(7));
                     } else {
-                        table.setTableName(line.substring(7));
+                        table.setName(line.substring(7));
                     }
                 }
 
@@ -113,15 +95,15 @@ public class Catalogue {
                     line = sc.nextLine();
 
                     if (!isCatalogue) {
-                        table.setTableInfo(line.substring(1).stripLeading());
+                        table.setInfo(line.substring(1).stripLeading());
                     } else {
-                        currentCatalogue.setCatalogueInfo(line.substring(1).stripLeading());
+                        currentCatalogue.setInfo(line.substring(1).stripLeading());
                         line = sc.nextLine();
                         tableInfoBugged = line.substring(1).stripLeading();
                     }
                 }
                 else if (line.contains("#Title:")) {
-                    currentCatalogue.setCatalogueInfo(line.substring(8));
+                    currentCatalogue.setInfo(line.substring(8));
                 }
 
                 if (line.contains("#Column")) {
