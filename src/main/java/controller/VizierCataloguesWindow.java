@@ -46,6 +46,10 @@ public class VizierCataloguesWindow {
     }
 
     public void addCatalogueVizier(ActionEvent actionEvent) {
+        if (inputVizierCatalogue.getText().isEmpty()) {
+            dialoguePopup("Input is empty", Alert.AlertType.INFORMATION);
+            return;
+        }
         Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.WAIT));
         Platform.runLater(() -> addCatalogueVizierButton.setDisable(true));
 
@@ -168,7 +172,7 @@ public class VizierCataloguesWindow {
         @Override
         protected void failed() {
             super.failed();
-            dialoguePopup("Task has failed", Alert.AlertType.ERROR);
+            dialoguePopup("Task hasn't been finished. It is probably due to output limit/overload.", Alert.AlertType.ERROR);
             Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.DEFAULT));
             Platform.runLater(() -> addCatalogueVizierButton.setDisable(false));
         }
