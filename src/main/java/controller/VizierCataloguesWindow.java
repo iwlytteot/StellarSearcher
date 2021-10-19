@@ -60,11 +60,11 @@ public class VizierCataloguesWindow {
         stage.hide();
     }
 
-    private static void dialoguePopup(Exception e) {
+    private static void dialoguePopup(String message, Alert.AlertType alertType) {
         Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
+            Alert alert = new Alert(alertType);
             alert.setTitle("Request failed");
-            alert.setContentText(e.getMessage());
+            alert.setContentText(message);
             alert.showAndWait();
         });
     }
@@ -129,10 +129,14 @@ public class VizierCataloguesWindow {
                         myWriter.close();
 
                     } catch (IOException | InterruptedException e) {
-                        dialoguePopup(e);
+                        dialoguePopup(e.getMessage(), Alert.AlertType.ERROR);
                     }
                     var catOutput = Catalogue.parseMetaData("catGetVizier.txt");
                     for (var catalogue : catOutput) {
+                        if (treeView.getRoot().getChildren().stream().anyMatch(e -> e.getValue().getName().equals(catalogue.getName()))) {
+                            dialoguePopup("There is already " + catalogue.getName() + " in list", Alert.AlertType.WARNING);
+                            continue;
+                        }
                         CheckBoxTreeItem<Data> catalogueNode = new CheckBoxTreeItem<>(catalogue);
                         var temp = new ArrayList<CheckBoxTreeItem<Data>>();
                         catalogue.getTables().forEach(e -> temp.add(new CheckBoxTreeItem<>(e)));
@@ -156,7 +160,7 @@ public class VizierCataloguesWindow {
         @Override
         protected void cancelled() {
             super.cancelled();
-            dialoguePopup(new Exception("Task was cancelled"));
+            dialoguePopup("Task was cancelled", Alert.AlertType.ERROR);
             Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.DEFAULT));
             Platform.runLater(() -> addCatalogueVizierButton.setDisable(false));
         }
@@ -164,7 +168,7 @@ public class VizierCataloguesWindow {
         @Override
         protected void failed() {
             super.failed();
-            dialoguePopup(new Exception("Task has failed"));
+            dialoguePopup("Task has failed", Alert.AlertType.ERROR);
             Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.DEFAULT));
             Platform.runLater(() -> addCatalogueVizierButton.setDisable(false));
         }
