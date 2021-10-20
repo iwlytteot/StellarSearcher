@@ -1,23 +1,20 @@
 package controller;
 
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import model.Data;
 import model.Table;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class FilterWindowController {
     @FXML
@@ -33,7 +30,7 @@ public class FilterWindowController {
         listViewAvailable.setOnMouseClicked(eventHandlerAvailable);
         listViewUsed.setOnMouseClicked(eventHandlerUsed);
 
-        listViewAvailable.getItems().addAll(table.getColumns().keySet());
+        listViewAvailable.getItems().addAll(table.getColumns().keySet().stream().sorted().collect(Collectors.toList()));
     }
 
     @FXML
@@ -55,7 +52,7 @@ public class FilterWindowController {
         public void handle(MouseEvent event) {
             if (event.getClickCount() == 2) {
                 var selected = listViewAvailable.getSelectionModel().getSelectedItem();
-                constraints.putIfAbsent(selected, initFxml("Constraint window", selected));
+                constraints.putIfAbsent(selected, initFxml(selected));
                 constraints.get(selected).show();
             }
         }
@@ -66,13 +63,13 @@ public class FilterWindowController {
         public void handle(MouseEvent event) {
             if (event.getClickCount() == 2) {
                 var selected = listViewUsed.getSelectionModel().getSelectedItem();
-                constraints.putIfAbsent(selected, initFxml("Constraint window", selected));
+                constraints.putIfAbsent(selected, initFxml(selected));
                 constraints.get(selected).show();
             }
         }
     };
 
-    private Stage initFxml(String stageTitle, String constraintName) {
+    private Stage initFxml(String constraintName) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ConstraintWindow.fxml"));
             Parent root = loader.load();
@@ -84,7 +81,7 @@ public class FilterWindowController {
             Stage stage = new Stage();
 
             stage.setScene(scene);
-            stage.setTitle(stageTitle);
+            stage.setTitle("Constraint window");
             return stage;
 
         } catch (IOException e) {
