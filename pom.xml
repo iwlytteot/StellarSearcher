@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cz.muni.fi</groupId>
-    <artifactId>thesis</artifactId>
+    <artifactId>thesis-tovarys</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -43,17 +43,22 @@
             <artifactId>javafx-base</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.13.0</version>
+        </dependency>
     </dependencies>
 
     <build>
         <!-- used for the name of the executable JAR file -->
         <finalName>StellarSearcher</finalName>
         <plugins>
-        <!--
-           Create an executable JAR file by packing all needed libraries.
-           Build with command "mvn package".
-           Run with command "java -jar target/astrosearch.jar"
-        -->
+            <!--
+               Create an executable JAR file by packing all needed libraries.
+               Build with command "mvn package".
+               Run with command "java -jar target/astrosearch.jar"
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -88,5 +93,6 @@
             </plugin>
         </plugins>
     </build>
+
 
 </project>

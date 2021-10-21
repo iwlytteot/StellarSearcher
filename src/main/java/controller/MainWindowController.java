@@ -46,7 +46,7 @@ public class MainWindowController {
 
     public void init() {
         vizierStage = initFxml("/VizierCataloguesWindow.fxml", "Vizier catalogues", true);
-        mastStage = initFxml("/MastMissionWindow.fxml", "MAST missions", false);
+        mastStage = initFxml("/MastMissionWindow.fxml", "MAST missions", true);
 
         radiusBox.getItems().setAll(Radius.values());
         radiusBox.getSelectionModel().selectFirst();
