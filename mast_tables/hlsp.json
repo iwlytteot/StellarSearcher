@@ -1,0 +1,19 @@
+{
+"name": "hlsp",
+"info": "High Level Science Products",
+"columns": {
+"Object": "hd_object_id",
+"Project": "hd_id",
+"Filename": "hd_filename",
+"RA (J2000)": "hd_ra",
+"Dec (J2000)": "hd_dec",
+"Instrument": "hd_instrument",
+"Product Type": "hd_product_type",
+"Format": "hd_format",
+"Project Title": "hp_title",
+"Primary Investigator": "hp_pi",
+"Bibcode": "hp_bibcode",
+"Webpage": "hp_webpage",
+"URL": "hd_url"
+}
+}

@@ -1,0 +1,28 @@
+{
+"name": "hpol",
+"info": "ground based spetropolarimater",
+"columns": {
+"Data ID": "hpol_data_id",
+"Target Name": "hpol_target_name",
+"Alternate Target Name": "hpol_alt_target_name",
+"RA (J2000)": "hpol_ra2000",
+"DEC (J2000)": "hpol_dec2000",
+"Obs. Start Time": "hpol_obs_start_time",
+"Object Type": "hpol_type",
+"Spec Type": "hpol_sptype",
+"V Mag": "hpol_vmag",
+"Exp Time": "hpol_exp_time",
+"Jotf ID": "hpol_wuppe_jotfid",
+"Slit": "hpol_slit",
+"Decker": "hpol_decker",
+"Position Angle": "hpol_posangle",
+"Observatory": "hpol_observatory",
+"Ref": "hpol_ref",
+"Galactic Longitude": "hpol_glong",
+"Galactic Latitude": "hpol_glat",
+"Ecliptic Longitude": "hpol_elong",
+"Ecliptic Latitude": "hpol_elat",
+"Category": "hpol_category",
+"WUPPE Obs": "hpol_wuppe"
+}
+}

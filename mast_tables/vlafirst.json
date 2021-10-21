@@ -1,0 +1,18 @@
+{
+"name": "vlafirst",
+"info": "VLA Faint Images of the Radio Sky (21-cm)",
+"columns": {
+"Data ID": "v_imname",
+"Field Name": "v_fieldname",
+"RA (J2000)": "v_ra",
+"Dec (J2000)": "v_dec",
+"VLA Program ID": "v_progid",
+"AIPS Image Class": "v_imclass",
+"Max Pixel Value": "v_datamax",
+"Min Pixel Value": "v_datamin",
+"Galactic Longitude": "v_glong",
+"Galactic Latitude": "v_glat",
+"Ecliptic Longitude": "v_elong",
+"Ecliptic Latitude": "v_elat"
+}
+}

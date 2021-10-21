@@ -1,0 +1,23 @@
+{
+"name": "imaps",
+"info": "Interstellar Medium Absorption Profile Spectrograph",
+"columns": {
+"File Name": "imaps_filename",
+"Target Name": "imaps_target_name",
+"RA (J2000)": "imaps_ra2000",
+"Dec (J2000)": "imaps_dec2000",
+"Obs Start Time": "imaps_obs_start_time",
+"Category": "imaps_category",
+"HD Number": "imaps_hd_num",
+"Sequence Number": "imaps_seq_num",
+"Echelle Pos": "imaps_echelle_pos",
+"Exp Time": "imaps_exp_time",
+"X offset": "imaps_x_offset",
+"Y offset": "imaps_y_offset",
+"Galactic Long.": "imaps_glong",
+"Galactic Lat.": "imaps_glat",
+"Ecliptic Long.": "imaps_elong",
+"Ecliptic Lat.": "imaps_elat",
+"Data ID": "imaps_data_id"
+}
+}

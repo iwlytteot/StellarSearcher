@@ -1,0 +1,27 @@
+{
+"name": "copernicus",
+"info": "Copernicus Satellite",
+"columns": {
+"Entry": "cop_entry",
+"Filename": "cop_filename",
+"Target Name": "cop_object_name",
+"RA (J2000)": "cop_ra2000",
+"Dec (J2000)": "cop_dec2000",
+"Scans": "cop_scans",
+"Luminosity": "cop_spec_lum",
+"Object Class": "cop_obj_class",
+"V Mag": "cop_vis_mag",
+"M Mag": "cop_m_mag",
+"EBV": "cop_ebv",
+"B-V": "cop_bv",
+"Vsini": "cop_vsini",
+"Vstar": "cop_vstar",
+"Vism": "cop_ism_vel",
+"Vlsr": "cop_lsr_vel",
+"Distance (kpc)": "cop_distance",
+"Galactic Longitude": "cop_glondeg",
+"Galactic Latitude": "cop_glatdeg",
+"Ecliptic Longitude": "cop_elong",
+"Ecliptic Latitude": "cop_elat"
+}
+}

@@ -1,0 +1,25 @@
+{
+"name": "hut",
+"info": "Hopkins Ultraviolet Telescope",
+"columns": {
+"Data ID": "hut_data_id",
+"Target Name": "hut_target_name",
+"Category": "hut_category",
+"Object Class": "hut_objclass",
+"RA (J2000)": "hut_ra2000",
+"Dec (J2000)": "hut_dec2000",
+"Ref": "hut_ref",
+"Obs. Start Time": "hut_obs_start_time",
+"Exp Time": "hut_exp_time",
+"Nighttime": "hut_nighttime",
+"MJD Start Time": "hut_mjdstart",
+"MJD End Time": "hut_mjdend",
+"Door": "hut_door",
+"Slit": "hut_slit",
+"Icorrate": "hut_icorrate",
+"Pcorrate": "hut_pcorrate",
+"Old Name": "hut_old_name",
+"URL": "hut_url",
+"Comments": "hut_comment"
+}
+}

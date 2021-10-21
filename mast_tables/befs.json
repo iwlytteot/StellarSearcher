@@ -1,0 +1,24 @@
+{
+"name": "befs",
+"info": "Berkeley Extreme and Far-UV Spectrometer",
+"columns": {
+"Data ID": "befs_data_id",
+"Target Name": "befs_target_name",
+"RA (J2000)": "befs_ra2000",
+"Dec (J2000)": "befs_dec2000",
+"Ref": "befs_reference",
+"Alt Object ID": "befs_alt_object_id",
+"Grating": "befs_gratings",
+"Exp Time (s)": "befs_exp_time",
+"Obs Start Time": "befs_obs_start_time",
+"Galactic Longitude": "befs_glong",
+"Galactic Latitude": "befs_glat",
+"Ecliptic Longitude": "befs_elong",
+"Ecliptic Latitude": "befs_elat",
+"Mission Number": "befs_mission_num",
+"Comments": "befs_comments",
+"Spectral Type": "befs_spectype",
+"IUE Class": "befs_iueclass",
+"Object Category": "befs_category"
+}
+}

@@ -1,0 +1,27 @@
+{
+"name": "tues",
+"info": "Tübingen Echelle Spectrograph",
+"columns": {
+"Data ID": "tues_data_id",
+"Target Name": "tues_target_name",
+"RA(J2000)": "tues_ra2000",
+"Dec(J2000)": "tues_dec2000",
+"Ref": "tues_reference",
+"Obs Block": "tues_obs_block",
+"Obs. Start Time": "tues_obs_start_time",
+"Exp Time": "tues_exp_time",
+"Count Rates": "tues_countrates",
+"Helio. Velocity": "tues_vhelo",
+"Vorbit": "tues_vorbit",
+"Vadd": "tues_vadd",
+"Vblock": "tues_vblock",
+"Wavelengths": "tues_wavelength_range",
+"Ext Orders": "tues_ext_orders",
+"Comments": "tues_comments",
+"Galactic Longitude": "tues_glong",
+"Galactic Latitude": "tues_glat",
+"Ecliptic Longitude": "tues_elong",
+"Ecliptic Latitude": "tues_elat",
+"Category": "tues_iueclass"
+}
+}

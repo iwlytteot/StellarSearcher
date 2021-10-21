@@ -1,0 +1,26 @@
+{
+"name": "euve",
+"info": "Extreme Ultraviolet Explorer",
+"columns": {
+"Data ID": "euve_data_id",
+"Target Name": "euve_target_name",
+"RA (J2000)": "euve_ra2000",
+"Dec (J2000)": "euve_dec2000",
+"Obs. Start Time": "euve_obs_start_time",
+"Day/Night": "euve_daynight",
+"Program ID": "euve_prog",
+"Exp Time": "euve_exp_time",
+"Observer": "euve_observer",
+"Total Size": "euve_totsize",
+"Category": "euve_category",
+"Spectral Type": "euve_spec_type",
+"GO Number": "euve_gonum",
+"Release Date": "euve_public_date",
+"Ref": "euve_ref",
+"Galactic Longitude": "euve_glong",
+"Galactic Latitude": "euve_glat",
+"Ecliptic Longitude": "euve_elong",
+"Ecliptic Latitude": "euve_elat",
+"High-Level Science Products": "euve_hlsp"
+}
+}
