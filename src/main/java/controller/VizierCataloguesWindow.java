@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import model.Catalogue;
 import model.Data;
 import model.Table;
+import utils.FxmlCreator;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -81,7 +82,7 @@ public class VizierCataloguesWindow {
                 if (node.getValue() instanceof Table) {
                     if (!nodeFilters.containsKey(node)) {
                         nodeFilters.putIfAbsent(node,
-                                initFxml(
+                                FxmlCreator.create(
                                         "Filter window - " + node.getValue().getName(),
                                         (Table) node.getValue()));
                     }
@@ -90,27 +91,6 @@ public class VizierCataloguesWindow {
             }
         }
     };
-
-    private Stage initFxml(String stageTitle, Table table) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/FilterWindow.fxml"));
-            Parent root = loader.load();
-
-            FilterWindowController filterWindowController = loader.getController();
-            filterWindowController.init(table);
-
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-
-            stage.setScene(scene);
-            stage.setTitle(stageTitle);
-            return stage;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
 
     private final Service<Void> catalogueRequestService = new Service<>() {
