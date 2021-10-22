@@ -1,5 +1,6 @@
 package controller;
 
+import controller.http.vizier.VizierRequest;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -15,6 +16,7 @@ import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import model.Catalogue;
+import model.CatalogueQueryException;
 import model.Data;
 import model.Table;
 import utils.FxmlCreator;
@@ -99,23 +101,17 @@ public class VizierCataloguesWindow {
             return new Task<>() {
                 @Override
                 protected Void call() {
-                    var client = HttpClient.newHttpClient();
-                    var request = HttpRequest
-                            .newBuilder(URI.create("https://vizier.u-strasbg.fr/viz-bin/asu-tsv?-source="
-                                    + inputVizierCatalogue.getText() +
-                                    "&-meta.all&-meta.max=500"))
-                            .GET()
-                            .build();
+                    var requestService = new VizierRequest();
+                    var request = requestService.createMetaDataRequest(inputVizierCatalogue.getText());
                     try {
-                        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                        FileWriter myWriter = new FileWriter("catGetVizier.txt");
-                        myWriter.write(response.body());
-                        myWriter.close();
-
-                    } catch (IOException | InterruptedException e) {
-                        dialoguePopup(e.getMessage(), Alert.AlertType.ERROR);
+                        requestService.sendRequest(request);
                     }
-                    var catOutput = Catalogue.parseMetaData("catGetVizier.txt");
+                    catch (CatalogueQueryException ex) {
+                        dialoguePopup(ex.getMessage(), Alert.AlertType.ERROR);
+                        return null;
+                    }
+
+                    var catOutput = Catalogue.parseMetaData("data.txt");
                     for (var catalogue : catOutput) {
                         if (treeView.getRoot().getChildren().stream().anyMatch(e -> e.getValue().getName().equals(catalogue.getName()))) {
                             dialoguePopup("There is already " + catalogue.getName() + " in list", Alert.AlertType.WARNING);
