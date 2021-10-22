@@ -17,7 +17,7 @@ public class VizierRequest implements Request {
     private static final String BASE_URL = "https://vizier.u-strasbg.fr/viz-bin/asu-tsv?";
 
     @Override
-    public URI createDataRequest(List<Catalogue> catalogues, String radius, Radius radiusType) {
+    public URI createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType) {
         StringBuilder sources = new StringBuilder();
         StringBuilder params = new StringBuilder();
         for (var catalogue : catalogues) {
@@ -38,7 +38,7 @@ public class VizierRequest implements Request {
         }
         params.append(radius);
 
-        return URI.create(BASE_URL + "asu-tsv?-source=" + sources + params);
+        return URI.create(BASE_URL + "-source=" + sources + "-c=" + coordinates + "&" + params);
     }
 
     @Override

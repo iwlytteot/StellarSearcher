@@ -10,12 +10,13 @@ public interface Request {
     /**
      * Creates URI that holds full web path to respective server and that
      * is immediately ready to use.
-     * @param catalogues list of catalogues specified by user
-     * @param radius radius specified by user
+     * @param catalogues list of catalogues
+     * @param coordinates coordinates
+     * @param radius radius
      * @param radiusType type of radius
      * @return URI object
      */
-    URI createDataRequest(List<Catalogue> catalogues, String radius, Radius radiusType);
+    URI createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType);
 
     /**
      * Sends request and saves incoming data into "data.txt" file. Note that
