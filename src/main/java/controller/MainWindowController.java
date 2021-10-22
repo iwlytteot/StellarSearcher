@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -39,37 +40,47 @@ public class MainWindowController {
     public Button mastTableButton;
     @FXML
     public Button vizierTableButton;
+    @FXML
+    public Button searchButton;
+    @FXML
+    public TextField inputText;
+    @FXML
+    public TextField radiusInput;
 
     private boolean vizierSearch = false, simbadSearch = false, mastSearch = false;
     private Stage vizierStage;
     private Stage mastStage;
 
     public void init() {
-        vizierStage = initFxml("/VizierCataloguesWindow.fxml", "Vizier catalogues", true);
-        mastStage = initFxml("/MastMissionWindow.fxml", "MAST missions", true);
+        vizierStage = initFxml("/VizierCataloguesWindow.fxml", "Vizier catalogues");
+        mastStage = initFxml("/MastMissionWindow.fxml", "MAST missions");
 
         radiusBox.getItems().setAll(Radius.values());
         radiusBox.getSelectionModel().selectFirst();
 
         vizierTableButton.setDisable(true);
         mastTableButton.setDisable(true);
+        searchButton.setDisable(true);
     }
 
     public void enterVizier(MouseEvent mouseEvent) {
         vizierSearch = !vizierSearch;
         rectLeft.setFill(vizierSearch ? Color.GREEN : Color.RED);
         vizierTableButton.setDisable(!vizierSearch);
+        SearchButtonCheck();
     }
 
     public void enterSimbad(MouseEvent mouseEvent) {
         simbadSearch = !simbadSearch;
         rectMid.setFill(simbadSearch ? Color.GREEN : Color.RED);
+        SearchButtonCheck();
     }
 
     public void enterMast(MouseEvent mouseEvent) {
         mastSearch = !mastSearch;
         rectRight.setFill(mastSearch ? Color.GREEN : Color.RED);
         mastTableButton.setDisable(!mastSearch);
+        SearchButtonCheck();
     }
 
     public void mastTableButtonAction(ActionEvent actionEvent) {
@@ -80,15 +91,17 @@ public class MainWindowController {
         vizierStage.show();
     }
 
-    private Stage initFxml(String resourcePath, String stageTitle, boolean callInit) {
+    private void SearchButtonCheck() {
+        searchButton.setDisable(!mastSearch && !simbadSearch && !vizierSearch);
+    }
+
+    private Stage initFxml(String resourcePath, String stageTitle) {
         try {
             FXMLLoader loader = new FXMLLoader(MainWindowController.class.getResource(resourcePath));
             Parent root = loader.load();
 
-            if (callInit) {
-                Method initMethod = Class.forName(loader.getController().getClass().getName()).getMethod("init");
-                initMethod.invoke(loader.getController());
-            }
+            Method initMethod = Class.forName(loader.getController().getClass().getName()).getMethod("init");
+            initMethod.invoke(loader.getController());
 
             Scene scene = new Scene(root);
             Stage stage = new Stage();
