@@ -17,6 +17,15 @@ public class Table extends Data {
         columns.put(columnName, "");
     }
 
+    public Table() {
+    }
+
+    public Table(Table table) {
+        setName(table.getName());
+        setInfo(table.getInfo());
+        setColumns(table.getColumns());
+    }
+
     @Override
     public String toString() {
         return getName();

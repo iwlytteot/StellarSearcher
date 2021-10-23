@@ -33,6 +33,15 @@ public class FilterWindowController {
         listViewAvailable.getItems().addAll(table.getColumns().keySet().stream().sorted().collect(Collectors.toList()));
     }
 
+    public HashMap<String, String> getConstraints() {
+        var output = new HashMap<String, String>();
+        for (var item : listViewUsed.getItems()) {
+            var controller = (ConstraintWindowController) constraints.get(item).getUserData();
+            output.put(item, controller.getConstraint());
+        }
+        return output;
+    }
+
     @FXML
     public void addFilter(ActionEvent actionEvent) {
         var selected = listViewAvailable.getSelectionModel().getSelectedItems();
@@ -80,6 +89,7 @@ public class FilterWindowController {
             Scene scene = new Scene(root);
             Stage stage = new Stage();
 
+            stage.setUserData(constraintWindowController);
             stage.setScene(scene);
             stage.setTitle("Constraint window");
             return stage;

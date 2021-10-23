@@ -11,6 +11,14 @@ import java.util.Scanner;
 public class Catalogue extends Data{
     ArrayList<Table> tables = new ArrayList<>();
 
+    public Catalogue() {
+    }
+    public Catalogue(Catalogue catalogue) {
+        setName(catalogue.getName());
+        setInfo(catalogue.getInfo());
+        setTables(catalogue.getTables());
+    }
+
     public ArrayList<Table> getTables() {
         return tables;
     }

@@ -17,6 +17,7 @@ import utils.FxmlCreator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class VizierCataloguesWindow {
     @FXML
@@ -28,11 +29,44 @@ public class VizierCataloguesWindow {
 
     private final HashMap<CheckBoxTreeItem<Data>, Stage> nodeFilters = new HashMap<>();
 
+    public List<Catalogue> getSelectedCatalogues() {
+        var tableFilters = getFilters();
+        var output = new ArrayList<Catalogue>();
+        var node = treeView.getRoot();
+        for (var itemCat : node.getChildren()) {
+            if (((CheckBoxTreeItem<Data>) itemCat).isSelected()) {
+                var tables = new ArrayList<Table>();
+                for (var itemTab : itemCat.getChildren()) {
+                    if (((CheckBoxTreeItem<Data>) itemTab).isSelected()) {
+                        var table = new Table((Table) itemTab.getValue());
+                        table.setColumns(tableFilters.getOrDefault(table.getName(), new HashMap<>()));
+                        tables.add(table);
+                    }
+                }
+                var catalogue = new Catalogue((Catalogue) itemCat.getValue());
+                catalogue.setTables(tables);
+                output.add(catalogue);
+            }
+        }
+        return output;
+    }
+
+    private HashMap<String, HashMap<String, String>> getFilters() {
+        var output = new HashMap<String, HashMap<String, String>>();
+        nodeFilters.forEach((k, v) -> {
+            if (k.isSelected()) {
+                var controller = (FilterWindowController) v.getUserData();
+                output.put((k.getValue()).getName(), controller.getConstraints());
+            }
+        });
+        return output;
+    }
+
     public void init () {
         CheckBoxTreeItem<Data> root = new CheckBoxTreeItem<>(new Catalogue());
         treeView.setRoot(root);
         treeView.setShowRoot(false);
-        treeView.setCellFactory(CheckBoxTreeCell.forTreeView());
+        treeView.setCellFactory(CheckBoxTreeCell.<Data>forTreeView());
         treeView.setOnMouseClicked(eventHandler);
     }
 

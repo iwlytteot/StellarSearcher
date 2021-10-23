@@ -20,6 +20,7 @@ public class FxmlCreator {
 
             Scene scene = new Scene(root);
             Stage stage = new Stage();
+            stage.setUserData(filterWindowController);
 
             stage.setScene(scene);
             stage.setTitle(stageTitle);

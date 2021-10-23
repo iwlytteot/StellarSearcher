@@ -1,5 +1,6 @@
 package controller;
 
+import controller.http.vizier.VizierRequest;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,6 +17,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Radius;
+import utils.Tuple;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -50,10 +52,21 @@ public class MainWindowController {
     private boolean vizierSearch = false, simbadSearch = false, mastSearch = false;
     private Stage vizierStage;
     private Stage mastStage;
+    private FXMLLoader vizierLoader;
+    private FXMLLoader mastLoader;
 
     public void init() {
-        vizierStage = initFxml("/VizierCataloguesWindow.fxml", "Vizier catalogues");
-        mastStage = initFxml("/MastMissionWindow.fxml", "MAST missions");
+        var vizierFXML = initFxml("/VizierCataloguesWindow.fxml", "Vizier catalogues");
+        if (vizierFXML != null) {
+            vizierLoader = vizierFXML.getFirst();
+            vizierStage = vizierFXML.getSecond();
+
+        }
+        var mastFXML = initFxml("/MastMissionWindow.fxml", "MAST missions");
+        if (mastFXML != null) {
+            mastLoader = mastFXML.getFirst();
+            mastStage = mastFXML.getSecond();
+        }
 
         radiusBox.getItems().setAll(Radius.values());
         radiusBox.getSelectionModel().selectFirst();
@@ -95,7 +108,7 @@ public class MainWindowController {
         searchButton.setDisable(!mastSearch && !simbadSearch && !vizierSearch);
     }
 
-    private Stage initFxml(String resourcePath, String stageTitle) {
+    private Tuple<FXMLLoader, Stage> initFxml(String resourcePath, String stageTitle) {
         try {
             FXMLLoader loader = new FXMLLoader(MainWindowController.class.getResource(resourcePath));
             Parent root = loader.load();
@@ -110,7 +123,7 @@ public class MainWindowController {
 
             stage.setTitle(stageTitle);
             stage.setScene(scene);
-            return stage;
+            return new Tuple<>(loader, stage);
         }
         catch (IOException e) {
             Platform.runLater(() -> {
@@ -124,5 +137,12 @@ public class MainWindowController {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void searchAction(ActionEvent actionEvent) {
+        if (vizierSearch) {
+            VizierCataloguesWindow vizierCataloguesWindow = vizierLoader.getController();
+            var catalogues = vizierCataloguesWindow.getSelectedCatalogues();
+        }
     }
 }

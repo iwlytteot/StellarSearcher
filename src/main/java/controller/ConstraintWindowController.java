@@ -17,12 +17,10 @@ public class ConstraintWindowController {
     @FXML
     public Button confirmButton;
 
-    private String name;
     private String constraint;
 
     public void init(String name) {
-        this.name = name;
-        textLabel.setText("Constraint: " + this.name);
+        textLabel.setText("Constraint: " + name);
     }
 
     public void confirmAction(ActionEvent actionEvent) {
@@ -37,5 +35,9 @@ public class ConstraintWindowController {
             var stage = (Stage) confirmButton.getScene().getWindow();
             stage.hide();
         }
+    }
+
+    public String getConstraint() {
+        return constraint;
     }
 }
