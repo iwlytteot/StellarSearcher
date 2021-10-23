@@ -8,9 +8,11 @@ import model.Radius;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class VizierRequest implements Request {
@@ -22,23 +24,30 @@ public class VizierRequest implements Request {
         StringBuilder params = new StringBuilder();
         for (var catalogue : catalogues) {
             for (var table : catalogue.getTables()) {
-                sources.append(table.getName()).append("&");
-                table.getColumns().forEach((k, v) -> params.append(k).append("=").append(v).append("&"));
+                sources.append(URLEncoder.encode(table.getName(), StandardCharsets.UTF_8)).append("&");
+                table.getColumns().forEach((k, v) -> params
+                        .append(URLEncoder.encode(k + "=" + v, StandardCharsets.UTF_8))
+                        .append("&"));
             }
-
         }
+        params.append("&"); // in case no params were added, otherwise double '&' is workable
         if (radiusType == Radius.ARCMIN) {
-            params.append("-c.rm=");
+            params.append(URLEncoder.encode("-c.rm=", StandardCharsets.UTF_8));
         }
         else if (radiusType == Radius.DEG) {
-            params.append("-c.rd=");
+            params.append(URLEncoder.encode("-c.rd=", StandardCharsets.UTF_8));
         }
         else {
-            params.append("-c.rs=");
+            params.append(URLEncoder.encode("-c.rs=", StandardCharsets.UTF_8));
         }
-        params.append(radius);
+        params.append(URLEncoder.encode(radius,StandardCharsets.UTF_8));
 
-        return URI.create(BASE_URL + "-source=" + sources + "-c=" + coordinates + "&" + params);
+        return URI.create(BASE_URL
+                + URLEncoder.encode("-source=", StandardCharsets.UTF_8)
+                + sources
+                + URLEncoder.encode("-c=" + coordinates , StandardCharsets.UTF_8)
+                + "&"
+                + params);
     }
 
     @Override
@@ -47,7 +56,7 @@ public class VizierRequest implements Request {
         var request = HttpRequest.newBuilder(uri).GET().build();
         try {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            FileWriter myWriter = new FileWriter("data.txt");
+            FileWriter myWriter = new FileWriter("vizier_data.txt");
             myWriter.write(response.body());
             myWriter.close();
 
@@ -59,10 +68,16 @@ public class VizierRequest implements Request {
     /**
      * This function is not in interface, because it is specific only for Vizier.
      * Given the input, create URI that allows for further inspection of specified catalogue.
-     * @param catalogueName Input from user
+     * According to the ASU qualifications for VizieR, it is required to decode arguments,
+     * more on https://cdsarc.u-strasbg.fr/doc/asu-summary.htx
+     *
+     * @param catalogueName non-decoded input from user
      * @return URI for further process
      */
     public URI createMetaDataRequest(String catalogueName) {
-        return URI.create(BASE_URL + "-source=" + catalogueName + "&-meta.all");
+        return URI.create(BASE_URL
+                + URLEncoder.encode("-source=" + catalogueName, StandardCharsets.UTF_8)
+                + "&"
+                + URLEncoder.encode("-meta.all", StandardCharsets.UTF_8));
     }
 }

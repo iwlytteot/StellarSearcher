@@ -29,7 +29,7 @@
       </Button>
       <TextField fx:id="inputText" layoutX="130.0" layoutY="286.0" prefHeight="31.0" prefWidth="140.0" promptText="ID or Coordinates" />
       <TextField fx:id="radiusInput" layoutX="284.0" layoutY="286.0" prefHeight="31.0" prefWidth="140.0" promptText="radius" />
-      <Button fx:id="searchButton" layoutX="284.0" layoutY="331.0" mnemonicParsing="false" text="Search">
+      <Button fx:id="searchButton" layoutX="284.0" layoutY="331.0" mnemonicParsing="false" onAction="#searchAction" text="Search">
          <font>
             <Font size="15.0" />
          </font>
