@@ -1,7 +1,10 @@
 package controller;
 
+import controller.http.mast.MastRequest;
 import controller.http.vizier.VizierRequest;
 import javafx.application.Platform;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -140,9 +143,40 @@ public class MainWindowController {
     }
 
     public void searchAction(ActionEvent actionEvent) {
+        if (inputText.getText().isEmpty() || radiusInput.getText().isEmpty()) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Missing input");
+                alert.setContentText("Missing input (Coordinates or radius)");
+                alert.showAndWait();
+            });
+            return;
+        }
+
         if (vizierSearch) {
-            VizierCataloguesWindow vizierCataloguesWindow = vizierLoader.getController();
-            var catalogues = vizierCataloguesWindow.getSelectedCatalogues();
+            if (!vizierSearchTask.isRunning()) {
+                vizierSearchTask.reset();
+            }
+            vizierSearchTask.start();
         }
     }
+
+    private final Service<Void> vizierSearchTask = new Service<>() {
+        @Override
+        protected Task<Void> createTask() {
+            return new Task<>() {
+                @Override
+                protected Void call() {
+                    var vizierService = new VizierRequest();
+
+                    VizierCataloguesWindow vizierCataloguesWindow = vizierLoader.getController();
+                    var catalogues = vizierCataloguesWindow.getSelectedCatalogues();
+
+                    var requestURI = vizierService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
+                    vizierService.sendRequest(requestURI);
+                    return null;
+                }
+            };
+        }
+    };
 }

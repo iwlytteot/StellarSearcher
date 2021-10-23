@@ -13,6 +13,6 @@
         <Label layoutX="372.0" layoutY="72.0" text="Used" />
         <Button layoutX="234.0" layoutY="125.0" mnemonicParsing="false" onAction="#addFilter" text="&gt;&gt;" />
         <Button layoutX="234.0" layoutY="158.0" mnemonicParsing="false" onAction="#removeFilter" text="&lt;&lt;" />
-        <Button fx:id="applyButton" layoutX="227.0" layoutY="251.0" mnemonicParsing="false" text="Apply" />
+        <Button layoutX="227.0" layoutY="251.0" mnemonicParsing="false" text="Apply" onAction="#applyFilter"/>
     </children>
 </AnchorPane>

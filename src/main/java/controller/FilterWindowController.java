@@ -56,6 +56,12 @@ public class FilterWindowController {
         listViewUsed.getItems().removeAll(selected);
     }
 
+    @FXML
+    public void applyFilter(ActionEvent actionEvent) {
+        var stage = (Stage) listViewAvailable.getScene().getWindow();
+        stage.hide();
+    }
+
     private final EventHandler<MouseEvent> eventHandlerAvailable = new EventHandler<>() {
         @Override
         public void handle(MouseEvent event) {
