@@ -19,12 +19,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import model.Catalogue;
 import model.Radius;
 import utils.Tuple;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 public class MainWindowController {
     @FXML
@@ -145,7 +147,7 @@ public class MainWindowController {
     public void searchAction(ActionEvent actionEvent) {
         if (inputText.getText().isEmpty() || radiusInput.getText().isEmpty()) {
             Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
+                Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Missing input");
                 alert.setContentText("Missing input (Coordinates or radius)");
                 alert.showAndWait();
@@ -159,6 +161,13 @@ public class MainWindowController {
             }
             vizierSearchTask.start();
         }
+
+        if (mastSearch) {
+            if (!mastSearchTask.isRunning()) {
+                mastSearchTask.reset();
+            }
+            mastSearchTask.start();
+        }
     }
 
     private final Service<Void> vizierSearchTask = new Service<>() {
@@ -169,8 +178,8 @@ public class MainWindowController {
                 protected Void call() {
                     var vizierService = new VizierRequest();
 
-                    VizierCataloguesWindow vizierCataloguesWindow = vizierLoader.getController();
-                    var catalogues = vizierCataloguesWindow.getSelectedCatalogues();
+                    VizierCataloguesController vizierCataloguesController = vizierLoader.getController();
+                    var catalogues = vizierCataloguesController.getSelectedCatalogues();
 
                     var requestURI = vizierService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
                     vizierService.sendRequest(requestURI);
@@ -179,4 +188,27 @@ public class MainWindowController {
             };
         }
     };
+
+    private final Service<Void> mastSearchTask = new Service<>() {
+        @Override
+        protected Task<Void> createTask() {
+            return new Task<>() {
+                @Override
+                protected Void call() {
+                    var mastService = new MastRequest();
+
+                    MastMissionController mastMissionController = mastLoader.getController();
+                    var catalogue = new Catalogue();
+                    catalogue.setTables(mastMissionController.getSelectedMissions());
+                    var catalogues = new ArrayList<Catalogue>();
+                    catalogues.add(catalogue);
+                    var requestURI = mastService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
+                    mastService.sendRequest(requestURI);
+                    return null;
+                }
+            };
+        }
+    };
+
+
 }

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class VizierCataloguesWindow {
+public class VizierCataloguesController {
     @FXML
     public Button addCatalogueVizierButton;
     @FXML

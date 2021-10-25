@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Catalogue extends Data{
-    ArrayList<Table> tables = new ArrayList<>();
+    List<Table> tables = new ArrayList<>();
 
     public Catalogue() {
     }
@@ -19,11 +19,11 @@ public class Catalogue extends Data{
         setTables(catalogue.getTables());
     }
 
-    public ArrayList<Table> getTables() {
+    public List<Table> getTables() {
         return tables;
     }
 
-    public void setTables(ArrayList<Table> tables) {
+    public void setTables(List<Table> tables) {
         this.tables = tables;
     }
 

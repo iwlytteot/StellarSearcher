@@ -19,6 +19,8 @@ import utils.FxmlCreator;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class MastMissionController {
     @FXML
@@ -81,4 +83,27 @@ public class MastMissionController {
         Platform.runLater(() ->
                 mastMissionList.setItems(FXCollections.observableList(new ArrayList<>(items.keySet())).sorted()));
     }
+
+    public List<Table> getSelectedMissions() {
+        var output = new ArrayList<Table>();
+        var selectedMissions = items.entrySet().stream()
+                .filter(x -> x.getValue().getValue())
+                .map(x -> x.getKey())
+                .collect(Collectors.toList());
+        for (var mission : selectedMissions) {
+            var outMission = new Table(mission);
+            outMission.setColumns(new HashMap<>());
+            if (nodeFilters.containsKey(mission)) {
+                var stage = nodeFilters.get(mission);
+                var controller = (FilterWindowController) stage.getUserData();
+                var temp = controller.getConstraints();
+                var constraints = new HashMap<String, String>();
+                temp.forEach((k, v) -> constraints.put(mission.getColumns().get(k), v));
+                outMission.setColumns(constraints);
+            }
+            output.add(outMission);
+        }
+        return output;
+    }
+
 }
