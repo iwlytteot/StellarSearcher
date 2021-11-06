@@ -24,7 +24,7 @@ public class VizierRequest implements Request {
         StringBuilder params = new StringBuilder();
         for (var catalogue : catalogues) {
             for (var table : catalogue.getTables()) {
-                sources.append(URLEncoder.encode(table.getName(), StandardCharsets.UTF_8)).append("&");
+                sources.append(URLEncoder.encode(table.getName(), StandardCharsets.UTF_8)).append("%20");
                 table.getColumns().forEach((k, v) -> params
                         .append(URLEncoder.encode(k + "=" + v, StandardCharsets.UTF_8))
                         .append("&"));
