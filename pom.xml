@@ -15,9 +15,45 @@
         <maven.compiler.target>15</maven.compiler.target>
         <javafx.version>15.0.1</javafx.version>
         <spring.boot.version>2.5.4</spring.boot.version>
+        <cds.parser.version>2.6</cds.parser.version>
     </properties>
 
+    <!--cds library is not available in mvn repo servers, therefore we need to set it locally in maven
+    http://maven.apache.org/plugins/maven-install-plugin/examples/specific-local-repo.html
+    https://stackoverflow.com/questions/2229757/maven-add-a-dependency-to-a-jar-by-relative-path -->
+    <repositories>
+        <repository>
+            <id>local-repository</id>
+            <url>file://${project.basedir}/libraries</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <dependency>
+            <groupId>cds.savot</groupId>
+            <artifactId>common</artifactId>
+            <version>${cds.parser.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cds.savot</groupId>
+            <artifactId>model</artifactId>
+            <version>${cds.parser.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cds.savot</groupId>
+            <artifactId>pull</artifactId>
+            <version>${cds.parser.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cds.savot</groupId>
+            <artifactId>writer</artifactId>
+            <version>${cds.parser.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>kxml2</groupId>
+            <artifactId>kxml2-min</artifactId>
+            <version>${cds.parser.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
