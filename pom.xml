@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cz.muni.fi</groupId>
-    <artifactId>thesis-tovarys</artifactId>
+    <artifactId>thesis-leotovarys</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
