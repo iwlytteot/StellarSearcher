@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class VizierRequest implements Request {
-    private static final String BASE_URL = "https://vizier.u-strasbg.fr/viz-bin/asu-tsv?";
+    private static final String BASE_URL = "https://vizier.u-strasbg.fr/viz-bin/votable?";
 
     @Override
     public URI createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType) {
