@@ -7,9 +7,9 @@ import model.Radius;
 import java.net.URI;
 import java.util.List;
 
-public class SimbadRequest implements Request {
+public class SimbadService implements Request {
     @Override
-    public URI createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType) {
+    public List<URI> createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType) {
         return null;
     }
 

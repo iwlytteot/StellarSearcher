@@ -1,7 +1,8 @@
 package controller;
 
+import controller.http.mast.MastService;
 import controller.http.mast.MastRequest;
-import controller.http.vizier.VizierRequest;
+import controller.http.vizier.VizierService;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -27,6 +28,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainWindowController {
     @FXML
@@ -176,13 +179,13 @@ public class MainWindowController {
             return new Task<>() {
                 @Override
                 protected Void call() {
-                    var vizierService = new VizierRequest();
+                    var vizierService = new VizierService();
 
                     VizierCataloguesController vizierCataloguesController = vizierLoader.getController();
                     var catalogues = vizierCataloguesController.getSelectedCatalogues();
 
                     var requestURI = vizierService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
-                    vizierService.sendRequest(requestURI);
+                    vizierService.sendRequest(requestURI.get(0));
                     return null;
                 }
             };
@@ -195,20 +198,23 @@ public class MainWindowController {
             return new Task<>() {
                 @Override
                 protected Void call() {
-                    var mastService = new MastRequest();
-
+                    var mastService = new MastService();
                     MastMissionController mastMissionController = mastLoader.getController();
                     var catalogue = new Catalogue();
                     catalogue.setTables(mastMissionController.getSelectedMissions());
                     var catalogues = new ArrayList<Catalogue>();
                     catalogues.add(catalogue);
-                    var requestURI = mastService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
-                    mastService.sendRequest(requestURI);
+                    var requests = mastService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
+
+                    ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+                    for (var request : requests) {
+                        executor.execute(new MastRequest(request));
+                    }
+                    executor.shutdown();
                     return null;
                 }
             };
         }
     };
-
 
 }

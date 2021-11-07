@@ -1,6 +1,7 @@
 package controller.http;
 
 import model.Catalogue;
+import model.CatalogueQueryException;
 import model.Radius;
 
 import java.net.URI;
@@ -19,12 +20,12 @@ public interface Request {
      * @param radiusType type of radius
      * @return URI object
      */
-    URI createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType);
+    List<URI> createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType);
 
     /**
      * Sends request and saves incoming data into "[vizier|simbad|mast]_data.txt" file. Note that
      * this file is being reused; there is no need to keep copies of these files.
-     * @param uri with specified catalogues (tables), radius and parameters
+     * @param request with specified catalogues (tables), radius and parameters
      */
-    void sendRequest(URI uri);
+    void sendRequest(URI request) throws CatalogueQueryException;
 }

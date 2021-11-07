@@ -13,13 +13,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
-public class VizierRequest implements Request {
+public class VizierService implements Request {
     private static final String BASE_URL = "https://vizier.u-strasbg.fr/viz-bin/votable?";
 
     @Override
-    public URI createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType) {
+    public List<URI> createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType) {
         StringBuilder sources = new StringBuilder();
         StringBuilder params = new StringBuilder();
         for (var catalogue : catalogues) {
@@ -42,12 +43,15 @@ public class VizierRequest implements Request {
         }
         params.append(URLEncoder.encode(radius,StandardCharsets.UTF_8));
 
-        return URI.create(BASE_URL
+        var uri = URI.create(BASE_URL
                 + URLEncoder.encode("-source=", StandardCharsets.UTF_8)
                 + sources
                 + URLEncoder.encode("-c=" + coordinates , StandardCharsets.UTF_8)
                 + "&"
                 + params);
+        var output = new ArrayList<URI>();
+        output.add(uri);
+        return output;
     }
 
     @Override

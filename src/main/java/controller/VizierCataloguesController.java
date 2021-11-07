@@ -1,6 +1,6 @@
 package controller;
 
-import controller.http.vizier.VizierRequest;
+import controller.http.vizier.VizierService;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -123,7 +123,7 @@ public class VizierCataloguesController {
             return new Task<>() {
                 @Override
                 protected Void call() {
-                    var requestService = new VizierRequest();
+                    var requestService = new VizierService();
                     var request = requestService.createMetaDataRequest(inputVizierCatalogue.getText());
                     try {
                         requestService.sendRequest(request);

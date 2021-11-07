@@ -1,20 +1,19 @@
 package controller.http.mast;
 
-import controller.http.Request;
-import model.Catalogue;
-import model.Radius;
-
 import java.net.URI;
-import java.util.List;
 
-public class MastRequest implements Request {
-    @Override
-    public URI createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType) {
-        return null;
+public class MastRequest implements Runnable {
+
+    private final URI request;
+    private final MastService mastService = new MastService();
+
+    public MastRequest(URI request) {
+        this.request = request;
     }
 
     @Override
-    public void sendRequest(URI uri) {
-
+    public void run() {
+        mastService.sendRequest(request);
     }
 }
+
