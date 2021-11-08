@@ -3,12 +3,10 @@ package controller;
 import cds.savot.model.*;
 import cds.savot.pull.SavotPullEngine;
 import cds.savot.pull.SavotPullParser;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 
 public class ResultWindowController {
     @FXML
@@ -17,6 +15,25 @@ public class ResultWindowController {
     public void init() {
         SavotPullParser sb = new SavotPullParser("vizier_data.txt", SavotPullEngine.FULL);
         SavotVOTable sv = sb.getVOTable();
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean errorOccured = false;
+        for (var infoItem : sv.getInfos().getItems()) {
+            var info = (SavotInfo) infoItem;
+            if (info.getName().equals("Error")) {
+                errorOccured = true;
+                stringBuilder.append(info.getValue()).append(" ");
+            }
+        }
+        if (errorOccured) {
+            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("There has been an error during retrieving some data");
+                alert.setContentText(stringBuilder.toString());
+                alert.showAndWait();
+            });
+            return;
+        }
         var resources = sv.getResources();
         for (var item : resources.getItems()) {
             var s = (SavotResource) item;

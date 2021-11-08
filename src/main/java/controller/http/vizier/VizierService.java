@@ -42,6 +42,8 @@ public class VizierService implements Request {
             params.append(URLEncoder.encode("-c.rs=", StandardCharsets.UTF_8));
         }
         params.append(URLEncoder.encode(radius,StandardCharsets.UTF_8));
+        params.append("&");
+        params.append("-out.max=unlimited");
 
         var uri = URI.create(BASE_URL
                 + URLEncoder.encode("-source=", StandardCharsets.UTF_8)
