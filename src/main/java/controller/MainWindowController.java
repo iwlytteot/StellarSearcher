@@ -1,11 +1,9 @@
 package controller;
 
-import controller.http.mast.MastService;
 import controller.http.mast.MastRequest;
+import controller.http.mast.MastService;
 import controller.http.vizier.VizierService;
 import javafx.application.Platform;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -28,6 +26,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -63,6 +62,10 @@ public class MainWindowController {
     private FXMLLoader vizierLoader;
     private FXMLLoader mastLoader;
 
+    private final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
+    private final ExecutorService executorWrapper = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
+    private final ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<>(executorWrapper);
+
     public void init() {
         var vizierFXML = initFxml("/VizierCataloguesWindow.fxml", "Vizier catalogues");
         if (vizierFXML != null) {
@@ -82,6 +85,7 @@ public class MainWindowController {
         vizierTableButton.setDisable(true);
         mastTableButton.setDisable(true);
         searchButton.setDisable(true);
+
     }
 
     public void enterVizier(MouseEvent mouseEvent) {
@@ -147,7 +151,7 @@ public class MainWindowController {
         return null;
     }
 
-    public void searchAction(ActionEvent actionEvent) {
+    public void searchAction(ActionEvent actionEvent) throws InterruptedException {
         if (inputText.getText().isEmpty() || radiusInput.getText().isEmpty()) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -158,63 +162,46 @@ public class MainWindowController {
             return;
         }
 
-        if (vizierSearch) {
-            if (!vizierSearchTask.isRunning()) {
-                vizierSearchTask.reset();
-            }
-            vizierSearchTask.start();
-        }
+        int threadCount = 0;
 
         if (mastSearch) {
-            if (!mastSearchTask.isRunning()) {
-                mastSearchTask.reset();
-            }
-            mastSearchTask.start();
+            executorCompletionService.submit(mastTask, null);
+            ++threadCount;
         }
+
+        if (vizierSearch) {
+            executorCompletionService.submit(vizierTask, null);
+            ++threadCount;
+        }
+
+        for (int i = 0; i < threadCount; ++i) {
+            executorCompletionService.take();
+        }
+
+        initFxml("/ResultWindow.fxml", "Results").getSecond().show();
     }
 
-    private final Service<Void> vizierSearchTask = new Service<>() {
-        @Override
-        protected Task<Void> createTask() {
-            return new Task<>() {
-                @Override
-                protected Void call() {
-                    var vizierService = new VizierService();
+    Runnable vizierTask = () -> {
+        var vizierService = new VizierService();
 
-                    VizierCataloguesController vizierCataloguesController = vizierLoader.getController();
-                    var catalogues = vizierCataloguesController.getSelectedCatalogues();
+        VizierCataloguesController vizierCataloguesController = vizierLoader.getController();
+        var catalogues = vizierCataloguesController.getSelectedCatalogues();
 
-                    var requestURI = vizierService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
-                    vizierService.sendRequest(requestURI.get(0));
-                    return null;
-                }
-            };
-        }
+        var requestURI = vizierService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
+        vizierService.sendRequest(requestURI.get(0));
     };
 
-    private final Service<Void> mastSearchTask = new Service<>() {
-        @Override
-        protected Task<Void> createTask() {
-            return new Task<>() {
-                @Override
-                protected Void call() {
-                    var mastService = new MastService();
-                    MastMissionController mastMissionController = mastLoader.getController();
-                    var catalogue = new Catalogue();
-                    catalogue.setTables(mastMissionController.getSelectedMissions());
-                    var catalogues = new ArrayList<Catalogue>();
-                    catalogues.add(catalogue);
-                    var requests = mastService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
+    Runnable mastTask = () -> {
+        var mastService = new MastService();
+        MastMissionController mastMissionController = mastLoader.getController();
+        var catalogue = new Catalogue();
+        catalogue.setTables(mastMissionController.getSelectedMissions());
+        var catalogues = new ArrayList<Catalogue>();
+        catalogues.add(catalogue);
+        var requests = mastService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
 
-                    ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-                    for (var request : requests) {
-                        executor.execute(new MastRequest(request));
-                    }
-                    executor.shutdown();
-                    return null;
-                }
-            };
+        for (var request : requests) {
+            executor.execute(new MastRequest(request));
         }
     };
-
 }
