@@ -25,7 +25,7 @@ public class SimbadService implements Request {
         StringBuilder params = new StringBuilder();
 
         params.append("Ident=").append(URLEncoder.encode(coordinates, StandardCharsets.UTF_8));
-        params.append("&Radius.unit="); // in case no params were added, otherwise double '&' is workable
+        params.append("&Radius.unit=");
         params.append(radiusType.name.replace(" ", ""));
         params.append("&");
         params.append(URLEncoder.encode(radius, StandardCharsets.UTF_8));
