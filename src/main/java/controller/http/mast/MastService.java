@@ -34,7 +34,7 @@ public class MastService implements Request {
         params.append(URLEncoder.encode(coordinates, StandardCharsets.UTF_8));
 
         for (var table : catalogues.get(0).getTables()) {
-            String source = URLEncoder.encode(table.getName(), StandardCharsets.UTF_8) + "/";
+            String source = table.getName() + "/";
             table.getColumns().forEach((k, v) -> params
                     .append(URLEncoder.encode(k, StandardCharsets.UTF_8))
                     .append("=")
@@ -59,8 +59,9 @@ public class MastService implements Request {
             String name = "mast";
             if (matcher.find() && matcher.groupCount() >= 1) {
                 name = matcher.group(1);
+                name = name.replace("/", "_");
             }
-            FileWriter myWriter = new FileWriter(name + ".txt");
+            FileWriter myWriter = new FileWriter("data/" + name + ".txt");
             myWriter.write(response.body());
             myWriter.close();
 
@@ -68,13 +69,4 @@ public class MastService implements Request {
             throw new CatalogueQueryException(e.getMessage());
         }
     }
-
-    public void sendRequest(List<URI> requests) {
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        for (var request : requests) {
-            executor.execute(new MastRequest(request));
-        }
-        executor.shutdown();
-    }
-
 }

@@ -1,5 +1,5 @@
 {
-"name": "hsc ",
+"name": "hst/hsc",
 "info": "Hubble Source Catalog Detailed table",
 "columns": {
 "CatID": "CatID",

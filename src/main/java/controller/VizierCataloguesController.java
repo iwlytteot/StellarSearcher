@@ -133,7 +133,7 @@ public class VizierCataloguesController {
                         return null;
                     }
 
-                    var catOutput = Catalogue.parseMetaData("vizier_data.txt");
+                    var catOutput = Catalogue.parseMetaData("data/vizier_data.txt");
                     for (var catalogue : catOutput) {
                         if (treeView.getRoot().getChildren().stream().anyMatch(e -> e.getValue().getName().equals(catalogue.getName()))) {
                             dialoguePopup("There is already " + catalogue.getName() + " in list", Alert.AlertType.WARNING);

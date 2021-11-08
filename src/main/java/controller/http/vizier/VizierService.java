@@ -62,7 +62,7 @@ public class VizierService implements Request {
         var request = HttpRequest.newBuilder(uri).GET().build();
         try {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            FileWriter myWriter = new FileWriter("vizier_data.txt");
+            FileWriter myWriter = new FileWriter("data/vizier_data.txt");
             myWriter.write(response.body());
             myWriter.close();
 

@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -59,12 +61,16 @@ public class MainWindowController {
     private boolean vizierSearch = false, simbadSearch = false, mastSearch = false;
     private Stage vizierStage;
     private Stage mastStage;
+    private Stage resultStage;
     private FXMLLoader vizierLoader;
     private FXMLLoader mastLoader;
+    private FXMLLoader resultLoader;
+    private final List<String> affectedTables = Collections.synchronizedList(new ArrayList<>());
 
     private final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private final ExecutorService executorWrapper = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private final ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<>(executorWrapper);
+    private int threadCount = 0;
 
     public void init() {
         var vizierFXML = initFxml("/VizierCataloguesWindow.fxml", "Vizier catalogues");
@@ -77,6 +83,11 @@ public class MainWindowController {
         if (mastFXML != null) {
             mastLoader = mastFXML.getFirst();
             mastStage = mastFXML.getSecond();
+        }
+        var resultFXML = initFxml("/ResultWindow.fxml", "Results");
+        if (resultFXML != null) {
+            resultLoader = resultFXML.getFirst();
+            resultStage = resultFXML.getSecond();
         }
 
         radiusBox.getItems().setAll(Radius.values());
@@ -162,8 +173,6 @@ public class MainWindowController {
             return;
         }
 
-        int threadCount = 0;
-
         if (mastSearch) {
             executorCompletionService.submit(mastTask, null);
             ++threadCount;
@@ -177,8 +186,12 @@ public class MainWindowController {
         for (int i = 0; i < threadCount; ++i) {
             executorCompletionService.take();
         }
+        ResultWindowController resultWindowController = resultLoader.getController();
+        resultWindowController.fill(affectedTables);
+        resultStage.show();
 
-        initFxml("/ResultWindow.fxml", "Results").getSecond().show();
+        affectedTables.clear();
+        threadCount = 0;
     }
 
     Runnable vizierTask = () -> {
@@ -189,6 +202,10 @@ public class MainWindowController {
 
         var requestURI = vizierService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
         vizierService.sendRequest(requestURI.get(0));
+
+        synchronized (affectedTables) {
+            affectedTables.add("vizier_data");
+        }
     };
 
     Runnable mastTask = () -> {
@@ -201,7 +218,12 @@ public class MainWindowController {
         var requests = mastService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
 
         for (var request : requests) {
-            executor.execute(new MastRequest(request));
+            executorCompletionService.submit(new MastRequest(request), null);
+            ++threadCount;
+        }
+
+        synchronized (affectedTables) {
+            catalogue.getTables().forEach(t -> affectedTables.add(t.getName().replace("/", "_")));
         }
     };
 }

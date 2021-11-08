@@ -1,5 +1,5 @@
 {
-"name": "hsc_sum",
+"name": "hst/hsc_sum",
 "info": "Hubble Source Catalog Summary table",
 "columns": {
 "MatchID": "matchid",
