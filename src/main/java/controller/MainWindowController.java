@@ -2,6 +2,7 @@ package controller;
 
 import controller.http.mast.MastRequest;
 import controller.http.mast.MastService;
+import controller.http.simbad.SimbadService;
 import controller.http.vizier.VizierService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -183,6 +184,11 @@ public class MainWindowController {
             ++threadCount;
         }
 
+        if (simbadSearch) {
+            executorCompletionService.submit(simbadTask, null);
+            ++threadCount;
+        }
+
         for (int i = 0; i < threadCount; ++i) {
             executorCompletionService.take();
         }
@@ -224,6 +230,17 @@ public class MainWindowController {
 
         synchronized (affectedTables) {
             catalogue.getTables().forEach(t -> affectedTables.add(t.getName().replace("/", "_")));
+        }
+    };
+
+    Runnable simbadTask = () -> {
+        var simbadService = new SimbadService();
+
+        var requestURI = simbadService.createDataRequest(null, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
+        simbadService.sendRequest(requestURI.get(0));
+
+        synchronized (affectedTables) {
+            affectedTables.add("simbad_data");
         }
     };
 }

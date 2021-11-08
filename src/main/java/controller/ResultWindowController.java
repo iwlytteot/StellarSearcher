@@ -53,13 +53,16 @@ public class ResultWindowController {
                     var tableView = new TableView<SavotTR>();
                     for (int i = 0; i < t.getFields().getItemCount(); ++i) {
                         var field = (SavotField) t.getFields().getItemAt(i);
-                        var column = new TableColumn<SavotTR, String>(field.getName());
+                        var column = new TableColumn<SavotTR, String>(field.getDescription());
                         int finalI = i;
                         column.setCellValueFactory(v -> new SimpleStringProperty(v.getValue().getTDs().getContent(finalI)));
                         column.setSortable(false);
                         tableView.getColumns().add(column);
                     }
 
+                    if (t.getData() == null) {
+                        continue;
+                    }
                     var data = t.getData().getTableData();
                     if (data.getTRs().getItems() != null) {
                         for (var trItem : data.getTRs().getItems()) {
