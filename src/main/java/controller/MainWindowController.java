@@ -62,8 +62,8 @@ public class MainWindowController {
     private FXMLLoader vizierLoader;
     private FXMLLoader mastLoader;
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
-    private final ExecutorService executorWrapper = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
+    private final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private final ExecutorService executorWrapper = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private final ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<>(executorWrapper);
 
     public void init() {
