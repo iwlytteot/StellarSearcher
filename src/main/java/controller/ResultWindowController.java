@@ -10,11 +10,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Vector;
-
 public class ResultWindowController {
     @FXML
     public TabPane tabPane;
@@ -30,24 +25,20 @@ public class ResultWindowController {
                 var t = (SavotTable) table;
                 var tableTab = new Tab(t.getName());
 
-                var tableView = new TableView<List<String>>();
+                var tableView = new TableView<SavotTR>();
                 for (int i = 0; i < t.getFields().getItemCount(); ++i) {
                     var field = (SavotField) t.getFields().getItemAt(i);
-                    var column = new TableColumn<List<String>, String>(field.getName());
+                    var column = new TableColumn<SavotTR, String>(field.getName());
                     int finalI = i;
-                    column.setCellValueFactory(v -> new SimpleStringProperty(v.getValue().get(finalI)));
+                    column.setCellValueFactory(v -> new SimpleStringProperty(v.getValue().getTDs().getContent(finalI)));
+                    column.setSortable(false);
                     tableView.getColumns().add(column);
                 }
 
                 var data = t.getData().getTableData();
                 for (var trItem : data.getTRs().getItems()) {
                     var tr = (SavotTR) trItem;
-                    var row = new ArrayList<String>();
-                    for (var td : tr.getTDs().getItems()) {
-                        var f = (SavotTD) td;
-                        row.add(f.getContent());
-                    }
-                    tableView.getItems().addAll(row);
+                    tableView.getItems().add(tr);
                 }
                 tableTab.setContent(tableView);
                 tabPane.getTabs().add(tableTab);
