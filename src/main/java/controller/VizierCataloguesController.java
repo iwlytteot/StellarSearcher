@@ -106,7 +106,7 @@ public class VizierCataloguesController {
                 if (node.getValue() instanceof Table) {
                     if (!nodeFilters.containsKey(node)) {
                         nodeFilters.putIfAbsent(node,
-                                FxmlCreator.create(
+                                FxmlCreator.createFilter(
                                         "Filter window - " + node.getValue().getName(),
                                         (Table) node.getValue()));
                     }

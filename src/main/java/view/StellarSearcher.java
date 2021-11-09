@@ -6,15 +6,17 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import model.Catalogue;
 
 public class StellarSearcher extends Application {
+
+    private MainWindowController mainWindowController;
+
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/MainWindow.fxml"));
         Parent root = loader.load();
 
-        MainWindowController mainWindowController = loader.getController();
+        this.mainWindowController = loader.getController();
         mainWindowController.init();
 
         stage.setTitle("Main window");
@@ -22,6 +24,11 @@ public class StellarSearcher extends Application {
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.show();
+    }
+
+    @Override
+    public void stop() {
+        mainWindowController.exit();
     }
 
     public static void main(String[] args) {
