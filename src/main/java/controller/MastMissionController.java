@@ -35,7 +35,8 @@ public class MastMissionController {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
-            String folderPath = System.getProperty("user.dir") + "\\mast_tables";
+            String folderPath = new File("").getAbsolutePath() + File.separator + "mast_tables";
+
             for (File file : new File(folderPath).listFiles()) {
                 var table = mapper.readValue(file, Table.class);
                 tables.add(table);
