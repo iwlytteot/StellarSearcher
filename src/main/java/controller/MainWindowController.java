@@ -5,9 +5,13 @@ import controller.http.mast.MastService;
 import controller.http.simbad.SimbadService;
 import controller.http.vizier.VizierService;
 import javafx.application.Platform;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -130,7 +134,7 @@ public class MainWindowController {
         searchButton.setDisable(!mastSearch && !simbadSearch && !vizierSearch);
     }
 
-    public void searchAction(ActionEvent actionEvent) throws InterruptedException {
+    public void searchAction(ActionEvent actionEvent) {
         if (inputText.getText().isEmpty() || radiusInput.getText().isEmpty()) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -141,30 +145,13 @@ public class MainWindowController {
             return;
         }
 
-        if (mastSearch) {
-            executorCompletionService.submit(mastTask, null);
-            ++threadCount;
-        }
+        searchButton.getScene().setCursor(Cursor.WAIT);
 
-        if (vizierSearch) {
-            executorCompletionService.submit(vizierTask, null);
-            ++threadCount;
+        if (searchService.getState() != Worker.State.READY) {
+            searchService.cancel();
+            searchService.reset();
         }
-
-        if (simbadSearch) {
-            executorCompletionService.submit(simbadTask, null);
-            ++threadCount;
-        }
-
-        for (int i = 0; i < threadCount; ++i) {
-            executorCompletionService.take();
-        }
-        ResultWindowController resultWindowController = resultLoader.getController();
-        resultWindowController.fill(affectedTables);
-        resultStage.show();
-
-        affectedTables.clear();
-        threadCount = 0;
+        searchService.start();
     }
 
     Runnable vizierTask = () -> {
@@ -208,6 +195,61 @@ public class MainWindowController {
 
         synchronized (affectedTables) {
             affectedTables.add("simbad_data");
+        }
+    };
+
+    private final Service<Void> searchService = new Service<>() {
+        @Override
+        protected Task<Void> createTask() {
+            return new Task<>() {
+                @Override
+                protected Void call() {
+                    if (mastSearch) {
+                        executorCompletionService.submit(mastTask, null);
+                        ++threadCount;
+                    }
+
+                    if (vizierSearch) {
+                        executorCompletionService.submit(vizierTask, null);
+                        ++threadCount;
+                    }
+
+                    if (simbadSearch) {
+                        executorCompletionService.submit(simbadTask, null);
+                        ++threadCount;
+                    }
+
+                    for (int i = 0; i < threadCount; ++i) {
+                        try {
+                            executorCompletionService.take();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    threadCount = 0;
+                    return null;
+                }
+            };
+        }
+        @Override
+        protected void succeeded() {
+            ResultWindowController resultWindowController = resultLoader.getController();
+            resultWindowController.fill(affectedTables);
+            affectedTables.clear();
+
+            searchButton.getScene().setCursor(Cursor.DEFAULT);
+
+            resultStage.show();
+        }
+
+        @Override
+        protected void cancelled() {
+            searchButton.getScene().setCursor(Cursor.DEFAULT);
+        }
+
+        @Override
+        protected void failed() {
+            searchButton.getScene().setCursor(Cursor.DEFAULT);
         }
     };
 }
