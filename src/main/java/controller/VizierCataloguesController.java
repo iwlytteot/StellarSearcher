@@ -134,9 +134,10 @@ public class VizierCataloguesController {
                     }
 
                     var catOutput = Catalogue.parseMetaData("data/vizier_data.txt");
+                    var catTemp = new ArrayList<CheckBoxTreeItem<Data>>();
                     for (var catalogue : catOutput) {
                         if (treeView.getRoot().getChildren().stream().anyMatch(e -> e.getValue().getName().equals(catalogue.getName()))) {
-                            dialoguePopup("There is already " + catalogue.getName() + " in list", Alert.AlertType.WARNING);
+                            //dialoguePopup("There is already " + catalogue.getName() + " in list", Alert.AlertType.WARNING);
                             continue;
                         }
                         CheckBoxTreeItem<Data> catalogueNode = new CheckBoxTreeItem<>(catalogue);
@@ -144,8 +145,9 @@ public class VizierCataloguesController {
                         catalogue.getTables().forEach(e -> temp.add(new CheckBoxTreeItem<>(e)));
                         catalogueNode.getChildren().addAll(temp);
                         catalogueNode.setSelected(true);
-                        Platform.runLater(() -> treeView.getRoot().getChildren().add(catalogueNode));
+                        catTemp.add(catalogueNode);
                     }
+                    Platform.runLater(() -> treeView.getRoot().getChildren().addAll(catTemp));
                     return null;
                 }
             };

@@ -84,6 +84,8 @@ public class VizierService implements Request {
         return URI.create(BASE_URL
                 + URLEncoder.encode("-source=" + catalogueName, StandardCharsets.UTF_8)
                 + "&"
-                + URLEncoder.encode("-meta.all", StandardCharsets.UTF_8));
+                + URLEncoder.encode("-meta.all", StandardCharsets.UTF_8)
+                + "&"
+                + URLEncoder.encode("-meta.max=99999", StandardCharsets.UTF_8));
     }
 }
