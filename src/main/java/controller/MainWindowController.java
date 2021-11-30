@@ -173,6 +173,9 @@ public class MainWindowController {
         MastMissionController mastMissionController = mastLoader.getController();
         var catalogue = new Catalogue();
         catalogue.setTables(mastMissionController.getSelectedMissions());
+        if (catalogue.getTables().isEmpty()) {
+            return;
+        }
         var catalogues = new ArrayList<Catalogue>();
         catalogues.add(catalogue);
         var requests = mastService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
