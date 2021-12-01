@@ -43,6 +43,9 @@ public class ResultWindowController {
                 continue;
             }
             var resources = sv.getResources();
+            if (resources.getItemCount() == 0) {
+                return;
+            }
             for (var item : resources.getItems()) {
                 var s = (SavotResource) item;
                 var tables = s.getTables();
