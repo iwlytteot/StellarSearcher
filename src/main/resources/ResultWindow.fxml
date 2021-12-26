@@ -5,5 +5,5 @@
 
 <AnchorPane prefHeight="700.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ResultWindowController">
     <TabPane fx:id="tabPane" layoutY="27.0" prefHeight="590.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" />
-    <Button layoutX="375.0" layoutY="641.0" mnemonicParsing="false" text="Export" />
+    <Button layoutX="375.0" layoutY="641.0" mnemonicParsing="false" text="Export" onAction="#exportData"/>
 </AnchorPane>

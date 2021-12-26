@@ -71,18 +71,18 @@ public class MainWindowController {
     private int threadCount = 0;
 
     public void init() {
-        var vizierFXML = FxmlCreator.initFxml("/VizierCataloguesWindow.fxml", "Vizier catalogues");
+        var vizierFXML = FxmlCreator.initFxml("/VizierCataloguesWindow.fxml", "Vizier catalogues", true);
         if (vizierFXML != null) {
             vizierLoader = vizierFXML.getFirst();
             vizierStage = vizierFXML.getSecond();
 
         }
-        var mastFXML = FxmlCreator.initFxml("/MastMissionWindow.fxml", "MAST missions");
+        var mastFXML = FxmlCreator.initFxml("/MastMissionWindow.fxml", "MAST missions", true);
         if (mastFXML != null) {
             mastLoader = mastFXML.getFirst();
             mastStage = mastFXML.getSecond();
         }
-        var resultFXML = FxmlCreator.initFxml("/ResultWindow.fxml", "Results");
+        var resultFXML = FxmlCreator.initFxml("/ResultWindow.fxml", "Results", true);
         if (resultFXML != null) {
             resultLoader = resultFXML.getFirst();
             resultStage = resultFXML.getSecond();

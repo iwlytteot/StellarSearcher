@@ -37,13 +37,15 @@ public class FxmlCreator {
         }
         return null;
     }
-    public static Tuple<FXMLLoader, Stage> initFxml(String resourcePath, String stageTitle) {
+    public static Tuple<FXMLLoader, Stage> initFxml(String resourcePath, String stageTitle, boolean init) {
         try {
             FXMLLoader loader = new FXMLLoader(MainWindowController.class.getResource(resourcePath));
             Parent root = loader.load();
 
-            Method initMethod = Class.forName(loader.getController().getClass().getName()).getMethod("init");
-            initMethod.invoke(loader.getController());
+            if (init) {
+                Method initMethod = Class.forName(loader.getController().getClass().getName()).getMethod("init");
+                initMethod.invoke(loader.getController());
+            }
 
             Scene scene = new Scene(root);
             Stage stage = new Stage();
