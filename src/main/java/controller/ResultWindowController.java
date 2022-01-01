@@ -3,10 +3,17 @@ package controller;
 import cds.savot.model.*;
 import cds.savot.pull.SavotPullEngine;
 import cds.savot.pull.SavotPullParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import utils.DataExporter;
+import utils.FxmlCreator;
 
 import java.util.List;
 
@@ -81,6 +88,47 @@ public class ResultWindowController {
             }
         }
 
+
+        for (var tab : tabPane.getTabs()) {
+            var p = (TableView<SavotTR>) tab.getContent();
+            for (var item : p.getColumns()) {
+                //System.out.println(item.getText()); // column name
+            }
+            System.out.println("h");
+            for (var item : p.getItems()) {
+                for (var f : item.getTDSet().getItems()) {
+                    //System.out.println(((SavotTD) f).getContent()); // column value
+                }
+            }
+        }
+
     }
 
+    public void exportData(ActionEvent actionEvent) throws JsonProcessingException {
+        var fxml = FxmlCreator.initFxml("/ExportWindow.fxml", "Export window", false);
+        ExportWindowController exportWindowController = fxml.getFirst().getController();
+        exportWindowController.setProceed(false);
+        fxml.getSecond().showAndWait();
+        if (!exportWindowController.isProceed() || exportWindowController.getSelectedDirectory() == null) {
+            return;
+        }
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule("DataSerial", new Version(1, 0, 0, null, null, null));
+        for (var tab : tabPane.getTabs()) {
+
+        }
+        if (exportWindowController.getMergeCheckBox().isSelected()) {
+
+        }
+        var tab = tabPane.getTabs().get(0);
+        module.addSerializer(Tab.class, new DataExporter());
+        mapper.registerModule(module);
+
+       System.out.println(mapper.writeValueAsString(tab));
+
+
+
+    }
 }
