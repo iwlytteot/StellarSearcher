@@ -12,9 +12,14 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import model.CatalogueQueryException;
+import model.DataWriteException;
 import utils.DataExporter;
 import utils.FxmlCreator;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.http.HttpResponse;
 import java.util.List;
 
 public class ResultWindowController {
@@ -87,21 +92,6 @@ public class ResultWindowController {
                 }
             }
         }
-
-
-        for (var tab : tabPane.getTabs()) {
-            var p = (TableView<SavotTR>) tab.getContent();
-            for (var item : p.getColumns()) {
-                //System.out.println(item.getText()); // column name
-            }
-            System.out.println("h");
-            for (var item : p.getItems()) {
-                for (var f : item.getTDSet().getItems()) {
-                    //System.out.println(((SavotTD) f).getContent()); // column value
-                }
-            }
-        }
-
     }
 
     public void exportData(ActionEvent actionEvent) throws JsonProcessingException {
@@ -116,19 +106,31 @@ public class ResultWindowController {
 
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule("DataSerial", new Version(1, 0, 0, null, null, null));
-        for (var tab : tabPane.getTabs()) {
-
-        }
-        if (exportWindowController.getMergeCheckBox().isSelected()) {
-
-        }
-        var tab = tabPane.getTabs().get(0);
         module.addSerializer(Tab.class, new DataExporter());
         mapper.registerModule(module);
 
-       System.out.println(mapper.writeValueAsString(tab));
+        if (exportWindowController.getMergeCheckBox().isSelected()) {
+            try {
+                FileWriter myWriter = new FileWriter( exportWindowController.getSelectedDirectory().getAbsolutePath() + "/merged_data.txt");
+                for (var tab : tabPane.getTabs()) {
+                    myWriter.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(tab));
+                }
+                myWriter.close();
 
-
-
+            } catch (IOException e) {
+                throw new DataWriteException(e.getMessage());
+            }
+        }
+        else {
+            try {
+                for (var tab : tabPane.getTabs()) {
+                    FileWriter myWriter = new FileWriter(exportWindowController.getSelectedDirectory().getAbsolutePath() + "/" + tab.getText().replace("/", "_") + ".txt");
+                    myWriter.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(tab));
+                    myWriter.close();
+                }
+            } catch (IOException e) {
+                throw new DataWriteException(e.getMessage());
+            }
+        }
     }
 }
