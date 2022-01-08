@@ -160,6 +160,10 @@ public class MainWindowController {
         VizierCataloguesController vizierCataloguesController = vizierLoader.getController();
         var catalogues = vizierCataloguesController.getSelectedCatalogues();
 
+        if (catalogues.isEmpty()) {
+            return;
+        }
+
         var requestURI = vizierService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
         vizierService.sendRequest(requestURI.get(0));
 
