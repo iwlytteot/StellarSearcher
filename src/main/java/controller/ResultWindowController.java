@@ -109,28 +109,14 @@ public class ResultWindowController {
         module.addSerializer(Tab.class, new DataExporter());
         mapper.registerModule(module);
 
-        if (exportWindowController.getMergeCheckBox().isSelected()) {
-            try {
-                FileWriter myWriter = new FileWriter( exportWindowController.getSelectedDirectory().getAbsolutePath() + "/merged_data.txt");
-                for (var tab : tabPane.getTabs()) {
-                    myWriter.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(tab));
-                }
+        try {
+            for (var tab : tabPane.getTabs()) {
+                FileWriter myWriter = new FileWriter(exportWindowController.getSelectedDirectory().getAbsolutePath() + "/" + tab.getText().replace("/", "_") + ".txt");
+                myWriter.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(tab));
                 myWriter.close();
-
-            } catch (IOException e) {
-                throw new DataWriteException(e.getMessage());
             }
-        }
-        else {
-            try {
-                for (var tab : tabPane.getTabs()) {
-                    FileWriter myWriter = new FileWriter(exportWindowController.getSelectedDirectory().getAbsolutePath() + "/" + tab.getText().replace("/", "_") + ".txt");
-                    myWriter.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(tab));
-                    myWriter.close();
-                }
-            } catch (IOException e) {
-                throw new DataWriteException(e.getMessage());
-            }
+        } catch (IOException e) {
+            throw new DataWriteException(e.getMessage());
         }
     }
 }

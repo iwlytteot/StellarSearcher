@@ -14,8 +14,6 @@ import java.io.File;
 public class ExportWindowController {
     @FXML
     public Label directoryLabel;
-    @FXML
-    public CheckBox mergeCheckBox;
 
     private boolean proceed = false;
 
@@ -40,10 +38,6 @@ public class ExportWindowController {
         proceed = true;
         var stage = (Stage) directoryLabel.getScene().getWindow();
         stage.hide();
-    }
-
-    public CheckBox getMergeCheckBox() {
-        return mergeCheckBox;
     }
 
     public boolean isProceed() {
