@@ -34,11 +34,13 @@ public class DataExporter extends StdSerializer<Tab> {
         jsonGenerator.writeStringField("catalogue", tab.getText());
         jsonGenerator.writeObjectField("columns", cols);
 
-        var rows = new ArrayList<String>();
+        var row = new ArrayList<String>();
+        var rows = new ArrayList<ArrayList<String>>();
         for (var value : tableView.getItems()) {
             for (var f : value.getTDSet().getItems()) {
-                rows.add(((SavotTD) f).getContent());
+                row.add(((SavotTD) f).getContent());
             }
+            rows.add(row);
         }
         jsonGenerator.writeObjectField("rows", rows);
         jsonGenerator.writeEndObject();
