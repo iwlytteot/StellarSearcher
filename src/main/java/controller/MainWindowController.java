@@ -139,7 +139,27 @@ public class MainWindowController {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Missing input");
-                alert.setContentText("Missing input (Coordinates or radius)");
+                alert.setContentText("Missing input");
+                alert.showAndWait();
+            });
+            return;
+        }
+        try {
+            var radius= Integer.parseInt(radiusInput.getText());
+            if (radius <= 0) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Wrong radius");
+                    alert.setContentText("Radius must be non negative");
+                    alert.showAndWait();
+                });
+                return;
+            }
+        } catch(NumberFormatException ex) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Missing input");
+                alert.setContentText("Missing input");
                 alert.showAndWait();
             });
             return;

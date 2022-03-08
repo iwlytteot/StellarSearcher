@@ -21,7 +21,6 @@ public class SimbadService implements Request {
     private static final String SUFFIX_URL = "&output.format=VOTable&submit=SIMBAD+search";
     @Override
     public List<URI> createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType) {
-        var s = "http://simbad.u-strasbg.fr/simbad/sim-basic?Ident=100.1+50.1&submit=SIMBAD+search";
         StringBuilder params = new StringBuilder();
 
         params.append("Ident=").append(URLEncoder.encode(coordinates, StandardCharsets.UTF_8));

@@ -7,7 +7,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="447.0" prefWidth="643.0" xmlns="http://javafx.com/javafx/15" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainWindowController">
+<AnchorPane prefHeight="450.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/15" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainWindowController">
    <children>
       <Rectangle fx:id="rectLeft" arcHeight="10.0" arcWidth="10.0" fill="RED" height="120.0" layoutX="76.0" layoutY="90.0" stroke="#85515100" strokeType="INSIDE" strokeWidth="0.0" width="120.0" />
       <Button fx:id="vizierButton" layoutX="82.0" layoutY="96.0" mnemonicParsing="false" onMouseClicked="#enterVizier" prefHeight="108.0" prefWidth="108.0" style="-fx-focus-color: transparent;" text="VizieR">

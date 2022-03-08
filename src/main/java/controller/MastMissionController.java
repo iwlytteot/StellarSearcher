@@ -76,6 +76,10 @@ public class MastMissionController {
         }
     };
 
+    /**
+     *
+     * @param actionEvent
+     */
     public void mButtonAction(ActionEvent actionEvent) {
         for (var entry : items.entrySet()) {
             entry.setValue(new SimpleBooleanProperty(setAll));
