@@ -12,25 +12,33 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import model.CatalogueQueryException;
+import javafx.stage.Stage;
 import model.DataWriteException;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import utils.DataExporter;
-import utils.FxmlCreator;
+import view.event.ExportWindowEvent;
+import view.event.MastWindowEvent;
+import view.handler.ExportWindowEventHandler;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.http.HttpResponse;
 import java.util.List;
 
 @Component
 @FxmlView("/ResultWindow.fxml")
 public class ResultWindowController {
+    private final ConfigurableApplicationContext context;
+    private final ExportWindowEventHandler exportWindowEventHandler;
+    private final ExportWindowController exportWindowController;
     @FXML
     public TabPane tabPane;
 
-    public void init() {
+    public ResultWindowController(ConfigurableApplicationContext context, ExportWindowEventHandler exportWindowEventHandler, ExportWindowController exportWindowController) {
+        this.context = context;
+        this.exportWindowEventHandler = exportWindowEventHandler;
+        this.exportWindowController = exportWindowController;
     }
 
     public void fill(List<String> affectedTables) {
@@ -99,10 +107,11 @@ public class ResultWindowController {
     }
 
     public void exportData(ActionEvent actionEvent) throws JsonProcessingException {
-        var fxml = FxmlCreator.initFxml("/ExportWindow.fxml", "Export window", false);
-        ExportWindowController exportWindowController = fxml.getFirst().getController();
+        if (exportWindowEventHandler.getStage() == null) {
+            context.publishEvent(new ExportWindowEvent(new Stage()));
+        }
         exportWindowController.setProceed(false);
-        fxml.getSecond().showAndWait();
+        exportWindowEventHandler.getStage().showAndWait();
         if (!exportWindowController.isProceed() || exportWindowController.getSelectedDirectory() == null) {
             return;
         }
