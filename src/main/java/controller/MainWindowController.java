@@ -23,9 +23,12 @@ import javafx.stage.Stage;
 import model.Catalogue;
 import model.Radius;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import utils.FxmlCreator;
+import view.event.MainWindowEvent;
+import view.event.VizierWindowEvent;
+import view.handler.VizierWindowEventHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +40,9 @@ import java.util.concurrent.Executors;
 @Component
 @FxmlView("/MainWindow.fxml")
 public class MainWindowController {
+    private ConfigurableApplicationContext context;
+    private VizierWindowEventHandler vizierWindowEventHandler;
+
     @FXML
     public Rectangle rectLeft;
     @FXML
@@ -74,6 +80,11 @@ public class MainWindowController {
     private final ExecutorService executorWrapper = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private final ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<>(executorWrapper);
     private int threadCount = 0;
+
+    public MainWindowController(ConfigurableApplicationContext context, VizierWindowEventHandler vizierWindowEventHandler) {
+        this.context = context;
+        this.vizierWindowEventHandler = vizierWindowEventHandler;
+    }
 
     public void init() {
         var vizierFXML = FxmlCreator.initFxml("/VizierCataloguesWindow.fxml", "Vizier catalogues", true);
@@ -132,7 +143,10 @@ public class MainWindowController {
     }
 
     public void vizierTableButtonAction(ActionEvent actionEvent) {
-        vizierStage.show();
+        if (vizierWindowEventHandler.getStage() == null) {
+            context.publishEvent(new VizierWindowEvent(new Stage()));
+        }
+        vizierWindowEventHandler.getStage().show();
     }
 
     private void SearchButtonCheck() {
