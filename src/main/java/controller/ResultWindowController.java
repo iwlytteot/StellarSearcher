@@ -14,6 +14,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import model.CatalogueQueryException;
 import model.DataWriteException;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.stereotype.Component;
 import utils.DataExporter;
 import utils.FxmlCreator;
 
@@ -22,6 +24,8 @@ import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.List;
 
+@Component
+@FxmlView("/ResultWindow.fxml")
 public class ResultWindowController {
     @FXML
     public TabPane tabPane;
