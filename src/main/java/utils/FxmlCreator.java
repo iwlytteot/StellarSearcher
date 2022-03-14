@@ -37,36 +37,4 @@ public class FxmlCreator {
         }
         return null;
     }
-    public static Tuple<FXMLLoader, Stage> initFxml(String resourcePath, String stageTitle, boolean init) {
-        try {
-            FXMLLoader loader = new FXMLLoader(MainWindowController.class.getResource(resourcePath));
-            Parent root = loader.load();
-
-            if (init) {
-                Method initMethod = Class.forName(loader.getController().getClass().getName()).getMethod("init");
-                initMethod.invoke(loader.getController());
-            }
-
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-
-            stage.initModality(Modality.APPLICATION_MODAL);
-
-            stage.setTitle(stageTitle);
-            stage.setScene(scene);
-            return new Tuple<>(loader, stage);
-        }
-        catch (IOException e) {
-            Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setContentText("Error while loading application. Try restarting application. " +
-                        "In case everything fails, please contact developer");
-                alert.showAndWait();
-            });
-        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }
