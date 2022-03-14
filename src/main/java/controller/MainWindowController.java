@@ -26,8 +26,9 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import utils.FxmlCreator;
-import view.event.MainWindowEvent;
+import view.event.MastWindowEvent;
 import view.event.VizierWindowEvent;
+import view.handler.MastWindowEventHandler;
 import view.handler.VizierWindowEventHandler;
 
 import java.util.ArrayList;
@@ -40,8 +41,9 @@ import java.util.concurrent.Executors;
 @Component
 @FxmlView("/MainWindow.fxml")
 public class MainWindowController {
-    private ConfigurableApplicationContext context;
-    private VizierWindowEventHandler vizierWindowEventHandler;
+    private final ConfigurableApplicationContext context;
+    private final VizierWindowEventHandler vizierWindowEventHandler;
+    private final MastWindowEventHandler mastWindowEventHandler;
 
     @FXML
     public Rectangle rectLeft;
@@ -81,9 +83,10 @@ public class MainWindowController {
     private final ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<>(executorWrapper);
     private int threadCount = 0;
 
-    public MainWindowController(ConfigurableApplicationContext context, VizierWindowEventHandler vizierWindowEventHandler) {
+    public MainWindowController(ConfigurableApplicationContext context, VizierWindowEventHandler vizierWindowEventHandler, MastWindowEventHandler mastWindowEventHandler) {
         this.context = context;
         this.vizierWindowEventHandler = vizierWindowEventHandler;
+        this.mastWindowEventHandler = mastWindowEventHandler;
     }
 
     public void init() {
@@ -139,7 +142,10 @@ public class MainWindowController {
 
 
     public void mastTableButtonAction(ActionEvent actionEvent) {
-        mastStage.show();
+        if (mastWindowEventHandler.getStage() == null) {
+            context.publishEvent(new MastWindowEvent(new Stage()));
+        }
+        mastWindowEventHandler.getStage().show();
     }
 
     public void vizierTableButtonAction(ActionEvent actionEvent) {
