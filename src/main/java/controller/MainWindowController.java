@@ -22,6 +22,9 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import model.Catalogue;
 import model.Radius;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 import utils.FxmlCreator;
 
 import java.util.ArrayList;
@@ -31,6 +34,8 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Component
+@FxmlView("/MainWindow.fxml")
 public class MainWindowController {
     @FXML
     public Rectangle rectLeft;
