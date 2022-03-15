@@ -115,7 +115,7 @@ public class VizierCataloguesController {
                                         "Filter window - " + node.getValue().getName(),
                                         (Table) node.getValue()));
                     }
-                nodeFilters.get(node).show();
+                    nodeFilters.get(node).show();
                 }
             }
         }
