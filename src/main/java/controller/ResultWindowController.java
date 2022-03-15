@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import model.DataWriteException;
+import model.OutputData;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
@@ -31,13 +32,15 @@ public class ResultWindowController {
     private final ConfigurableApplicationContext context;
     private final ExportWindowEventHandler exportWindowEventHandler;
     private final ExportWindowController exportWindowController;
+    private final OutputData outputData;
     @FXML
     public TabPane tabPane;
 
-    public ResultWindowController(ConfigurableApplicationContext context, ExportWindowEventHandler exportWindowEventHandler, ExportWindowController exportWindowController) {
+    public ResultWindowController(ConfigurableApplicationContext context, ExportWindowEventHandler exportWindowEventHandler, ExportWindowController exportWindowController, OutputData outputData) {
         this.context = context;
         this.exportWindowEventHandler = exportWindowEventHandler;
         this.exportWindowController = exportWindowController;
+        this.outputData = outputData;
     }
 
     public void fill(List<String> affectedTables) {
@@ -118,13 +121,14 @@ public class ResultWindowController {
 
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule("DataSerial", new Version(1, 0, 0, null, null, null));
-        module.addSerializer(Tab.class, new DataExporter());
+        module.addSerializer(OutputData.class, new DataExporter());
         mapper.registerModule(module);
 
         try {
             for (var tab : tabPane.getTabs()) {
                 FileWriter myWriter = new FileWriter(exportWindowController.getSelectedDirectory().getAbsolutePath() + "/" + tab.getText().replace("/", "_") + ".txt");
-                myWriter.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(tab));
+                outputData.setTab(tab);
+                myWriter.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(outputData));
                 myWriter.close();
             }
         } catch (IOException e) {

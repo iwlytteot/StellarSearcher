@@ -22,9 +22,11 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import model.Catalogue;
 import model.Radius;
+import model.OutputData;
 import model.Table;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import view.event.MastWindowEvent;
 import view.event.ResultWindowEvent;
@@ -41,6 +43,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Component
+@ComponentScan("model")
 @FxmlView("/MainWindow.fxml")
 public class MainWindowController {
     private final ConfigurableApplicationContext context;
@@ -53,6 +56,7 @@ public class MainWindowController {
     private final ResultWindowController resultWindowController;
 
     private final SesameResolver sesameResolver;
+    private final OutputData outputData;
 
     @FXML
     public Rectangle rectLeft;
@@ -86,7 +90,10 @@ public class MainWindowController {
     private final ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<>(executorWrapper);
     private int threadCount = 0;
 
-    public MainWindowController(ConfigurableApplicationContext context, VizierWindowEventHandler vizierWindowEventHandler, MastWindowEventHandler mastWindowEventHandler, ResultWindowEventHandler resultWindowEventHandler, VizierCataloguesController vizierCataloguesController, MastMissionController mastMissionController, ResultWindowController resultWindowController, SesameResolver sesameResolver) {
+    public MainWindowController(ConfigurableApplicationContext context, VizierWindowEventHandler vizierWindowEventHandler,
+                                MastWindowEventHandler mastWindowEventHandler, ResultWindowEventHandler resultWindowEventHandler,
+                                VizierCataloguesController vizierCataloguesController, MastMissionController mastMissionController,
+                                ResultWindowController resultWindowController, SesameResolver sesameResolver, OutputData outputData) {
         this.context = context;
         this.vizierWindowEventHandler = vizierWindowEventHandler;
         this.mastWindowEventHandler = mastWindowEventHandler;
@@ -95,6 +102,7 @@ public class MainWindowController {
         this.mastMissionController = mastMissionController;
         this.resultWindowController = resultWindowController;
         this.sesameResolver = sesameResolver;
+        this.outputData = outputData;
     }
 
     @FXML
@@ -181,6 +189,10 @@ public class MainWindowController {
             });
             return;
         }
+
+        outputData.setInput(inputText.getText());
+        outputData.setRadius(radiusInput.getText());
+        outputData.setRadiusType(radiusBox.getValue().name);
 
         searchButton.getScene().setCursor(Cursor.WAIT);
 

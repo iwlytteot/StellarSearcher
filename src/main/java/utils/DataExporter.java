@@ -5,25 +5,33 @@ import cds.savot.model.SavotTR;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
+import model.OutputData;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class DataExporter extends StdSerializer<Tab> {
+@Component
+public class DataExporter extends StdSerializer<OutputData> {
 
     public DataExporter() {
         this(null);
     }
 
-    public DataExporter(Class<Tab> data) {
+    public DataExporter(Class<OutputData> data) {
         super(data);
     }
 
     @Override
-    public void serialize(Tab tab, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    public void serialize(OutputData outputData, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
+
+        jsonGenerator.writeStringField("input", outputData.getInput());
+        jsonGenerator.writeStringField("radius", outputData.getRadius());
+        jsonGenerator.writeStringField("radius_type", outputData.getRadiusType());
+
+        var tab = outputData.getTab();
 
         var tableView = (TableView<SavotTR>) tab.getContent();
         var cols = new ArrayList<String>();
@@ -43,6 +51,7 @@ public class DataExporter extends StdSerializer<Tab> {
             rows.add(row);
         }
         jsonGenerator.writeObjectField("rows", rows);
+
         jsonGenerator.writeEndObject();
     }
 }
