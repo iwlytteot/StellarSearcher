@@ -10,7 +10,6 @@ import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -22,7 +21,16 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import model.Catalogue;
 import model.Radius;
-import utils.FxmlCreator;
+import model.Table;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.stereotype.Component;
+import view.event.MastWindowEvent;
+import view.event.ResultWindowEvent;
+import view.event.VizierWindowEvent;
+import view.handler.MastWindowEventHandler;
+import view.handler.ResultWindowEventHandler;
+import view.handler.VizierWindowEventHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +39,18 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Component
+@FxmlView("/MainWindow.fxml")
 public class MainWindowController {
+    private final ConfigurableApplicationContext context;
+    private final VizierWindowEventHandler vizierWindowEventHandler;
+    private final MastWindowEventHandler mastWindowEventHandler;
+    private final ResultWindowEventHandler resultWindowEventHandler;
+
+    private final VizierCataloguesController vizierCataloguesController;
+    private final MastMissionController mastMissionController;
+    private final ResultWindowController resultWindowController;
+
     @FXML
     public Rectangle rectLeft;
     @FXML
@@ -58,36 +77,24 @@ public class MainWindowController {
     public TextField radiusInput;
 
     private boolean vizierSearch = false, simbadSearch = false, mastSearch = false;
-    private Stage vizierStage;
-    private Stage mastStage;
-    private Stage resultStage;
-    private FXMLLoader vizierLoader;
-    private FXMLLoader mastLoader;
-    private FXMLLoader resultLoader;
     private final List<String> affectedTables = Collections.synchronizedList(new ArrayList<>());
 
     private final ExecutorService executorWrapper = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private final ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<>(executorWrapper);
     private int threadCount = 0;
 
-    public void init() {
-        var vizierFXML = FxmlCreator.initFxml("/VizierCataloguesWindow.fxml", "Vizier catalogues", true);
-        if (vizierFXML != null) {
-            vizierLoader = vizierFXML.getFirst();
-            vizierStage = vizierFXML.getSecond();
+    public MainWindowController(ConfigurableApplicationContext context, VizierWindowEventHandler vizierWindowEventHandler, MastWindowEventHandler mastWindowEventHandler, ResultWindowEventHandler resultWindowEventHandler, VizierCataloguesController vizierCataloguesController, MastMissionController mastMissionController, ResultWindowController resultWindowController) {
+        this.context = context;
+        this.vizierWindowEventHandler = vizierWindowEventHandler;
+        this.mastWindowEventHandler = mastWindowEventHandler;
+        this.resultWindowEventHandler = resultWindowEventHandler;
+        this.vizierCataloguesController = vizierCataloguesController;
+        this.mastMissionController = mastMissionController;
+        this.resultWindowController = resultWindowController;
+    }
 
-        }
-        var mastFXML = FxmlCreator.initFxml("/MastMissionWindow.fxml", "MAST missions", true);
-        if (mastFXML != null) {
-            mastLoader = mastFXML.getFirst();
-            mastStage = mastFXML.getSecond();
-        }
-        var resultFXML = FxmlCreator.initFxml("/ResultWindow.fxml", "Results", true);
-        if (resultFXML != null) {
-            resultLoader = resultFXML.getFirst();
-            resultStage = resultFXML.getSecond();
-        }
-
+    @FXML
+    public void initialize() {
         radiusBox.getItems().setAll(Radius.values());
         radiusBox.getSelectionModel().select(Radius.ARCMIN);
 
@@ -123,11 +130,17 @@ public class MainWindowController {
 
 
     public void mastTableButtonAction(ActionEvent actionEvent) {
-        mastStage.show();
+        if (mastWindowEventHandler.getStage() == null) {
+            context.publishEvent(new MastWindowEvent(new Stage()));
+        }
+        mastWindowEventHandler.getStage().show();
     }
 
     public void vizierTableButtonAction(ActionEvent actionEvent) {
-        vizierStage.show();
+        if (vizierWindowEventHandler.getStage() == null) {
+            context.publishEvent(new VizierWindowEvent(new Stage()));
+        }
+        vizierWindowEventHandler.getStage().show();
     }
 
     private void SearchButtonCheck() {
@@ -174,11 +187,17 @@ public class MainWindowController {
         searchService.start();
     }
 
+    private List<Catalogue> getVizierCatalogues() {
+        return vizierCataloguesController.getSelectedCatalogues();
+    }
+
+    private List<Table> getMastMissions() {
+        return mastMissionController.getSelectedMissions();
+    }
+
     Runnable vizierTask = () -> {
         var vizierService = new VizierService();
-
-        VizierCataloguesController vizierCataloguesController = vizierLoader.getController();
-        var catalogues = vizierCataloguesController.getSelectedCatalogues();
+        var catalogues = getVizierCatalogues();
 
         if (catalogues.isEmpty()) {
             return;
@@ -194,9 +213,8 @@ public class MainWindowController {
 
     Runnable mastTask = () -> {
         var mastService = new MastService();
-        MastMissionController mastMissionController = mastLoader.getController();
         var catalogue = new Catalogue();
-        catalogue.setTables(mastMissionController.getSelectedMissions());
+        catalogue.setTables(getMastMissions());
         if (catalogue.getTables().isEmpty()) {
             return;
         }
@@ -260,13 +278,15 @@ public class MainWindowController {
         }
         @Override
         protected void succeeded() {
-            ResultWindowController resultWindowController = resultLoader.getController();
+            if (resultWindowEventHandler.getStage() == null) {
+                context.publishEvent(new ResultWindowEvent(new Stage()));
+            }
             resultWindowController.fill(affectedTables);
             affectedTables.clear();
 
             searchButton.getScene().setCursor(Cursor.DEFAULT);
 
-            resultStage.show();
+            resultWindowEventHandler.getStage().show();
         }
 
         @Override

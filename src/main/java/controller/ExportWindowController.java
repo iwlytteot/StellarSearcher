@@ -4,13 +4,16 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 
+@Component
+@FxmlView("/ExportWindow.fxml")
 public class ExportWindowController {
     @FXML
     public Label directoryLabel;

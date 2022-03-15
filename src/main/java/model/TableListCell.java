@@ -1,10 +1,8 @@
 package model;
 
 import javafx.beans.value.ObservableValue;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 
 public class TableListCell extends CheckBoxListCell<Table> {

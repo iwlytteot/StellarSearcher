@@ -12,13 +12,20 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import model.*;
+import model.Catalogue;
+import model.CatalogueQueryException;
+import model.Data;
+import model.Table;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.stereotype.Component;
 import utils.FxmlCreator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Component
+@FxmlView("/VizierCataloguesWindow.fxml")
 public class VizierCataloguesController {
     @FXML
     public Button addCatalogueVizierButton;
@@ -62,7 +69,8 @@ public class VizierCataloguesController {
         return output;
     }
 
-    public void init () {
+    @FXML
+    public void initialize () {
         CheckBoxTreeItem<Data> root = new CheckBoxTreeItem<>(new Catalogue());
         treeView.setRoot(root);
         treeView.setShowRoot(false);
@@ -110,7 +118,7 @@ public class VizierCataloguesController {
                                         "Filter window - " + node.getValue().getName(),
                                         (Table) node.getValue()));
                     }
-                nodeFilters.get(node).show();
+                    nodeFilters.get(node).show();
                 }
             }
         }

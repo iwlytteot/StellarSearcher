@@ -14,6 +14,8 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Table;
 import model.TableListCell;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.stereotype.Controller;
 import utils.FxmlCreator;
 
 import java.io.File;
@@ -22,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Controller
+@FxmlView("/MastMissionWindow.fxml")
 public class MastMissionController {
     @FXML
     public ListView<Table> mastMissionList;
@@ -30,7 +34,8 @@ public class MastMissionController {
     private final HashMap<Table, Stage> nodeFilters = new HashMap<>();
     private boolean setAll = true;
 
-    public void init() {
+    @FXML
+    public void initialize() {
         var tables = new ArrayList<Table>();
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -76,10 +81,6 @@ public class MastMissionController {
         }
     };
 
-    /**
-     *
-     * @param actionEvent
-     */
     public void mButtonAction(ActionEvent actionEvent) {
         for (var entry : items.entrySet()) {
             entry.setValue(new SimpleBooleanProperty(setAll));
