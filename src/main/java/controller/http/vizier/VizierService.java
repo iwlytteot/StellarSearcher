@@ -27,7 +27,9 @@ public class VizierService implements Request {
             for (var table : catalogue.getTables()) {
                 sources.append(URLEncoder.encode(table.getName(), StandardCharsets.UTF_8)).append("%20");
                 table.getColumns().forEach((k, v) -> params
-                        .append(URLEncoder.encode(k + "=" + v, StandardCharsets.UTF_8))
+                        .append(URLEncoder.encode(k, StandardCharsets.UTF_8))
+                        .append("=")
+                        .append(URLEncoder.encode(v, StandardCharsets.UTF_8))
                         .append("&"));
             }
         }
