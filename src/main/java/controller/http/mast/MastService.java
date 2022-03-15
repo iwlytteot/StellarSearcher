@@ -15,8 +15,6 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,15 +24,16 @@ public class MastService implements Request {
 
     public List<URI> createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType) {
         var output = new ArrayList<URI>();
-        StringBuilder params = new StringBuilder();
-        params.append("&radius=");
-        params.append(URLEncoder.encode(radius, StandardCharsets.UTF_8));
+        StringBuilder base = new StringBuilder();
 
-        params.append("&target=");
-        params.append(URLEncoder.encode(coordinates, StandardCharsets.UTF_8));
+        base.append("&radius=");
+        base.append(URLEncoder.encode(radius, StandardCharsets.UTF_8));
+        base.append("&target=");
+        base.append(URLEncoder.encode(coordinates, StandardCharsets.UTF_8));
 
         for (var table : catalogues.get(0).getTables()) {
             String source = table.getName() + "/";
+            StringBuilder params = new StringBuilder();
             table.getColumns().forEach((k, v) -> params
                     .append(URLEncoder.encode(k, StandardCharsets.UTF_8))
                     .append("=")
@@ -43,6 +42,8 @@ public class MastService implements Request {
             output.add(URI.create(BASE_URL
                 + source
                 + BASE_PARAMS
+                + base
+                + "&"
                 + params));
         }
         return output;
