@@ -1,5 +1,6 @@
 package controller;
 
+import controller.http.SesameResolver;
 import controller.http.mast.MastRequest;
 import controller.http.mast.MastService;
 import controller.http.simbad.SimbadService;
@@ -51,6 +52,8 @@ public class MainWindowController {
     private final MastMissionController mastMissionController;
     private final ResultWindowController resultWindowController;
 
+    private final SesameResolver sesameResolver;
+
     @FXML
     public Rectangle rectLeft;
     @FXML
@@ -83,7 +86,7 @@ public class MainWindowController {
     private final ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<>(executorWrapper);
     private int threadCount = 0;
 
-    public MainWindowController(ConfigurableApplicationContext context, VizierWindowEventHandler vizierWindowEventHandler, MastWindowEventHandler mastWindowEventHandler, ResultWindowEventHandler resultWindowEventHandler, VizierCataloguesController vizierCataloguesController, MastMissionController mastMissionController, ResultWindowController resultWindowController) {
+    public MainWindowController(ConfigurableApplicationContext context, VizierWindowEventHandler vizierWindowEventHandler, MastWindowEventHandler mastWindowEventHandler, ResultWindowEventHandler resultWindowEventHandler, VizierCataloguesController vizierCataloguesController, MastMissionController mastMissionController, ResultWindowController resultWindowController, SesameResolver sesameResolver) {
         this.context = context;
         this.vizierWindowEventHandler = vizierWindowEventHandler;
         this.mastWindowEventHandler = mastWindowEventHandler;
@@ -91,6 +94,7 @@ public class MainWindowController {
         this.vizierCataloguesController = vizierCataloguesController;
         this.mastMissionController = mastMissionController;
         this.resultWindowController = resultWindowController;
+        this.sesameResolver = sesameResolver;
     }
 
     @FXML
@@ -232,10 +236,15 @@ public class MainWindowController {
         }
     };
 
+    private String getResolvedInput(String input) {
+        return sesameResolver.resolve(input);
+    }
+
     Runnable simbadTask = () -> {
         var simbadService = new SimbadService();
+        var resolvedInput = getResolvedInput(inputText.getText());
 
-        var requestURI = simbadService.createDataRequest(null, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
+        var requestURI = simbadService.createDataRequest(null, resolvedInput, radiusInput.getText(), radiusBox.getValue());
         simbadService.sendRequest(requestURI.get(0));
 
         synchronized (affectedTables) {

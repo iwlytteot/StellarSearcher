@@ -17,20 +17,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SimbadService implements Request {
-    private static final String BASE_URL = "http://simbad.u-strasbg.fr/simbad/sim-basic?";
-    private static final String SUFFIX_URL = "&output.format=VOTable&submit=SIMBAD+search";
+    private static final String BASE_URL = "http://simbad.u-strasbg.fr/simbad/sim-coo?";
+    private static final String SUFFIX_URL = "&output.format=VOTable";
     @Override
     public List<URI> createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType) {
         StringBuilder params = new StringBuilder();
 
-        params.append("Ident=").append(URLEncoder.encode(coordinates, StandardCharsets.UTF_8));
+        params.append("Coord=").append(URLEncoder.encode(coordinates, StandardCharsets.UTF_8));
         params.append("&Radius.unit=");
         params.append(radiusType.name.replace(" ", ""));
         params.append("&");
+        params.append("Radius=");
         params.append(URLEncoder.encode(radius, StandardCharsets.UTF_8));
 
         var uri = URI.create(BASE_URL
-            + params.toString()
+            + params
             + SUFFIX_URL);
         var output = new ArrayList<URI>();
         output.add(uri);
