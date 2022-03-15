@@ -1,19 +1,13 @@
 package utils;
 
 import controller.FilterWindowController;
-import controller.MainWindowController;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Table;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public class FxmlCreator {
     public static Stage createFilter(String stageTitle, Table table) {

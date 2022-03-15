@@ -19,7 +19,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import utils.DataExporter;
 import view.event.ExportWindowEvent;
-import view.event.MastWindowEvent;
 import view.handler.ExportWindowEventHandler;
 
 import java.io.FileWriter;
