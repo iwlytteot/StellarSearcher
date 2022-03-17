@@ -21,10 +21,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import model.Catalogue;
-import model.Radius;
-import model.OutputData;
-import model.Table;
+import model.*;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
@@ -38,6 +35,7 @@ import view.handler.VizierWindowEventHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -217,6 +215,10 @@ public class MainWindowController {
         return sesameResolver.resolve(input);
     }
 
+    private UserInput getUserInput() {
+        return new UserInput(inputText.getText(), radiusInput.getText(), radiusBox.getValue());
+    }
+
     private final Service<List<List<String>>> searchService = new Service<>() {
         @Override
         protected Task<List<List<String>>> createTask() {
@@ -269,8 +271,9 @@ public class MainWindowController {
                 context.publishEvent(new ResultWindowEvent(new Stage()));
             }
             var flatList = searchService.getValue().stream().flatMap(List::stream).collect(Collectors.toList());
-            resultWindowController.fill(flatList);
-            affectedTables.clear();
+            var result = new HashMap<UserInput, List<String>>();
+            result.put(getUserInput(), flatList);
+            resultWindowController.fill(result);
 
             searchButton.getScene().setCursor(Cursor.DEFAULT);
 

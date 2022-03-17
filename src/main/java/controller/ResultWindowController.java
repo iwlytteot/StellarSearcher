@@ -15,6 +15,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import model.DataWriteException;
 import model.OutputData;
+import model.UserInput;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 
 @Component
@@ -45,68 +47,74 @@ public class ResultWindowController {
         this.outputData = outputData;
     }
 
-    public void fill(List<String> output) {
+    public void fill(HashMap<UserInput, List<String>> output) {
         tabPane.getTabs().clear();
 
-        for (var singleTable : output) {
-            SavotPullParser sb = new SavotPullParser(new ByteArrayInputStream(singleTable.getBytes(StandardCharsets.UTF_8)), SavotPullEngine.FULL, "UTF-8");
-            SavotVOTable sv = sb.getVOTable();
-            StringBuilder stringBuilder = new StringBuilder();
-            if (sv.getInfos() != null && sv.getInfos().getItems() != null) {
-                for (var infoItem : sv.getInfos().getItems()) {
-                    var info = (SavotInfo) infoItem;
-                    if (info.getName().equals("Error")) {
-                        stringBuilder.append(info.getValue()).append(" ");
-                    }
-                }
-            }
-            if (!stringBuilder.isEmpty()) {
-                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("There has been an error during retrieving some data");
-                    alert.setContentText(stringBuilder.toString());
-                    alert.showAndWait();
-                });
-                continue;
-            }
-            var resources = sv.getResources();
-            if (resources.getItemCount() == 0) {
-                return;
-            }
-            for (var item : resources.getItems()) {
-                var s = (SavotResource) item;
-                var tables = s.getTables();
-                for (var table : tables.getItems()) {
-                    var t = (SavotTable) table;
-                    var tableTab = new Tab(t.getName());
-
-                    var tableView = new TableView<SavotTR>();
-                    for (int i = 0; i < t.getFields().getItemCount(); ++i) {
-                        var field = (SavotField) t.getFields().getItemAt(i);
-                        var column = new TableColumn<SavotTR, String>(field.getDescription());
-                        int finalI = i;
-                        column.setCellValueFactory(v -> new SimpleStringProperty(v.getValue().getTDs().getContent(finalI)));
-                        column.setSortable(false);
-                        tableView.getColumns().add(column);
-                    }
-
-                    if (t.getData() == null) {
-                        continue;
-                    }
-                    var data = t.getData().getTableData();
-                    if (data.getTRs().getItems() != null) {
-                        for (var trItem : data.getTRs().getItems()) {
-                            var tr = (SavotTR) trItem;
-                            tableView.getItems().add(tr);
+        for (var entry : output.entrySet()) {
+            var inputTab = new Tab(entry.getKey().toString());
+            var inputPane = new TabPane();
+            for (var singleTable : entry.getValue()) {
+                SavotPullParser sb = new SavotPullParser(new ByteArrayInputStream(singleTable.getBytes(StandardCharsets.UTF_8)), SavotPullEngine.FULL, "UTF-8");
+                SavotVOTable sv = sb.getVOTable();
+                StringBuilder stringBuilder = new StringBuilder();
+                if (sv.getInfos() != null && sv.getInfos().getItems() != null) {
+                    for (var infoItem : sv.getInfos().getItems()) {
+                        var info = (SavotInfo) infoItem;
+                        if (info.getName().equals("Error")) {
+                            stringBuilder.append(info.getValue()).append(" ");
                         }
                     }
-                    if (!tableView.getItems().isEmpty()) {
-                        tableTab.setContent(tableView);
-                        tabPane.getTabs().add(tableTab);
+                }
+                if (!stringBuilder.isEmpty()) {
+                    stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("There has been an error during retrieving some data");
+                        alert.setContentText(stringBuilder.toString());
+                        alert.showAndWait();
+                    });
+                    continue;
+                }
+                var resources = sv.getResources();
+                if (resources.getItemCount() == 0) {
+                    return;
+                }
+                for (var item : resources.getItems()) {
+                    var s = (SavotResource) item;
+                    var tables = s.getTables();
+                    for (var table : tables.getItems()) {
+                        var t = (SavotTable) table;
+                        var tableTab = new Tab(t.getName());
+
+                        var tableView = new TableView<SavotTR>();
+                        for (int i = 0; i < t.getFields().getItemCount(); ++i) {
+                            var field = (SavotField) t.getFields().getItemAt(i);
+                            var column = new TableColumn<SavotTR, String>(field.getDescription());
+                            int finalI = i;
+                            column.setCellValueFactory(v -> new SimpleStringProperty(v.getValue().getTDs().getContent(finalI)));
+                            column.setSortable(false);
+                            tableView.getColumns().add(column);
+                        }
+
+                        if (t.getData() == null) {
+                            continue;
+                        }
+                        var data = t.getData().getTableData();
+                        if (data.getTRs().getItems() != null) {
+                            for (var trItem : data.getTRs().getItems()) {
+                                var tr = (SavotTR) trItem;
+                                tableView.getItems().add(tr);
+                            }
+                        }
+                        if (!tableView.getItems().isEmpty()) {
+                            tableTab.setContent(tableView);
+                            inputPane.getTabs().add(tableTab);
+                        }
                     }
                 }
             }
+            inputTab.setContent(inputPane);
+            tabPane.getTabs().add(inputTab);
         }
     }
 
