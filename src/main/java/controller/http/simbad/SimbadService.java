@@ -37,20 +37,4 @@ public class SimbadService implements Request {
         output.add(uri);
         return output;
     }
-
-    @Override
-    public String sendRequest(URI uri) {
-        var client = HttpClient.newHttpClient();
-        var request = HttpRequest.newBuilder(uri).GET().build();
-        try {
-            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            FileWriter myWriter = new FileWriter("data/simbad_data.txt");
-            myWriter.write(response.body());
-            myWriter.close();
-
-        } catch (IOException | InterruptedException e) {
-            throw new CatalogueQueryException(e.getMessage());
-        }
-        return "";
-    }
 }

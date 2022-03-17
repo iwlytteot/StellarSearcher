@@ -57,19 +57,6 @@ public class VizierService implements Request {
         return output;
     }
 
-    @Override
-    public String sendRequest(URI uri) throws CatalogueQueryException {
-        var client = HttpClient.newHttpClient();
-        var request = HttpRequest.newBuilder(uri).GET().build();
-        try {
-            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.body();
-
-        } catch (IOException | InterruptedException e) {
-            throw new CatalogueQueryException(e.getMessage());
-        }
-    }
-
     /**
      * This function is not in interface, because it is specific only for Vizier.
      * Given the input, create URI that allows for further inspection of specified catalogue.
