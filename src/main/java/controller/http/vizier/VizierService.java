@@ -4,6 +4,7 @@ import controller.http.Request;
 import model.Catalogue;
 import model.CatalogueQueryException;
 import model.Radius;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class VizierService implements Request {
     private static final String BASE_URL = "https://vizier.u-strasbg.fr/viz-bin/votable?";
 

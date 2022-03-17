@@ -24,7 +24,6 @@ import utils.FxmlCreator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Future;
 
 @Component
 @FxmlView("/VizierCataloguesWindow.fxml")

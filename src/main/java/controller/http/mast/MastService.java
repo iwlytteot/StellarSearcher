@@ -4,6 +4,7 @@ import controller.http.Request;
 import model.Catalogue;
 import model.CatalogueQueryException;
 import model.Radius;
+import org.springframework.stereotype.Component;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public class MastService implements Request {
     private static final String BASE_URL = "https://archive.stsci.edu/";
     private static final String BASE_PARAMS = "search.php?action=Search&outputformat=VOTable&";

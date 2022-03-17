@@ -4,6 +4,7 @@ import controller.http.Request;
 import model.Catalogue;
 import model.CatalogueQueryException;
 import model.Radius;
+import org.springframework.stereotype.Component;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class SimbadService implements Request {
     private static final String BASE_URL = "http://simbad.u-strasbg.fr/simbad/sim-coo?";
     private static final String SUFFIX_URL = "&output.format=VOTable";

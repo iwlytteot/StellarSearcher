@@ -20,6 +20,10 @@ public class Table extends Data {
     public Table() {
     }
 
+    public Table(String name) {
+        setName(name);
+    }
+
     public Table(Table table) {
         setName(table.getName());
         setInfo(table.getInfo());
