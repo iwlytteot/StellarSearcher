@@ -50,7 +50,7 @@ public class MastService implements Request {
     }
 
     @Override
-    public void sendRequest(URI uri) throws CatalogueQueryException {
+    public String sendRequest(URI uri) throws CatalogueQueryException {
         var client = HttpClient.newHttpClient();
         var request = HttpRequest.newBuilder(uri).GET().build();
         try {
@@ -69,5 +69,6 @@ public class MastService implements Request {
         } catch (IOException | InterruptedException e) {
             throw new CatalogueQueryException(e.getMessage());
         }
+        return "";
     }
 }

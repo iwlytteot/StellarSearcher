@@ -5,7 +5,6 @@ import model.Catalogue;
 import model.CatalogueQueryException;
 import model.Radius;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -59,14 +58,12 @@ public class VizierService implements Request {
     }
 
     @Override
-    public void sendRequest(URI uri) throws CatalogueQueryException {
+    public String sendRequest(URI uri) throws CatalogueQueryException {
         var client = HttpClient.newHttpClient();
         var request = HttpRequest.newBuilder(uri).GET().build();
         try {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            FileWriter myWriter = new FileWriter("data/vizier_data.txt");
-            myWriter.write(response.body());
-            myWriter.close();
+            return response.body();
 
         } catch (IOException | InterruptedException e) {
             throw new CatalogueQueryException(e.getMessage());

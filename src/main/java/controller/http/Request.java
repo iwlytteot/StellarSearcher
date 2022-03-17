@@ -27,5 +27,5 @@ public interface Request {
      * this file is being reused; there is no need to keep copies of these files.
      * @param request with specified catalogues (tables), radius and parameters
      */
-    void sendRequest(URI request) throws CatalogueQueryException;
+    String sendRequest(URI request) throws CatalogueQueryException;
 }

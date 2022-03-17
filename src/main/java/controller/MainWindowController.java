@@ -1,5 +1,6 @@
 package controller;
 
+import controller.http.GetDataTask;
 import controller.http.SesameResolver;
 import controller.http.mast.MastRequest;
 import controller.http.mast.MastService;
@@ -38,9 +39,7 @@ import view.handler.VizierWindowEventHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 @Component
 @ComponentScan("model")
@@ -87,7 +86,7 @@ public class MainWindowController {
     private final List<String> affectedTables = Collections.synchronizedList(new ArrayList<>());
 
     private final ExecutorService executorWrapper = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    private final ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<>(executorWrapper);
+    private final ExecutorCompletionService<List<String>> executorCompletionService = new ExecutorCompletionService<>(executorWrapper);
     private int threadCount = 0;
 
     public MainWindowController(ConfigurableApplicationContext context, VizierWindowEventHandler vizierWindowEventHandler,
@@ -196,6 +195,8 @@ public class MainWindowController {
 
         searchButton.getScene().setCursor(Cursor.WAIT);
 
+
+
         if (searchService.getState() != Worker.State.READY) {
             searchService.cancel();
             searchService.reset();
@@ -269,14 +270,16 @@ public class MainWindowController {
         protected Task<Void> createTask() {
             return new Task<>() {
                 @Override
-                protected Void call() {
+                protected Void call() throws ExecutionException, InterruptedException {
+                    List<Future<List<String>>> results = new ArrayList<>();
                     if (mastSearch) {
                         executorCompletionService.submit(mastTask, null);
                         ++threadCount;
                     }
 
                     if (vizierSearch) {
-                        executorCompletionService.submit(vizierTask, null);
+                        results.add(executorCompletionService.submit(new GetDataTask(getVizierCatalogues(),
+                                inputText.getText(), radiusInput.getText(), radiusBox.getValue())));
                         ++threadCount;
                     }
 
@@ -291,6 +294,9 @@ public class MainWindowController {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
+                    }
+                    for (var result : results) {
+                        System.out.println(result.get());
                     }
                     threadCount = 0;
                     return null;

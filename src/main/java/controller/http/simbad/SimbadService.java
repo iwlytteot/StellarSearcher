@@ -39,7 +39,7 @@ public class SimbadService implements Request {
     }
 
     @Override
-    public void sendRequest(URI uri) {
+    public String sendRequest(URI uri) {
         var client = HttpClient.newHttpClient();
         var request = HttpRequest.newBuilder(uri).GET().build();
         try {
@@ -51,5 +51,6 @@ public class SimbadService implements Request {
         } catch (IOException | InterruptedException e) {
             throw new CatalogueQueryException(e.getMessage());
         }
+        return "";
     }
 }
