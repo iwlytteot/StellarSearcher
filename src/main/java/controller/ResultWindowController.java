@@ -22,8 +22,10 @@ import utils.DataExporter;
 import view.event.ExportWindowEvent;
 import view.handler.ExportWindowEventHandler;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
@@ -43,11 +45,11 @@ public class ResultWindowController {
         this.outputData = outputData;
     }
 
-    public void fill(List<String> affectedTables) {
+    public void fill(List<String> output) {
         tabPane.getTabs().clear();
 
-        for (var tableName : affectedTables) {
-            SavotPullParser sb = new SavotPullParser("data/" + tableName + ".txt", SavotPullEngine.FULL);
+        for (var singleTable : output) {
+            SavotPullParser sb = new SavotPullParser(new ByteArrayInputStream(singleTable.getBytes(StandardCharsets.UTF_8)), SavotPullEngine.FULL, "UTF-8");
             SavotVOTable sv = sb.getVOTable();
             StringBuilder stringBuilder = new StringBuilder();
             if (sv.getInfos() != null && sv.getInfos().getItems() != null) {

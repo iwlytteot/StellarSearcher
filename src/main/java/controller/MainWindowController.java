@@ -1,5 +1,6 @@
 package controller;
 
+import controller.http.GetDataTask;
 import controller.http.SesameResolver;
 import controller.http.mast.MastRequest;
 import controller.http.mast.MastService;
@@ -38,9 +39,8 @@ import view.handler.VizierWindowEventHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 @Component
 @ComponentScan("model")
@@ -87,7 +87,7 @@ public class MainWindowController {
     private final List<String> affectedTables = Collections.synchronizedList(new ArrayList<>());
 
     private final ExecutorService executorWrapper = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    private final ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<>(executorWrapper);
+    private final ExecutorCompletionService<List<String>> executorCompletionService = new ExecutorCompletionService<>(executorWrapper);
     private int threadCount = 0;
 
     public MainWindowController(ConfigurableApplicationContext context, VizierWindowEventHandler vizierWindowEventHandler,
@@ -196,6 +196,8 @@ public class MainWindowController {
 
         searchButton.getScene().setCursor(Cursor.WAIT);
 
+
+
         if (searchService.getState() != Worker.State.READY) {
             searchService.cancel();
             searchService.reset();
@@ -211,77 +213,37 @@ public class MainWindowController {
         return mastMissionController.getSelectedMissions();
     }
 
-    Runnable vizierTask = () -> {
-        var vizierService = new VizierService();
-        var catalogues = getVizierCatalogues();
-
-        if (catalogues.isEmpty()) {
-            return;
-        }
-
-        var requestURI = vizierService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
-        vizierService.sendRequest(requestURI.get(0));
-
-        synchronized (affectedTables) {
-            affectedTables.add("vizier_data");
-        }
-    };
-
-    Runnable mastTask = () -> {
-        var mastService = new MastService();
-        var catalogue = new Catalogue();
-        catalogue.setTables(getMastMissions());
-        if (catalogue.getTables().isEmpty()) {
-            return;
-        }
-        var catalogues = new ArrayList<Catalogue>();
-        catalogues.add(catalogue);
-        var requests = mastService.createDataRequest(catalogues, inputText.getText(), radiusInput.getText(), radiusBox.getValue());
-
-        for (var request : requests) {
-            executorCompletionService.submit(new MastRequest(request), null);
-            ++threadCount;
-        }
-
-        synchronized (affectedTables) {
-            catalogue.getTables().forEach(t -> affectedTables.add(t.getName().replace("/", "_")));
-        }
-    };
-
     private String getResolvedInput(String input) {
         return sesameResolver.resolve(input);
     }
 
-    Runnable simbadTask = () -> {
-        var simbadService = new SimbadService();
-        var resolvedInput = getResolvedInput(inputText.getText());
-
-        var requestURI = simbadService.createDataRequest(null, resolvedInput, radiusInput.getText(), radiusBox.getValue());
-        simbadService.sendRequest(requestURI.get(0));
-
-        synchronized (affectedTables) {
-            affectedTables.add("simbad_data");
-        }
-    };
-
-    private final Service<Void> searchService = new Service<>() {
+    private final Service<List<List<String>>> searchService = new Service<>() {
         @Override
-        protected Task<Void> createTask() {
+        protected Task<List<List<String>>> createTask() {
             return new Task<>() {
                 @Override
-                protected Void call() {
+                protected List<List<String>> call() throws ExecutionException, InterruptedException {
+                    List<Future<List<String>>> results = new ArrayList<>();
                     if (mastSearch) {
-                        executorCompletionService.submit(mastTask, null);
+                        var catalogue = new Catalogue();
+                        catalogue.setTables(getMastMissions());
+                        var catalogues = new ArrayList<Catalogue>();
+                        catalogues.add(catalogue);
+                        results.add(executorCompletionService.submit(new GetDataTask<>(catalogues,
+                                inputText.getText(), radiusInput.getText(), radiusBox.getValue(), MastService.class)));
                         ++threadCount;
                     }
 
                     if (vizierSearch) {
-                        executorCompletionService.submit(vizierTask, null);
+                        results.add(executorCompletionService.submit(new GetDataTask<>(getVizierCatalogues(),
+                                inputText.getText(), radiusInput.getText(), radiusBox.getValue(), VizierService.class)));
                         ++threadCount;
                     }
 
                     if (simbadSearch) {
-                        executorCompletionService.submit(simbadTask, null);
+                        var resolvedInput = getResolvedInput(inputText.getText());
+                        results.add(executorCompletionService.submit(new GetDataTask<>(null,
+                                resolvedInput, radiusInput.getText(), radiusBox.getValue(), SimbadService.class)));
                         ++threadCount;
                     }
 
@@ -292,8 +254,12 @@ public class MainWindowController {
                             e.printStackTrace();
                         }
                     }
+                    var output = new ArrayList<List<String>>();
+                    for (var result : results) {
+                        output.add(result.get());
+                    }
                     threadCount = 0;
-                    return null;
+                    return output;
                 }
             };
         }
@@ -302,7 +268,8 @@ public class MainWindowController {
             if (resultWindowEventHandler.getStage() == null) {
                 context.publishEvent(new ResultWindowEvent(new Stage()));
             }
-            resultWindowController.fill(affectedTables);
+            var flatList = searchService.getValue().stream().flatMap(List::stream).collect(Collectors.toList());
+            resultWindowController.fill(flatList);
             affectedTables.clear();
 
             searchButton.getScene().setCursor(Cursor.DEFAULT);

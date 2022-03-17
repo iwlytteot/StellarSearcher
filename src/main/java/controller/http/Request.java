@@ -4,7 +4,11 @@ import model.Catalogue;
 import model.CatalogueQueryException;
 import model.Radius;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 
 public interface Request {
@@ -23,9 +27,17 @@ public interface Request {
     List<URI> createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType);
 
     /**
-     * Sends request and saves incoming data into "[vizier|simbad|mast]_data.txt" file. Note that
-     * this file is being reused; there is no need to keep copies of these files.
-     * @param request with specified catalogues (tables), radius and parameters
+     * Sends request and returns a string with data.
+     * @param uri with specified catalogues (tables), radius and parameters
      */
-    void sendRequest(URI request) throws CatalogueQueryException;
+    default String sendRequest(URI uri) throws CatalogueQueryException {
+        var client = HttpClient.newHttpClient();
+        var request = HttpRequest.newBuilder(uri).GET().build();
+        try {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.body();
+        } catch (IOException | InterruptedException e) {
+            throw new CatalogueQueryException(e.getMessage());
+        }
+    }
 }

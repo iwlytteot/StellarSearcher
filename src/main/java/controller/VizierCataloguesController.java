@@ -4,6 +4,7 @@ import controller.http.vizier.VizierService;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -23,6 +24,7 @@ import utils.FxmlCreator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Future;
 
 @Component
 @FxmlView("/VizierCataloguesWindow.fxml")
@@ -133,15 +135,19 @@ public class VizierCataloguesController {
                 protected Void call() {
                     var requestService = new VizierService();
                     var request = requestService.createMetaDataRequest(inputVizierCatalogue.getText());
+                    String result;
                     try {
-                        requestService.sendRequest(request);
+                        result = requestService.sendRequest(request);
                     }
                     catch (CatalogueQueryException ex) {
                         dialoguePopup(ex.getMessage(), Alert.AlertType.ERROR);
                         return null;
                     }
 
-                    var catOutput = Catalogue.parseMetaData("data/vizier_data.txt");
+                    if (result.isEmpty()) {
+                        return null;
+                    }
+                    var catOutput = Catalogue.parseMetaData(result);
                     var catTemp = new ArrayList<CheckBoxTreeItem<Data>>();
                     for (var catalogue : catOutput) {
                         if (treeView.getRoot().getChildren().stream().anyMatch(e -> e.getValue().getName().equals(catalogue.getName()))) {
@@ -180,7 +186,7 @@ public class VizierCataloguesController {
         @Override
         protected void failed() {
             super.failed();
-            dialoguePopup("Task hasn't been finished. It is probably due to output limit/overload.", Alert.AlertType.ERROR);
+            dialoguePopup("Task failed.", Alert.AlertType.ERROR);
             Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.DEFAULT));
             Platform.runLater(() -> addCatalogueVizierButton.setDisable(false));
         }

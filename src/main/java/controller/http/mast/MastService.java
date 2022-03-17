@@ -48,26 +48,4 @@ public class MastService implements Request {
         }
         return output;
     }
-
-    @Override
-    public void sendRequest(URI uri) throws CatalogueQueryException {
-        var client = HttpClient.newHttpClient();
-        var request = HttpRequest.newBuilder(uri).GET().build();
-        try {
-            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            Pattern pattern = Pattern.compile("https://archive\\.stsci\\.edu/(.*)/");
-            Matcher matcher = pattern.matcher(uri.toString());
-            String name = "mast";
-            if (matcher.find() && matcher.groupCount() >= 1) {
-                name = matcher.group(1);
-                name = name.replace("/", "_");
-            }
-            FileWriter myWriter = new FileWriter("data/" + name + ".txt");
-            myWriter.write(response.body());
-            myWriter.close();
-
-        } catch (IOException | InterruptedException e) {
-            throw new CatalogueQueryException(e.getMessage());
-        }
-    }
 }
