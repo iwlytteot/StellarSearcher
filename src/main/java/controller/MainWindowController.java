@@ -290,4 +290,7 @@ public class MainWindowController {
             searchButton.getScene().setCursor(Cursor.DEFAULT);
         }
     };
+
+    public void importData(ActionEvent actionEvent) {
+    }
 }
