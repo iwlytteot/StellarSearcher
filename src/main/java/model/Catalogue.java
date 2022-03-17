@@ -6,6 +6,8 @@ import cds.savot.model.SavotTable;
 import cds.savot.pull.SavotPullEngine;
 import cds.savot.pull.SavotPullParser;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,9 +40,10 @@ public class Catalogue extends Data{
         return getName();
     }
 
-    public static List<Catalogue> parseMetaData(String path) {
+    public static List<Catalogue> parseMetaData(String input) {
         var output = new ArrayList<Catalogue>();
-        var catalogues = new SavotPullParser(path, SavotPullEngine.FULL).getVOTable().getResources();
+        var catalogues = new SavotPullParser(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)),
+                SavotPullEngine.FULL, "UTF-8").getVOTable().getResources();
         for (var item : catalogues.getItems()) {
             var newCatalogue = new Catalogue();
             var catalogue = (SavotResource) item;

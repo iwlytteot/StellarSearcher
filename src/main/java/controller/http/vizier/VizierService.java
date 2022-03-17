@@ -85,6 +85,6 @@ public class VizierService implements Request {
                 + "&"
                 + URLEncoder.encode("-meta.all", StandardCharsets.UTF_8)
                 + "&"
-                + URLEncoder.encode("-meta.max=99999", StandardCharsets.UTF_8));
+                + URLEncoder.encode("-meta.max=50", StandardCharsets.UTF_8));
     }
 }
