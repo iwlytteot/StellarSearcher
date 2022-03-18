@@ -292,6 +292,9 @@ public class MainWindowController {
     public void importData(ActionEvent actionEvent) throws ExecutionException, InterruptedException {
         FileChooser fileChooser = new FileChooser();
         var selectedFile = fileChooser.showOpenDialog(searchButton.getScene().getWindow());
+        if (selectedFile == null) {
+            return;
+        }
         searchButton.getScene().setCursor(Cursor.WAIT);
         var importTask = new FutureTask<>(new ImportControllerTask(selectedFile.getAbsolutePath()));
         new Thread(importTask).start();
