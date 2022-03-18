@@ -1,8 +1,6 @@
 package controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import controller.http.GetDataTask;
-import controller.http.Request;
 import controller.http.SesameResolver;
 import controller.http.mast.MastService;
 import controller.http.simbad.SimbadService;
@@ -35,8 +33,6 @@ import view.handler.MastWindowEventHandler;
 import view.handler.ResultWindowEventHandler;
 import view.handler.VizierWindowEventHandler;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -57,12 +53,13 @@ public class MainWindowController {
     private final MastMissionController mastMissionController;
     private final ResultWindowController resultWindowController;
 
-    private final SesameResolver sesameResolver;
     private final OutputData outputData;
 
     private final VizierService vizierService;
     private final MastService mastService;
     private final SimbadService simbadService;
+
+    private final ImportController importController;
 
     @FXML
     public Rectangle rectLeft;
@@ -99,8 +96,8 @@ public class MainWindowController {
     public MainWindowController(ConfigurableApplicationContext context, VizierWindowEventHandler vizierWindowEventHandler,
                                 MastWindowEventHandler mastWindowEventHandler, ResultWindowEventHandler resultWindowEventHandler,
                                 VizierCataloguesController vizierCataloguesController, MastMissionController mastMissionController,
-                                ResultWindowController resultWindowController, SesameResolver sesameResolver, OutputData outputData,
-                                VizierService vizierService, MastService mastService, SimbadService simbadService) {
+                                ResultWindowController resultWindowController, OutputData outputData,
+                                VizierService vizierService, MastService mastService, SimbadService simbadService, ImportController importController) {
         this.context = context;
         this.vizierWindowEventHandler = vizierWindowEventHandler;
         this.mastWindowEventHandler = mastWindowEventHandler;
@@ -108,11 +105,11 @@ public class MainWindowController {
         this.vizierCataloguesController = vizierCataloguesController;
         this.mastMissionController = mastMissionController;
         this.resultWindowController = resultWindowController;
-        this.sesameResolver = sesameResolver;
         this.outputData = outputData;
         this.vizierService = vizierService;
         this.mastService = mastService;
         this.simbadService = simbadService;
+        this.importController = importController;
     }
 
     @FXML
@@ -221,8 +218,10 @@ public class MainWindowController {
         return mastMissionController.getSelectedMissions();
     }
 
-    private String getResolvedInput(String input) {
-        return sesameResolver.resolve(input);
+    private String getResolvedInput(String input) throws ExecutionException, InterruptedException {
+        var resolverTask = new FutureTask<>(new SesameResolver(input));
+        new Thread(resolverTask).start();
+        return resolverTask.get();
     }
 
     private UserInput getUserInput() {
@@ -253,9 +252,8 @@ public class MainWindowController {
                     }
 
                     if (simbadSearch) {
-                        var resolvedInput = getResolvedInput(inputText.getText());
                         results.add(executorCompletionService.submit(new GetDataTask<>(null,
-                                resolvedInput, radiusInput.getText(), radiusBox.getValue(), SimbadService.class)));
+                                getResolvedInput(inputText.getText()), radiusInput.getText(), radiusBox.getValue(), SimbadService.class)));
                         ++threadCount;
                     }
 
@@ -305,65 +303,7 @@ public class MainWindowController {
         FileChooser fileChooser = new FileChooser();
         var selectedFile = fileChooser.showOpenDialog(searchButton.getScene().getWindow());
         searchButton.getScene().setCursor(Cursor.WAIT);
-        processData(selectedFile.getAbsolutePath());
-    }
-
-    private void processData(String absolutePath) {
-        var output = new HashMap<UserInput, List<String>>();
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            InputDataCollector inputDataCollector = objectMapper.readValue(new File(absolutePath), InputDataCollector.class);
-            for (var input : inputDataCollector.getTargets()) {
-                //Vizier part
-                var vizierCatalogue = new Catalogue();
-                for (var object : input.getVizier()) {
-                    vizierCatalogue.addTable(new Table(object));
-                }
-
-                //Mast part
-                var mastCatalogue = new Catalogue();
-                for (var object : input.getMast()) {
-                    mastCatalogue.addTable(new Table(object));
-                }
-
-                //Search part
-                var tempMap = new HashMap<UserInput, List<FutureTask<List<String>>>>();
-                for (var position : input.getInput()) {
-                    var userInput = new UserInput(position, input.getRadius(), input.getUnit());
-                    tempMap.put(userInput, new ArrayList<>());
-
-                    var vizierCatalogues = new ArrayList<Catalogue>();
-                    vizierCatalogues.add(vizierCatalogue);
-                    var vizierFutureTask = new FutureTask<>(new GetDataTask<>(vizierCatalogues,
-                            position, input.getRadius(), input.getUnit(), VizierService.class));
-                    new Thread(vizierFutureTask).start();
-                    tempMap.get(userInput).add(vizierFutureTask);
-
-                    var mastCatalogues = new ArrayList<Catalogue>();
-                    mastCatalogues.add(mastCatalogue);
-                    var mastFutureTask = new FutureTask<>(new GetDataTask<>(mastCatalogues,
-                            position, input.getRadius(), input.getUnit(), MastService.class));
-                    new Thread(mastFutureTask).start();
-                    tempMap.get(userInput).add(mastFutureTask);
-
-                    if (input.isSimbad()) {
-                        var simbadFutureTask = new FutureTask<>(new GetDataTask<>(null,
-                                getResolvedInput(position), input.getRadius(), input.getUnit(), SimbadService.class));
-                        new Thread(simbadFutureTask).start();
-                        tempMap.get(userInput).add(simbadFutureTask);
-                    }
-                }
-                for (var entry : tempMap.entrySet()) {
-                    var tempList = new ArrayList<List<String>>();
-                    for (var futureTask : entry.getValue()) {
-                        tempList.add(futureTask.get());
-                    }
-                    output.put(entry.getKey(), tempList.stream().flatMap(List::stream).collect(Collectors.toList()));
-                }
-            }
-        } catch (IOException | InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+        var output = importController.process(selectedFile.getAbsolutePath());
         if (resultWindowEventHandler.getStage() == null) {
             context.publishEvent(new ResultWindowEvent(new Stage()));
         }

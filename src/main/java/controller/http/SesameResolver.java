@@ -17,12 +17,19 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Callable;
 
-@Component
-public class SesameResolver {
+public class SesameResolver implements Callable<String> {
     private static final String BASE_URL = "https://cdsweb.u-strasbg.fr/cgi-bin/nph-sesame/-oxp/SNV?";
 
-    public String resolve(String input) {
+    private final String input;
+
+    public SesameResolver(String input) {
+        this.input = input;
+    }
+
+    @Override
+    public String call() throws Exception {
         request(input);
         return getPosition();
     }
