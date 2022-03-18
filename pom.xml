@@ -119,6 +119,7 @@
 
     </dependencies>
 
+    <!-- mvn package -->
     <build>
         <finalName>StellarSearcher</finalName>
         <defaultGoal>package</defaultGoal>
