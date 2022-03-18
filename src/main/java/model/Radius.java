@@ -2,8 +2,8 @@ package model;
 
 public enum Radius {
     DEG("deg"),
-    ARCSEC("arc sec"),
-    ARCMIN("arc min");
+    ARCSEC("arcsec"),
+    ARCMIN("arcmin");
 
     public final String name;
 

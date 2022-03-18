@@ -8,6 +8,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,29 +31,26 @@ public class SesameResolver implements Callable<String> {
 
     @Override
     public String call() throws Exception {
-        request(input);
-        return getPosition();
+        return getPosition(request(input));
     }
 
-    private void request(String input) {
+    private String request(String input) {
         var client = HttpClient.newHttpClient();
         var request = HttpRequest.newBuilder(URI.create(BASE_URL + URLEncoder.encode(input, StandardCharsets.UTF_8))).GET().build();
         try {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            FileWriter myWriter = new FileWriter("data/resolver.txt");
-            myWriter.write(response.body());
-            myWriter.close();
+            return response.body();
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
+        throw new ResolverQueryException("Input was not resolved");
     }
 
-    private String getPosition() throws ResolverQueryException {
-        File inputFile = new File("data/resolver.txt");
+    private String getPosition(String input) throws ResolverQueryException {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(inputFile);
+            Document doc = dBuilder.parse(new ByteArrayInputStream(input.getBytes()));
             doc.getDocumentElement().normalize();
             var el = doc.getElementsByTagName("jpos");
             if (el.getLength() == 0) {
