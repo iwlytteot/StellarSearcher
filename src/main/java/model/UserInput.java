@@ -26,6 +26,6 @@ public class UserInput {
 
     @Override
     public String toString() {
-        return input + ", " + radius + " " + type.toString();
+        return input + ";" + radius + " " + type.toString();
     }
 }

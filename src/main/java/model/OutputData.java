@@ -1,14 +1,16 @@
 package model;
 
 import javafx.scene.control.Tab;
-import org.springframework.stereotype.Component;
 
-@Component
 public class OutputData {
     private String input;
     private String radius;
-    private String radiusType;
     private Tab tab;
+
+    public OutputData(String input, String radius) {
+        this.input = input;
+        this.radius = radius;
+    }
 
     public String getInput() {
         return input;
@@ -24,14 +26,6 @@ public class OutputData {
 
     public void setRadius(String radius) {
         this.radius = radius;
-    }
-
-    public String getRadiusType() {
-        return radiusType;
-    }
-
-    public void setRadiusType(String radiusType) {
-        this.radiusType = radiusType;
     }
 
     public Tab getTab() {

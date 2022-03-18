@@ -53,13 +53,9 @@ public class MainWindowController {
     private final MastMissionController mastMissionController;
     private final ResultWindowController resultWindowController;
 
-    private final OutputData outputData;
-
     private final VizierService vizierService;
     private final MastService mastService;
     private final SimbadService simbadService;
-
-    private final ImportController importController;
 
     @FXML
     public Rectangle rectLeft;
@@ -96,8 +92,8 @@ public class MainWindowController {
     public MainWindowController(ConfigurableApplicationContext context, VizierWindowEventHandler vizierWindowEventHandler,
                                 MastWindowEventHandler mastWindowEventHandler, ResultWindowEventHandler resultWindowEventHandler,
                                 VizierCataloguesController vizierCataloguesController, MastMissionController mastMissionController,
-                                ResultWindowController resultWindowController, OutputData outputData,
-                                VizierService vizierService, MastService mastService, SimbadService simbadService, ImportController importController) {
+                                ResultWindowController resultWindowController,
+                                VizierService vizierService, MastService mastService, SimbadService simbadService) {
         this.context = context;
         this.vizierWindowEventHandler = vizierWindowEventHandler;
         this.mastWindowEventHandler = mastWindowEventHandler;
@@ -105,11 +101,9 @@ public class MainWindowController {
         this.vizierCataloguesController = vizierCataloguesController;
         this.mastMissionController = mastMissionController;
         this.resultWindowController = resultWindowController;
-        this.outputData = outputData;
         this.vizierService = vizierService;
         this.mastService = mastService;
         this.simbadService = simbadService;
-        this.importController = importController;
     }
 
     @FXML
@@ -196,10 +190,6 @@ public class MainWindowController {
             });
             return;
         }
-
-        outputData.setInput(inputText.getText());
-        outputData.setRadius(radiusInput.getText());
-        outputData.setRadiusType(radiusBox.getValue().name);
 
         searchButton.getScene().setCursor(Cursor.WAIT);
 
@@ -299,11 +289,13 @@ public class MainWindowController {
         }
     };
 
-    public void importData(ActionEvent actionEvent) {
+    public void importData(ActionEvent actionEvent) throws ExecutionException, InterruptedException {
         FileChooser fileChooser = new FileChooser();
         var selectedFile = fileChooser.showOpenDialog(searchButton.getScene().getWindow());
         searchButton.getScene().setCursor(Cursor.WAIT);
-        var output = importController.process(selectedFile.getAbsolutePath());
+        var importTask = new FutureTask<>(new ImportControllerTask(selectedFile.getAbsolutePath()));
+        new Thread(importTask).start();
+        var output = importTask.get();
         if (resultWindowEventHandler.getStage() == null) {
             context.publishEvent(new ResultWindowEvent(new Stage()));
         }

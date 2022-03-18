@@ -10,21 +10,26 @@ import model.Catalogue;
 import model.InputDataCollector;
 import model.Table;
 import model.UserInput;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.stream.Collectors;
 
-@Component
-public class ImportController {
+public class ImportControllerTask implements Callable<HashMap<UserInput, List<String>>> {
+    private final String absolutePath;
 
-    public HashMap<UserInput, List<String>> process(String absolutePath) {
+    public ImportControllerTask(String absolutePath) {
+        this.absolutePath = absolutePath;
+    }
+
+    @Override
+    public HashMap<UserInput, List<String>> call() {
         var output = new HashMap<UserInput, List<String>>();
         try {
             ObjectMapper objectMapper = new ObjectMapper();

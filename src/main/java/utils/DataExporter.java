@@ -29,7 +29,6 @@ public class DataExporter extends StdSerializer<OutputData> {
 
         jsonGenerator.writeStringField("input", outputData.getInput());
         jsonGenerator.writeStringField("radius", outputData.getRadius());
-        jsonGenerator.writeStringField("radius_type", outputData.getRadiusType());
 
         var tab = outputData.getTab();
 

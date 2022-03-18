@@ -24,11 +24,14 @@ import view.event.ExportWindowEvent;
 import view.handler.ExportWindowEventHandler;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @FxmlView("/ResultWindow.fxml")
@@ -36,15 +39,13 @@ public class ResultWindowController {
     private final ConfigurableApplicationContext context;
     private final ExportWindowEventHandler exportWindowEventHandler;
     private final ExportWindowController exportWindowController;
-    private final OutputData outputData;
     @FXML
     public TabPane tabPane;
 
-    public ResultWindowController(ConfigurableApplicationContext context, ExportWindowEventHandler exportWindowEventHandler, ExportWindowController exportWindowController, OutputData outputData) {
+    public ResultWindowController(ConfigurableApplicationContext context, ExportWindowEventHandler exportWindowEventHandler, ExportWindowController exportWindowController) {
         this.context = context;
         this.exportWindowEventHandler = exportWindowEventHandler;
         this.exportWindowController = exportWindowController;
-        this.outputData = outputData;
     }
 
     public void fill(HashMap<UserInput, List<String>> output) {
@@ -118,7 +119,7 @@ public class ResultWindowController {
         }
     }
 
-    public void exportData(ActionEvent actionEvent) throws JsonProcessingException {
+    public void exportData(ActionEvent actionEvent) throws IOException {
         if (exportWindowEventHandler.getStage() == null) {
             context.publishEvent(new ExportWindowEvent(new Stage()));
         }
@@ -128,21 +129,22 @@ public class ResultWindowController {
             return;
         }
 
-
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule("DataSerial", new Version(1, 0, 0, null, null, null));
         module.addSerializer(OutputData.class, new DataExporter());
         mapper.registerModule(module);
 
-        try {
-            for (var tab : tabPane.getTabs()) {
-                FileWriter myWriter = new FileWriter(exportWindowController.getSelectedDirectory().getAbsolutePath() + "/" + tab.getText().replace("/", "_") + ".txt");
+        int i = 0;
+        for (var inputTab : tabPane.getTabs()) {
+            var input = Arrays.stream(inputTab.getText().split(";")).collect(Collectors.toList());
+            for (var tab : ((TabPane) inputTab.getContent()).getTabs()) {
+                FileWriter myWriter = new FileWriter(exportWindowController.getSelectedDirectory().getAbsolutePath() + "/" + i + ".txt");
+                var outputData = new OutputData(input.get(0), input.get(1));
                 outputData.setTab(tab);
                 myWriter.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(outputData));
                 myWriter.close();
+                ++i;
             }
-        } catch (IOException e) {
-            throw new DataWriteException(e.getMessage());
         }
     }
 }
