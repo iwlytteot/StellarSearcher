@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Class for mapping between Java class OutputData to JSON object.
+ */
 @Component
 public class DataExporter extends StdSerializer<OutputData> {
 

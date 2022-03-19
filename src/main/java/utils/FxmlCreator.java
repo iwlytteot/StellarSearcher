@@ -10,6 +10,9 @@ import model.Table;
 
 import java.io.IOException;
 
+/**
+ * Class for creating JavaFX windows from FXML files.
+ */
 public class FxmlCreator {
     public static Stage createFilterWindow(String stageTitle, Table table) {
         try {
