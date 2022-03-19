@@ -13,21 +13,20 @@ import java.util.List;
 
 public interface Request {
     /**
-     * Creates URI that holds full web path to respective server and that
-     * is immediately ready to use.
-     * According to the ASU qualifications for VizieR, it is required to decode arguments,
-     * more on https://cdsarc.u-strasbg.fr/doc/asu-summary.htx
+     * Creates List of URIs. These URIs hold full web path to respective server and are ready for immediate querying.
+     * According to the ASU qualifications for VizieR (that recalls HTTP protocol specification), it is required to
+     * decode arguments, more on https://cdsarc.u-strasbg.fr/doc/asu-summary.htx
      *
-     * @param catalogues list of catalogues
-     * @param coordinates coordinates
+     * @param catalogues list of catalogues for searching
+     * @param identification identification of object. Can be either coordinates or named identification
      * @param radius radius
      * @param radiusType type of radius
-     * @return URI object
+     * @return List of URIs
      */
-    List<URI> createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType);
+    List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius, Radius radiusType);
 
     /**
-     * Sends request and returns a string with data.
+     * Sends HTTP GET request and returns a string with data.
      * @param uri with specified catalogues (tables), radius and parameters
      */
     default String sendRequest(URI uri) throws CatalogueQueryException {

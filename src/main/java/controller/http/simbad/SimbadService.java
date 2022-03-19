@@ -11,14 +11,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service for Simbad database. For official API, check http://simbad.u-strasbg.fr/guide/sim-url.htx.
+ */
 @Component
 public class SimbadService implements Request {
     private static final String BASE_URL = "http://simbad.u-strasbg.fr/simbad/sim-coo?";
     private static final String SUFFIX_URL = "&output.format=VOTable";
     @Override
-    public List<URI> createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType) {
-
-        String params = "Coord=" + URLEncoder.encode(coordinates, StandardCharsets.UTF_8) +
+    public List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius, Radius radiusType) {
+        String params = "Coord=" + URLEncoder.encode(identification, StandardCharsets.UTF_8) +
                 "&Radius.unit=" +
                 radiusType.name.replace(" ", "") +
                 "&" +

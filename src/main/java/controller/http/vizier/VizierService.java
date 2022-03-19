@@ -11,12 +11,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service for VizieR catalogue. For official API, check https://cdsarc.u-strasbg.fr/doc/asu-summary.htx.
+ */
 @Component
 public class VizierService implements Request {
     private static final String BASE_URL = "https://vizier.u-strasbg.fr/viz-bin/votable?";
 
     @Override
-    public List<URI> createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType) {
+    public List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius, Radius radiusType) {
         StringBuilder sources = new StringBuilder();
         StringBuilder params = new StringBuilder();
         for (var catalogue : catalogues) {
@@ -46,7 +49,7 @@ public class VizierService implements Request {
         var uri = URI.create(BASE_URL
                 + URLEncoder.encode("-source=", StandardCharsets.UTF_8)
                 + sources
-                + URLEncoder.encode("-c=" + coordinates , StandardCharsets.UTF_8)
+                + URLEncoder.encode("-c=" + identification, StandardCharsets.UTF_8)
                 + "&"
                 + params);
         var output = new ArrayList<URI>();
