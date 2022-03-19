@@ -18,8 +18,11 @@ import model.CatalogueQueryException;
 import model.Data;
 import model.Table;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import utils.FxmlCreator;
+import view.Main;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +37,8 @@ public class VizierCataloguesController {
     public TextField inputVizierCatalogue;
     @FXML
     public TreeView<Data> treeView;
+
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     private final HashMap<CheckBoxTreeItem<Data>, Stage> nodeFilters = new HashMap<>();
 
