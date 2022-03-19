@@ -72,7 +72,7 @@ public class MastMissionController {
                 var node = mastMissionList.getSelectionModel().getSelectedItem();
                 if (!nodeFilters.containsKey(node)) {
                     nodeFilters.putIfAbsent(node,
-                            FxmlCreator.createFilter(
+                            FxmlCreator.createFilterWindow(
                                     "Filter window - " + node.getName(),
                                     node));
                 }

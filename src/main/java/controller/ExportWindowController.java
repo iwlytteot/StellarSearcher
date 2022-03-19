@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 
+/**
+ * Class controller for "ExportWindow.fxml"
+ */
 @Component
 @FxmlView("/ExportWindow.fxml")
 @Data
@@ -23,12 +26,19 @@ public class ExportWindowController {
 
     private File selectedDirectory;
 
+    /**
+     * Opens directory chooser and then sets the directory and displays the path.
+     */
     public void directoryDialog() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         selectedDirectory = directoryChooser.showDialog(directoryLabel.getScene().getWindow());
         directoryLabel.setText(selectedDirectory != null ? selectedDirectory.getAbsolutePath() : "");
     }
 
+    /**
+     * If no directory was chosen, displays error, else sets 'proceed' to true (for further processing)
+     * and closes the window
+     */
     public void proceedAction() {
         if (selectedDirectory == null) {
             Platform.runLater(() -> {
