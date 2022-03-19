@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Class controller for "VizierCataloguesWindow.fxml".
+ */
 @Component
 @FxmlView("/VizierCataloguesWindow.fxml")
 public class VizierCataloguesController {

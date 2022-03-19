@@ -11,6 +11,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import lombok.extern.slf4j.Slf4j;
 import model.Table;
 import model.TableListCell;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -24,8 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Class controller for "MastMissionWindow.fxml".
+ */
 @Controller
 @FxmlView("/MastMissionWindow.fxml")
+@Slf4j
 public class MastMissionController {
     @FXML
     public ListView<Table> mastMissionList;
@@ -34,6 +39,11 @@ public class MastMissionController {
     private final HashMap<Table, Stage> nodeFilters = new HashMap<>();
     private boolean setAll = true;
 
+    /**
+     * Method that initializes after FXML view is created. From directory "/mast_tables" retrieves
+     * every file and parses them into Tables with acronyms for respective missions and catalogues.
+     * Then saves the Table object into ListView for further inspecting.
+     */
     @FXML
     public void initialize() {
         var tables = new ArrayList<Table>();
@@ -47,8 +57,11 @@ public class MastMissionController {
                 tables.add(table);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Error while processing \"/mast_tables\" into application: " + ex.getMessage());
         }
+
+        //Initializes each table with SimpleBooleanProperty into HashMap, which is further
+        //used in CellFactory of ListView
         for (var table : tables) {
             items.put(table, new SimpleBooleanProperty(false));
         }
@@ -81,6 +94,9 @@ public class MastMissionController {
         }
     };
 
+    /**
+     * Selects or deselects all tables from list
+     */
     public void mButtonAction() {
         for (var entry : items.entrySet()) {
             entry.setValue(new SimpleBooleanProperty(setAll));
@@ -90,12 +106,20 @@ public class MastMissionController {
                 mastMissionList.setItems(FXCollections.observableList(new ArrayList<>(items.keySet())).sorted()));
     }
 
+    /**
+     * Method that retrieves all selected (checkboxed) tables from ListView.
+     * @return List of selected Tables
+     */
     public List<Table> getSelectedMissions() {
         var output = new ArrayList<Table>();
+
+        //Get all selected tables
         var selectedMissions = items.entrySet().stream()
                 .filter(x -> x.getValue().getValue())
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
+
+        //Get all constraints from respective table
         for (var mission : selectedMissions) {
             var outMission = new Table(mission);
             outMission.setColumns(new HashMap<>());

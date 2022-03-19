@@ -7,6 +7,7 @@ import controller.http.mast.MastService;
 import controller.http.simbad.SimbadService;
 import controller.http.vizier.VizierService;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import model.Catalogue;
 import model.InputDataCollector;
 import model.Table;
@@ -22,16 +23,27 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.stream.Collectors;
 
+/**
+ * Class for handling and processing imported file in JSON format.
+ */
 @Data
+@Slf4j
 public class ImportControllerTask implements Callable<HashMap<UserInput, List<String>>> {
     private final String absolutePath;
 
+    /**
+     * Method that parses JSON file from absolute path.
+     * @return HashMap, where key is UserInput and value is List of Strings, which are basically
+     * responses from respective servers.
+     */
     @Override
     public HashMap<UserInput, List<String>> call() {
         var output = new HashMap<UserInput, List<String>>();
         try {
+            //Opens JSON file and parses it to InputDataCollector class
             ObjectMapper objectMapper = new ObjectMapper();
             InputDataCollector inputDataCollector = objectMapper.readValue(new File(absolutePath), InputDataCollector.class);
+
             for (var input : inputDataCollector.getTargets()) {
                 //Vizier part
                 var vizierCatalogue = new Catalogue();
@@ -48,9 +60,11 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                 //Search part
                 var tempMap = new HashMap<UserInput, List<FutureTask<List<String>>>>();
                 for (var position : input.getInput()) {
+                    //Retrieves inputs and radius + radius type
                     var userInput = new UserInput(position, input.getRadius(), input.getUnit());
                     tempMap.put(userInput, new ArrayList<>());
 
+                    //Vizier task
                     var vizierCatalogues = new ArrayList<Catalogue>();
                     vizierCatalogues.add(vizierCatalogue);
                     var vizierFutureTask = new FutureTask<>(new GetDataTask<>(vizierCatalogues,
@@ -58,6 +72,7 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                     new Thread(vizierFutureTask).start();
                     tempMap.get(userInput).add(vizierFutureTask);
 
+                    //Mast task
                     var mastCatalogues = new ArrayList<Catalogue>();
                     mastCatalogues.add(mastCatalogue);
                     var mastFutureTask = new FutureTask<>(new GetDataTask<>(mastCatalogues,
@@ -65,6 +80,7 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                     new Thread(mastFutureTask).start();
                     tempMap.get(userInput).add(mastFutureTask);
 
+                    //Simbad task
                     if (input.isSimbad()) {
                         var resolverTask = new FutureTask<>(new SesameResolver(position));
                         new Thread(resolverTask).start();
@@ -74,18 +90,21 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                         tempMap.get(userInput).add(simbadFutureTask);
                     }
                 }
+                //Retrieving data from Future task and associating user input with results so that Result
+                //windows contains data that are in correct tab
                 for (var entry : tempMap.entrySet()) {
                     var tempList = new ArrayList<List<String>>();
                     for (var futureTask : entry.getValue()) {
                         tempList.add(futureTask.get());
                     }
+                    //flatting the result because it is not necessary to have deeper division in results
+                    //as it is enough to divide it by input and radius
                     output.put(entry.getKey(), tempList.stream().flatMap(List::stream).collect(Collectors.toList()));
                 }
             }
         } catch (IOException | InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            log.error("Error while processing JSON file: " + e.getMessage());
         }
-
         return output;
     }
 }

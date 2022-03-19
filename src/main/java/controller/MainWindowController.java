@@ -20,6 +20,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import model.*;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -39,10 +40,15 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
+/**
+ * Class controller for "MainWindow.fxml". Beware that this controller is the main controller of the whole
+ * application.
+ */
 @Component
 @ComponentScan("model")
 @FxmlView("/MainWindow.fxml")
 @Data
+@Slf4j
 public class MainWindowController {
     private final ConfigurableApplicationContext context;
     private final VizierWindowEventHandler vizierWindowEventHandler;
@@ -119,8 +125,6 @@ public class MainWindowController {
         SearchButtonCheck();
     }
 
-
-
     public void mastTableButtonAction() {
         if (mastWindowEventHandler.getStage() == null) {
             context.publishEvent(new MastWindowEvent(new Stage()));
@@ -139,6 +143,9 @@ public class MainWindowController {
         searchButton.setDisable(!mastSearch && !simbadSearch && !vizierSearch);
     }
 
+    /**
+     * Method that check the input and starts the searchService.
+     */
     public void searchAction() {
         if (inputText.getText().isEmpty() || radiusInput.getText().isEmpty()) {
             Platform.runLater(() -> {
@@ -209,6 +216,9 @@ public class MainWindowController {
         return new UserInput(inputText.getText(), radiusInput.getText(), radiusBox.getValue());
     }
 
+    /**
+     * JavaFX Service, where search parameters are retrieved and where search action takes place.
+     */
     private final Service<List<List<String>>> searchService = new Service<>() {
         @Override
         protected Task<List<List<String>>> createTask() {
@@ -216,6 +226,8 @@ public class MainWindowController {
                 @Override
                 protected List<List<String>> call() throws ExecutionException, InterruptedException {
                     List<Future<List<String>>> results = new ArrayList<>();
+
+                    //If MAST button was activated
                     if (mastSearch) {
                         var catalogue = new Catalogue();
                         catalogue.setTables(getMastMissions());
@@ -226,18 +238,21 @@ public class MainWindowController {
                         ++threadCount;
                     }
 
+                    //If VizieR button was activated
                     if (vizierSearch) {
                         results.add(executorCompletionService.submit(new GetDataTask<>(getVizierCatalogues(),
                                 inputText.getText(), radiusInput.getText(), radiusBox.getValue(), VizierService.class)));
                         ++threadCount;
                     }
 
+                    //If SIMBAD button was activated
                     if (simbadSearch) {
                         results.add(executorCompletionService.submit(new GetDataTask<>(null,
                                 getResolvedInput(inputText.getText()), radiusInput.getText(), radiusBox.getValue(), SimbadService.class)));
                         ++threadCount;
                     }
 
+                    //Waits for all threads to finish
                     for (int i = 0; i < threadCount; ++i) {
                         try {
                             executorCompletionService.take();
@@ -245,6 +260,8 @@ public class MainWindowController {
                             e.printStackTrace();
                         }
                     }
+
+                    //Gets results
                     var output = new ArrayList<List<String>>();
                     for (var result : results) {
                         output.add(result.get());
@@ -254,6 +271,11 @@ public class MainWindowController {
                 }
             };
         }
+
+        /**
+         * If searching was successful and no error occurred during retrieving data, then
+         * Result Window is invoked and filled with respective data.
+         */
         @Override
         protected void succeeded() {
             if (resultWindowEventHandler.getStage() == null) {
@@ -272,24 +294,38 @@ public class MainWindowController {
         @Override
         protected void cancelled() {
             searchButton.getScene().setCursor(Cursor.DEFAULT);
+            log.warn("Search action was cancelled, the input was: "
+                    + inputText.getText() + ", " + radiusInput.getText() + " " + radiusBox.getValue());
         }
 
         @Override
         protected void failed() {
             searchButton.getScene().setCursor(Cursor.DEFAULT);
+            log.error("Search action has failed, the input was: "
+                    + inputText.getText() + ", " + radiusInput.getText() + " " + radiusBox.getValue());
         }
     };
 
-    public void importData() throws ExecutionException, InterruptedException {
+    /**
+     * Method that handles uppermost interaction with user when importing file.
+     */
+    public void importData() {
         FileChooser fileChooser = new FileChooser();
         var selectedFile = fileChooser.showOpenDialog(searchButton.getScene().getWindow());
         if (selectedFile == null) {
             return;
         }
         searchButton.getScene().setCursor(Cursor.WAIT);
+
+        //Starts a new task for processing, so it doesn't block main JavaFX thread
         var importTask = new FutureTask<>(new ImportControllerTask(selectedFile.getAbsolutePath()));
         new Thread(importTask).start();
-        var output = importTask.get();
+        HashMap<UserInput, List<String>> output = new HashMap<>();
+        try {
+            output = importTask.get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("Error while retrieving data from import: " + e.getMessage());
+        }
         if (resultWindowEventHandler.getStage() == null) {
             context.publishEvent(new ResultWindowEvent(new Stage()));
         }
