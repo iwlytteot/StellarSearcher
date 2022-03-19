@@ -13,6 +13,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import lombok.Data;
 import model.DataWriteException;
 import model.OutputData;
 import model.UserInput;
@@ -35,18 +36,13 @@ import java.util.stream.Collectors;
 
 @Component
 @FxmlView("/ResultWindow.fxml")
+@Data
 public class ResultWindowController {
     private final ConfigurableApplicationContext context;
     private final ExportWindowEventHandler exportWindowEventHandler;
     private final ExportWindowController exportWindowController;
     @FXML
     public TabPane tabPane;
-
-    public ResultWindowController(ConfigurableApplicationContext context, ExportWindowEventHandler exportWindowEventHandler, ExportWindowController exportWindowController) {
-        this.context = context;
-        this.exportWindowEventHandler = exportWindowEventHandler;
-        this.exportWindowController = exportWindowController;
-    }
 
     public void fill(HashMap<UserInput, List<String>> output) {
         tabPane.getTabs().clear();

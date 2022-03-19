@@ -21,6 +21,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import lombok.Data;
 import model.*;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -43,6 +44,7 @@ import java.util.stream.Collectors;
 @Component
 @ComponentScan("model")
 @FxmlView("/MainWindow.fxml")
+@Data
 public class MainWindowController {
     private final ConfigurableApplicationContext context;
     private final VizierWindowEventHandler vizierWindowEventHandler;
@@ -52,10 +54,6 @@ public class MainWindowController {
     private final VizierCataloguesController vizierCataloguesController;
     private final MastMissionController mastMissionController;
     private final ResultWindowController resultWindowController;
-
-    private final VizierService vizierService;
-    private final MastService mastService;
-    private final SimbadService simbadService;
 
     @FXML
     public Rectangle rectLeft;
@@ -88,23 +86,6 @@ public class MainWindowController {
     private final ExecutorService executorWrapper = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private final ExecutorCompletionService<List<String>> executorCompletionService = new ExecutorCompletionService<>(executorWrapper);
     private int threadCount = 0;
-
-    public MainWindowController(ConfigurableApplicationContext context, VizierWindowEventHandler vizierWindowEventHandler,
-                                MastWindowEventHandler mastWindowEventHandler, ResultWindowEventHandler resultWindowEventHandler,
-                                VizierCataloguesController vizierCataloguesController, MastMissionController mastMissionController,
-                                ResultWindowController resultWindowController,
-                                VizierService vizierService, MastService mastService, SimbadService simbadService) {
-        this.context = context;
-        this.vizierWindowEventHandler = vizierWindowEventHandler;
-        this.mastWindowEventHandler = mastWindowEventHandler;
-        this.resultWindowEventHandler = resultWindowEventHandler;
-        this.vizierCataloguesController = vizierCataloguesController;
-        this.mastMissionController = mastMissionController;
-        this.resultWindowController = resultWindowController;
-        this.vizierService = vizierService;
-        this.mastService = mastService;
-        this.simbadService = simbadService;
-    }
 
     @FXML
     public void initialize() {

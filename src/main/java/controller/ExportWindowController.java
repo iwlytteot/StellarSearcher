@@ -7,6 +7,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import lombok.Data;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.io.File;
 
 @Component
 @FxmlView("/ExportWindow.fxml")
+@Data
 public class ExportWindowController {
     @FXML
     public Label directoryLabel;
@@ -41,17 +43,5 @@ public class ExportWindowController {
         proceed = true;
         var stage = (Stage) directoryLabel.getScene().getWindow();
         stage.hide();
-    }
-
-    public boolean isProceed() {
-        return proceed;
-    }
-
-    public File getSelectedDirectory() {
-        return selectedDirectory;
-    }
-
-    public void setProceed(boolean proceed) {
-        this.proceed = proceed;
     }
 }
