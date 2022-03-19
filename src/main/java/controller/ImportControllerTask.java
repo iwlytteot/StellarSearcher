@@ -6,6 +6,7 @@ import controller.http.SesameResolver;
 import controller.http.mast.MastService;
 import controller.http.simbad.SimbadService;
 import controller.http.vizier.VizierService;
+import lombok.Data;
 import model.Catalogue;
 import model.InputDataCollector;
 import model.Table;
@@ -21,12 +22,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.stream.Collectors;
 
+@Data
 public class ImportControllerTask implements Callable<HashMap<UserInput, List<String>>> {
     private final String absolutePath;
-
-    public ImportControllerTask(String absolutePath) {
-        this.absolutePath = absolutePath;
-    }
 
     @Override
     public HashMap<UserInput, List<String>> call() {

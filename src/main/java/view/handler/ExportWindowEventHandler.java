@@ -3,6 +3,7 @@ package view.handler;
 import controller.ExportWindowController;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lombok.Data;
 import net.rgielen.fxweaver.core.FxWeaver;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.ComponentScan;
@@ -11,13 +12,10 @@ import view.event.ExportWindowEvent;
 
 @Component
 @ComponentScan(basePackages = "controller")
+@Data
 public class ExportWindowEventHandler implements ApplicationListener<ExportWindowEvent> {
     private final FxWeaver fxWeaver;
     private Stage stage;
-
-    public ExportWindowEventHandler(FxWeaver fxWeaver) {
-        this.fxWeaver = fxWeaver;
-    }
 
     @Override
     public void onApplicationEvent(ExportWindowEvent exportWindowEvent) {
@@ -25,9 +23,5 @@ public class ExportWindowEventHandler implements ApplicationListener<ExportWindo
         stage.setScene(new Scene(fxWeaver.loadView(ExportWindowController.class)));
         stage.setTitle("Export window");
         this.stage = stage;
-    }
-
-    public Stage getStage() {
-        return stage;
     }
 }

@@ -3,6 +3,7 @@ package view.handler;
 import controller.ResultWindowController;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lombok.Data;
 import net.rgielen.fxweaver.core.FxWeaver;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.ComponentScan;
@@ -11,13 +12,10 @@ import view.event.ResultWindowEvent;
 
 @Component
 @ComponentScan(basePackages = "controller")
+@Data
 public class ResultWindowEventHandler implements ApplicationListener<ResultWindowEvent> {
     private final FxWeaver fxWeaver;
     private Stage stage;
-
-    public ResultWindowEventHandler(FxWeaver fxWeaver) {
-        this.fxWeaver = fxWeaver;
-    }
 
     @Override
     public void onApplicationEvent(ResultWindowEvent resultWindowEvent) {
@@ -26,9 +24,5 @@ public class ResultWindowEventHandler implements ApplicationListener<ResultWindo
         stage.setTitle("Result window");
         this.stage = stage;
         stage.show();
-    }
-
-    public Stage getStage() {
-        return stage;
     }
 }

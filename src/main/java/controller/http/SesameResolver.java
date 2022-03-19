@@ -1,5 +1,6 @@
 package controller.http;
 
+import lombok.Data;
 import model.ResolverQueryException;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -20,14 +21,11 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
+@Data
 public class SesameResolver implements Callable<String> {
     private static final String BASE_URL = "https://cdsweb.u-strasbg.fr/cgi-bin/nph-sesame/-oxp/SNV?";
 
     private final String input;
-
-    public SesameResolver(String input) {
-        this.input = input;
-    }
 
     @Override
     public String call() throws Exception {
