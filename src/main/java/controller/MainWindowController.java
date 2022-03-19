@@ -151,6 +151,18 @@ public class MainWindowController {
             });
             return;
         }
+        if (vizierSearch) {
+            if (getVizierCatalogues().isEmpty()) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Missing catalogues");
+                    alert.setContentText("No catalogues from VizieR was selected");
+                    alert.showAndWait();
+                });
+                return;
+            }
+        }
+
         try {
             var radius= Integer.parseInt(radiusInput.getText());
             if (radius <= 0) {

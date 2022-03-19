@@ -43,8 +43,11 @@ public class VizierCataloguesController {
     private final HashMap<CheckBoxTreeItem<Data>, Stage> nodeFilters = new HashMap<>();
 
     public List<Catalogue> getSelectedCatalogues() {
-        var tableFilters = getFilters();
         var output = new ArrayList<Catalogue>();
+        if (treeView == null) {
+            return output;
+        }
+        var tableFilters = getFilters();
         var node = treeView.getRoot();
         for (var itemCat : node.getChildren()) {
             if (((CheckBoxTreeItem<Data>) itemCat).isSelected()) {
