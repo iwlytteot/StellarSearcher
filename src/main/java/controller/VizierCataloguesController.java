@@ -50,6 +50,8 @@ public class VizierCataloguesController {
         }
         var tableFilters = getFilters();
         var node = treeView.getRoot();
+
+        //Get sleected tables and sets columns from 'tableFilters'
         for (var itemCat : node.getChildren()) {
             if (((CheckBoxTreeItem<Data>) itemCat).isSelected()) {
                 var tables = new ArrayList<Table>();
@@ -116,6 +118,9 @@ public class VizierCataloguesController {
         });
     }
 
+    /**
+     * EventHandler that handles creating of Filter Window for respective Table
+     */
     private final EventHandler<MouseEvent> eventHandler = new EventHandler<>() {
         @Override
         public void handle(MouseEvent event) {
@@ -134,7 +139,9 @@ public class VizierCataloguesController {
         }
     };
 
-
+    /**
+     * JavaFX Service, where search parameters are retrieved and where search action takes place.
+     */
     private final Service<Void> catalogueRequestService = new Service<>() {
         @Override
         protected Task<Void> createTask() {
@@ -149,6 +156,7 @@ public class VizierCataloguesController {
                     }
                     catch (CatalogueQueryException ex) {
                         dialoguePopup(ex.getMessage(), Alert.AlertType.ERROR);
+                        log.error("Error during retrieving data: " + ex.getMessage());
                         return null;
                     }
 
@@ -158,8 +166,8 @@ public class VizierCataloguesController {
                     var catOutput = Catalogue.parseMetaData(result);
                     var catTemp = new ArrayList<CheckBoxTreeItem<Data>>();
                     for (var catalogue : catOutput) {
+                        //If there already exists catalogue with the same name
                         if (treeView.getRoot().getChildren().stream().anyMatch(e -> e.getValue().getName().equals(catalogue.getName()))) {
-                            //dialoguePopup("There is already " + catalogue.getName() + " in list", Alert.AlertType.WARNING);
                             continue;
                         }
                         CheckBoxTreeItem<Data> catalogueNode = new CheckBoxTreeItem<>(catalogue);
