@@ -18,7 +18,7 @@ public class GetDataTask<T extends Request> implements Callable<List<String>> {
     private final Class<T> serviceClass;
 
     @Override
-    public List<String> call() throws Exception {
+    public List<String> call() {
         var service = getInstanceOfService(serviceClass);
 
         var output = new ArrayList<String>();

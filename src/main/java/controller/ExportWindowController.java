@@ -1,7 +1,6 @@
 package controller;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
@@ -24,13 +23,13 @@ public class ExportWindowController {
 
     private File selectedDirectory;
 
-    public void directoryDialog(ActionEvent actionEvent) {
+    public void directoryDialog() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         selectedDirectory = directoryChooser.showDialog(directoryLabel.getScene().getWindow());
         directoryLabel.setText(selectedDirectory != null ? selectedDirectory.getAbsolutePath() : "");
     }
 
-    public void proceedAction(ActionEvent actionEvent) {
+    public void proceedAction() {
         if (selectedDirectory == null) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.WARNING);

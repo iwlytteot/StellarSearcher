@@ -37,7 +37,7 @@ public interface Request {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
             return response.body();
         } catch (IOException | InterruptedException e) {
-            throw new CatalogueQueryException(e.getMessage());
+            throw new CatalogueQueryException();
         }
     }
 }

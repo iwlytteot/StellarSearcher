@@ -4,8 +4,6 @@ import controller.http.vizier.VizierService;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.concurrent.Worker;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -83,11 +81,11 @@ public class VizierCataloguesController {
         CheckBoxTreeItem<Data> root = new CheckBoxTreeItem<>(new Catalogue());
         treeView.setRoot(root);
         treeView.setShowRoot(false);
-        treeView.setCellFactory(CheckBoxTreeCell.<Data>forTreeView());
+        treeView.setCellFactory(CheckBoxTreeCell.forTreeView());
         treeView.setOnMouseClicked(eventHandler);
     }
 
-    public void addCatalogueVizier(ActionEvent actionEvent) {
+    public void addCatalogueVizier() {
         if (inputVizierCatalogue.getText().isEmpty()) {
             dialoguePopup("Input is empty", Alert.AlertType.INFORMATION);
             return;
@@ -101,7 +99,7 @@ public class VizierCataloguesController {
         catalogueRequestService.start();
     }
 
-    public void backVizier(ActionEvent actionEvent) {
+    public void backVizier() {
         var stage = (Stage) addCatalogueVizierButton.getScene().getWindow();
         stage.hide();
     }

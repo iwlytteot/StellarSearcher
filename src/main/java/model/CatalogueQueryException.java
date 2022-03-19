@@ -7,5 +7,5 @@ import view.Main;
 public class CatalogueQueryException extends RuntimeException {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    public CatalogueQueryException(String message) {}
+    public CatalogueQueryException() {}
 }

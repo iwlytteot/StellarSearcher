@@ -1,6 +1,5 @@
 package controller;
 
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -43,21 +42,21 @@ public class FilterWindowController {
     }
 
     @FXML
-    public void addFilter(ActionEvent actionEvent) {
+    public void addFilter() {
         var selected = listViewAvailable.getSelectionModel().getSelectedItems();
         listViewUsed.getItems().addAll(selected);
         listViewAvailable.getItems().removeAll(selected);
     }
 
     @FXML
-    public void removeFilter(ActionEvent actionEvent) {
+    public void removeFilter() {
         var selected = listViewUsed.getSelectionModel().getSelectedItems();
         listViewAvailable.getItems().addAll(selected);
         listViewUsed.getItems().removeAll(selected);
     }
 
     @FXML
-    public void applyFilter(ActionEvent actionEvent) {
+    public void applyFilter() {
         var stage = (Stage) listViewAvailable.getScene().getWindow();
         stage.hide();
     }

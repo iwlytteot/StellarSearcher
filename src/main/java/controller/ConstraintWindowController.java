@@ -1,6 +1,5 @@
 package controller;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -23,7 +22,7 @@ public class ConstraintWindowController {
         textLabel.setText("Constraint: " + name);
     }
 
-    public void confirmAction(ActionEvent actionEvent) {
+    public void confirmAction() {
         constraint = input.getText();
         var stage = (Stage) confirmButton.getScene().getWindow();
         stage.hide();

@@ -5,7 +5,6 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
@@ -22,6 +21,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -60,7 +60,7 @@ public class MastMissionController {
 
     }
 
-    public void backMast(ActionEvent actionEvent) {
+    public void backMast() {
         var stage = (Stage) mastMissionList.getScene().getWindow();
         stage.close();
     }
@@ -81,7 +81,7 @@ public class MastMissionController {
         }
     };
 
-    public void mButtonAction(ActionEvent actionEvent) {
+    public void mButtonAction() {
         for (var entry : items.entrySet()) {
             entry.setValue(new SimpleBooleanProperty(setAll));
         }
@@ -94,7 +94,7 @@ public class MastMissionController {
         var output = new ArrayList<Table>();
         var selectedMissions = items.entrySet().stream()
                 .filter(x -> x.getValue().getValue())
-                .map(x -> x.getKey())
+                .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
         for (var mission : selectedMissions) {
             var outMission = new Table(mission);

@@ -9,14 +9,12 @@ import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
@@ -101,20 +99,20 @@ public class MainWindowController {
         executorWrapper.shutdownNow();
     }
 
-    public void enterVizier(MouseEvent mouseEvent) {
+    public void enterVizier() {
         vizierSearch = !vizierSearch;
         rectLeft.setFill(vizierSearch ? Color.GREEN : Color.RED);
         vizierTableButton.setDisable(!vizierSearch);
         SearchButtonCheck();
     }
 
-    public void enterSimbad(MouseEvent mouseEvent) {
+    public void enterSimbad() {
         simbadSearch = !simbadSearch;
         rectMid.setFill(simbadSearch ? Color.GREEN : Color.RED);
         SearchButtonCheck();
     }
 
-    public void enterMast(MouseEvent mouseEvent) {
+    public void enterMast() {
         mastSearch = !mastSearch;
         rectRight.setFill(mastSearch ? Color.GREEN : Color.RED);
         mastTableButton.setDisable(!mastSearch);
@@ -123,14 +121,14 @@ public class MainWindowController {
 
 
 
-    public void mastTableButtonAction(ActionEvent actionEvent) {
+    public void mastTableButtonAction() {
         if (mastWindowEventHandler.getStage() == null) {
             context.publishEvent(new MastWindowEvent(new Stage()));
         }
         mastWindowEventHandler.getStage().show();
     }
 
-    public void vizierTableButtonAction(ActionEvent actionEvent) {
+    public void vizierTableButtonAction() {
         if (vizierWindowEventHandler.getStage() == null) {
             context.publishEvent(new VizierWindowEvent(new Stage()));
         }
@@ -141,7 +139,7 @@ public class MainWindowController {
         searchButton.setDisable(!mastSearch && !simbadSearch && !vizierSearch);
     }
 
-    public void searchAction(ActionEvent actionEvent) {
+    public void searchAction() {
         if (inputText.getText().isEmpty() || radiusInput.getText().isEmpty()) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -282,7 +280,7 @@ public class MainWindowController {
         }
     };
 
-    public void importData(ActionEvent actionEvent) throws ExecutionException, InterruptedException {
+    public void importData() throws ExecutionException, InterruptedException {
         FileChooser fileChooser = new FileChooser();
         var selectedFile = fileChooser.showOpenDialog(searchButton.getScene().getWindow());
         if (selectedFile == null) {

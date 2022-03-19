@@ -2,7 +2,6 @@ package controller.http;
 
 import lombok.Data;
 import model.ResolverQueryException;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -10,8 +9,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -28,7 +25,7 @@ public class SesameResolver implements Callable<String> {
     private final String input;
 
     @Override
-    public String call() throws Exception {
+    public String call() {
         return getPosition(request(input));
     }
 
@@ -41,7 +38,7 @@ public class SesameResolver implements Callable<String> {
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
-        throw new ResolverQueryException("Input was not resolved");
+        throw new ResolverQueryException();
     }
 
     private String getPosition(String input) throws ResolverQueryException {
@@ -52,12 +49,12 @@ public class SesameResolver implements Callable<String> {
             doc.getDocumentElement().normalize();
             var el = doc.getElementsByTagName("jpos");
             if (el.getLength() == 0) {
-                throw new ResolverQueryException("Resolving was unsuccessful");
+                throw new ResolverQueryException();
             }
             return el.item(0).getFirstChild().getNodeValue();
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }
-        throw new ResolverQueryException("Resolving was unsuccessful");
+        throw new ResolverQueryException();
     }
 }

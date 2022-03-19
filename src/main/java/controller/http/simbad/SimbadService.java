@@ -2,17 +2,11 @@ package controller.http.simbad;
 
 import controller.http.Request;
 import model.Catalogue;
-import model.CatalogueQueryException;
 import model.Radius;
 import org.springframework.stereotype.Component;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,14 +17,13 @@ public class SimbadService implements Request {
     private static final String SUFFIX_URL = "&output.format=VOTable";
     @Override
     public List<URI> createDataRequest(List<Catalogue> catalogues, String coordinates, String radius, Radius radiusType) {
-        StringBuilder params = new StringBuilder();
 
-        params.append("Coord=").append(URLEncoder.encode(coordinates, StandardCharsets.UTF_8));
-        params.append("&Radius.unit=");
-        params.append(radiusType.name.replace(" ", ""));
-        params.append("&");
-        params.append("Radius=");
-        params.append(URLEncoder.encode(radius, StandardCharsets.UTF_8));
+        String params = "Coord=" + URLEncoder.encode(coordinates, StandardCharsets.UTF_8) +
+                "&Radius.unit=" +
+                radiusType.name.replace(" ", "") +
+                "&" +
+                "Radius=" +
+                URLEncoder.encode(radius, StandardCharsets.UTF_8);
 
         var uri = URI.create(BASE_URL
             + params

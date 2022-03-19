@@ -3,18 +3,15 @@ package controller;
 import cds.savot.model.*;
 import cds.savot.pull.SavotPullEngine;
 import cds.savot.pull.SavotPullParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.Data;
-import model.DataWriteException;
 import model.OutputData;
 import model.UserInput;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -25,7 +22,6 @@ import view.event.ExportWindowEvent;
 import view.handler.ExportWindowEventHandler;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -115,7 +111,7 @@ public class ResultWindowController {
         }
     }
 
-    public void exportData(ActionEvent actionEvent) throws IOException {
+    public void exportData() throws IOException {
         if (exportWindowEventHandler.getStage() == null) {
             context.publishEvent(new ExportWindowEvent(new Stage()));
         }
