@@ -2,6 +2,9 @@ package model;
 
 import lombok.Data;
 
+/**
+ * Representation for user's input that was written into TextFields, such as input, radius and type of radius.
+ */
 @Data
 public class UserInput {
 

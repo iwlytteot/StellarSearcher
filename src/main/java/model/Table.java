@@ -2,6 +2,9 @@ package model;
 
 import java.util.HashMap;
 
+/**
+ * Representation that stores information about Table that belongs to Catalogue.
+ */
 public class Table extends Data {
     HashMap<String, String> columns = new HashMap<>();
 
@@ -11,10 +14,6 @@ public class Table extends Data {
 
     public void setColumns(HashMap<String, String> columns) {
         this.columns = columns;
-    }
-
-    public void addColumn(String columnName) {
-        columns.put(columnName, "");
     }
 
     public Table() {

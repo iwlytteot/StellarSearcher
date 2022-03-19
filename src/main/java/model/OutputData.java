@@ -3,6 +3,9 @@ package model;
 import javafx.scene.control.Tab;
 import lombok.Data;
 
+/**
+ * General representation for exporting into JSON format.
+ */
 @Data
 public class OutputData {
     private String input;

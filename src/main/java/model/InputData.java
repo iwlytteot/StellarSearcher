@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Representation of a singleton from JSON object used for importing data.
+ */
 @Data
 public class InputData {
     private List<String> vizier;
