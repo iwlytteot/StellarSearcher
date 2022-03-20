@@ -12,7 +12,7 @@ import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import model.Catalogue;
-import model.CatalogueQueryException;
+import model.exception.CatalogueQueryException;
 import model.Data;
 import model.Table;
 import net.rgielen.fxweaver.core.FxmlView;

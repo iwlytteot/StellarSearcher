@@ -2,7 +2,7 @@ package controller.http;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import model.ResolverQueryException;
+import model.exception.ResolverQueryException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 

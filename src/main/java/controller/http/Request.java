@@ -1,7 +1,7 @@
 package controller.http;
 
 import model.Catalogue;
-import model.CatalogueQueryException;
+import model.exception.CatalogueQueryException;
 import model.Radius;
 
 import java.io.IOException;
