@@ -169,7 +169,7 @@ public class MainWindowController {
         }
 
         try {
-            var radius= Integer.parseInt(radiusInput.getText());
+            var radius= Float.parseFloat(radiusInput.getText());
             if (radius <= 0) {
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.WARNING);
