@@ -182,10 +182,11 @@ public class MainWindowController {
         } catch(NumberFormatException ex) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Missing input");
-                alert.setContentText("Missing input");
+                alert.setTitle("Wrong radius");
+                alert.setContentText("Radius is not in correct format. Use dot (.) eg: 1.2");
                 alert.showAndWait();
             });
+            log.error("Wrong radius input: " + radiusInput.getText());
             return;
         }
 
