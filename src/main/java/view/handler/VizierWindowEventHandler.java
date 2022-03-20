@@ -1,6 +1,6 @@
 package view.handler;
 
-import controller.VizierCataloguesController;
+import controller.fxml.VizierCataloguesController;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lombok.Data;

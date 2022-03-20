@@ -1,6 +1,6 @@
 package view.handler;
 
-import controller.MastMissionController;
+import controller.fxml.MastMissionController;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lombok.Data;

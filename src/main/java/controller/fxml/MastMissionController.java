@@ -1,4 +1,4 @@
-package controller;
+package controller.fxml;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;

@@ -1,6 +1,6 @@
 package view.handler;
 
-import controller.MainWindowController;
+import controller.fxml.MainWindowController;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lombok.Data;

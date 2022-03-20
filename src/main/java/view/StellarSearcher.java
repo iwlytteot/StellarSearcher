@@ -1,6 +1,6 @@
 package view;
 
-import controller.MainWindowController;
+import controller.fxml.MainWindowController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.springframework.boot.builder.SpringApplicationBuilder;

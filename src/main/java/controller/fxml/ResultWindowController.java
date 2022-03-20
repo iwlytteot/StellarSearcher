@@ -1,4 +1,4 @@
-package controller;
+package controller.fxml;
 
 import cds.savot.model.*;
 import cds.savot.pull.SavotPullEngine;

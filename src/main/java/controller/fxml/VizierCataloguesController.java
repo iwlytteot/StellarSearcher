@@ -1,4 +1,4 @@
-package controller;
+package controller.fxml;
 
 import controller.http.vizier.VizierService;
 import javafx.application.Platform;

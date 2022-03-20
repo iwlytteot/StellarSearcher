@@ -1,7 +1,7 @@
 package utils;
 
-import controller.ConstraintWindowController;
-import controller.FilterWindowController;
+import controller.fxml.ConstraintWindowController;
+import controller.fxml.FilterWindowController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
