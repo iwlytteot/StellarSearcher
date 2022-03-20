@@ -41,8 +41,7 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
- * Class controller for "MainWindow.fxml". Beware that this controller is the main controller of the whole
- * application.
+ * Class controller for "MainWindow.fxml".
  */
 @Component
 @ComponentScan("model")

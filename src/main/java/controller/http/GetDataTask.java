@@ -1,6 +1,7 @@
 package controller.http;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import model.Catalogue;
 import model.Radius;
 
@@ -15,6 +16,7 @@ import java.util.concurrent.Callable;
  *           Available classes: MastService, SimbadService, VizierService.
  */
 @Data
+@Slf4j
 public class GetDataTask<T extends Request> implements Callable<List<String>> {
     private final List<Catalogue> catalogues;
     private final String input;
@@ -46,7 +48,7 @@ public class GetDataTask<T extends Request> implements Callable<List<String>> {
         try {
             return tClass.getDeclaredConstructor().newInstance();
         } catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
+            log.error("Error during retrieving instance of " + tClass.getName() + " Service: " + e.getMessage());
         }
         return null;
     }
