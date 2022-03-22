@@ -16,6 +16,7 @@ import java.util.ArrayList;
  * Class for mapping between Java class OutputData to JSON object.
  */
 @Component
+@SuppressWarnings("unchecked")
 public class DataExporter extends StdSerializer<OutputData> {
 
     public DataExporter() {
