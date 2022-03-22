@@ -52,7 +52,15 @@ public class MastMissionController {
 
             String folderPath = new File("").getAbsolutePath() + File.separator + "mast_tables";
 
-            for (File file : new File(folderPath).listFiles()) {
+            var files = new File(folderPath).listFiles();
+            if (files == null) {
+                log.error("Path to mast_tables was not found");
+                return;
+            }
+            for (File file : files) {
+                if (file.getName().startsWith(".")) {
+                    continue; //for macOS
+                }
                 var table = mapper.readValue(file, Table.class);
                 tables.add(table);
             }
