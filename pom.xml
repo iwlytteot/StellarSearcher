@@ -134,6 +134,7 @@
                     <!-- https://docs.spring.io/spring-boot/docs/current/reference/html/deployment.html#deployment.installing -->
                     <executable>true</executable>
                     <mainClass>view.Main</mainClass>
+                    <outputDirectory>${project.basedir}</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>
