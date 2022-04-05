@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioMenuItem?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="450.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.fxml.MainWindowController">
+<AnchorPane prefHeight="450.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.fxml.MainWindowController">
    <children>
       <Rectangle fx:id="rectLeft" arcHeight="10.0" arcWidth="10.0" fill="RED" height="120.0" layoutX="76.0" layoutY="90.0" stroke="#85515100" strokeType="INSIDE" strokeWidth="0.0" width="120.0" />
       <Button fx:id="vizierButton" layoutX="82.0" layoutY="96.0" mnemonicParsing="false" onMouseClicked="#enterVizier" prefHeight="108.0" prefWidth="108.0" style="-fx-focus-color: transparent;" text="VizieR">
@@ -50,9 +58,37 @@
               <MenuItem mnemonicParsing="false" onAction="#importData" text="Import" />
             </items>
           </Menu>
+            <Menu mnemonicParsing="false" text="Settings">
+               <items>
+                  <Menu mnemonicParsing="false" text="VizieR server">
+                     <items>
+                        <RadioMenuItem fx:id="vizierFrance" mnemonicParsing="false" selected="true" text="CDS Strasbourg, France">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="vizierGroup" />
+                           </toggleGroup>
+                        </RadioMenuItem>
+                        <RadioMenuItem fx:id="vizierJapan" mnemonicParsing="false" text="ADAC Tokyo, Japan" toggleGroup="$vizierGroup" />
+                        <RadioMenuItem fx:id="vizierIndia" mnemonicParsing="false" text="IUCAA Pune, India" toggleGroup="$vizierGroup" />
+                        <RadioMenuItem fx:id="vizierUsa" mnemonicParsing="false" text="CFA Harvard Cambridge, USA" toggleGroup="$vizierGroup" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Simbad server">
+                     <items>
+                        <RadioMenuItem fx:id="simbadFrance" mnemonicParsing="false" selected="true" text="CDS Strasbourg, France">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="simbadGroup" />
+                           </toggleGroup>
+                        </RadioMenuItem>
+                        <RadioMenuItem fx:id="simbadUsa" mnemonicParsing="false" text="CFA Harvard Cambridge, USA" toggleGroup="$simbadGroup" />
+                     </items>
+                  </Menu>
+               </items>
+            </Menu>
           <Menu mnemonicParsing="false" text="Tutorial">
           </Menu>
         </menus>
       </MenuBar>
+      <ToggleButton fx:id="vizierToogleGroup" layoutX="42.0" layoutY="397.0" mnemonicParsing="false" text="ToggleButton" toggleGroup="$vizierGroup" visible="false" />
+      <ToggleButton fx:id="simbadToogleGroup" layoutX="52.0" layoutY="407.0" mnemonicParsing="false" text="ToggleButton" toggleGroup="$simbadGroup" visible="false" />
    </children>
 </AnchorPane>
