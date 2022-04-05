@@ -16,10 +16,11 @@ import java.util.List;
  */
 @Component
 public class VizierService implements Request {
-    private static final String BASE_URL = "https://vizier.u-strasbg.fr/viz-bin/votable?";
+    private static final String BASE_PARAM = "/viz-bin/votable?";
 
     @Override
-    public List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius, Radius radiusType) {
+    public List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius,
+                                       Radius radiusType, String baseUrl) {
         StringBuilder sources = new StringBuilder();
         StringBuilder params = new StringBuilder();
         for (var catalogue : catalogues) {
@@ -46,7 +47,7 @@ public class VizierService implements Request {
         params.append("&");
         params.append("-out.max=unlimited");
 
-        var uri = URI.create(BASE_URL
+        var uri = URI.create(baseUrl + BASE_PARAM
                 + URLEncoder.encode("-source=", StandardCharsets.UTF_8)
                 + sources
                 + URLEncoder.encode("-c=" + identification, StandardCharsets.UTF_8)
@@ -66,8 +67,8 @@ public class VizierService implements Request {
      * @param catalogueName non-decoded input from user
      * @return URI for further process
      */
-    public URI createMetaDataRequest(String catalogueName) {
-        return URI.create(BASE_URL
+    public URI createMetaDataRequest(String catalogueName, String baseUrl) {
+        return URI.create(baseUrl + BASE_PARAM
                 + URLEncoder.encode("-source=" + catalogueName, StandardCharsets.UTF_8)
                 + "&"
                 + URLEncoder.encode("-meta.all", StandardCharsets.UTF_8)

@@ -16,10 +16,11 @@ import java.util.List;
  */
 @Component
 public class SimbadService implements Request {
-    private static final String BASE_URL = "http://simbad.u-strasbg.fr/simbad/sim-coo?";
+    private static final String BASE_PARAM = "/simbad/sim-coo?";
     private static final String SUFFIX_URL = "&output.format=VOTable";
     @Override
-    public List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius, Radius radiusType) {
+    public List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius,
+                                       Radius radiusType, String baseUrl) {
         String params = "Coord=" + URLEncoder.encode(identification, StandardCharsets.UTF_8) +
                 "&Radius.unit=" +
                 radiusType.name.replace(" ", "") +
@@ -27,7 +28,7 @@ public class SimbadService implements Request {
                 "Radius=" +
                 URLEncoder.encode(radius, StandardCharsets.UTF_8);
 
-        var uri = URI.create(BASE_URL
+        var uri = URI.create(baseUrl + BASE_PARAM
             + params
             + SUFFIX_URL);
         var output = new ArrayList<URI>();

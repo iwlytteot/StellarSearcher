@@ -12,6 +12,7 @@ import model.Catalogue;
 import model.InputDataCollector;
 import model.Table;
 import model.UserInput;
+import model.mirror.MastServer;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +31,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ImportControllerTask implements Callable<HashMap<UserInput, List<String>>> {
     private final String absolutePath;
+    private final String vizierServer;
+    private final String simbadServer;
 
     /**
      * Method that parses JSON file from absolute path.
@@ -68,7 +71,7 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                     var vizierCatalogues = new ArrayList<Catalogue>();
                     vizierCatalogues.add(vizierCatalogue);
                     var vizierFutureTask = new FutureTask<>(new GetDataTask<>(vizierCatalogues,
-                            position, input.getRadius(), input.getUnit(), VizierService.class));
+                            position, input.getRadius(), input.getUnit(), VizierService.class, vizierServer));
                     new Thread(vizierFutureTask).start();
                     tempMap.get(userInput).add(vizierFutureTask);
 
@@ -76,7 +79,7 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                     var mastCatalogues = new ArrayList<Catalogue>();
                     mastCatalogues.add(mastCatalogue);
                     var mastFutureTask = new FutureTask<>(new GetDataTask<>(mastCatalogues,
-                            position, input.getRadius(), input.getUnit(), MastService.class));
+                            position, input.getRadius(), input.getUnit(), MastService.class, MastServer.MAST_DEFAULT));
                     new Thread(mastFutureTask).start();
                     tempMap.get(userInput).add(mastFutureTask);
 
@@ -85,7 +88,7 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                         var resolverTask = new FutureTask<>(new SesameResolver(position));
                         new Thread(resolverTask).start();
                         var simbadFutureTask = new FutureTask<>(new GetDataTask<>(null,
-                                resolverTask.get(), input.getRadius(), input.getUnit(), SimbadService.class));
+                                resolverTask.get(), input.getRadius(), input.getUnit(), SimbadService.class, simbadServer));
                         new Thread(simbadFutureTask).start();
                         tempMap.get(userInput).add(simbadFutureTask);
                     }

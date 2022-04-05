@@ -16,10 +16,10 @@ import java.util.List;
  */
 @Component
 public class MastService implements Request {
-    private static final String BASE_URL = "https://archive.stsci.edu/";
     private static final String BASE_PARAMS = "search.php?action=Search&outputformat=VOTable&";
 
-    public List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius, Radius radiusType) {
+    public List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius,
+                                       Radius radiusType, String baseUrl) {
         var output = new ArrayList<URI>();
         StringBuilder base = new StringBuilder();
 
@@ -36,7 +36,7 @@ public class MastService implements Request {
                     .append("=")
                     .append(URLEncoder.encode(v, StandardCharsets.UTF_8))
                     .append("&"));
-            output.add(URI.create(BASE_URL
+            output.add(URI.create(baseUrl
                 + source
                 + BASE_PARAMS
                 + base

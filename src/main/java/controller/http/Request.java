@@ -21,9 +21,11 @@ public interface Request {
      * @param identification identification of object. Can be either coordinates or named identification
      * @param radius radius
      * @param radiusType type of radius
+     * @param server base url of the server, can be a mirror
      * @return List of URIs
      */
-    List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius, Radius radiusType);
+    List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius,
+                                Radius radiusType, String server);
 
     /**
      * Sends HTTP GET request and returns a string with data.

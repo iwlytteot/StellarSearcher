@@ -31,6 +31,7 @@ import java.util.List;
  */
 @Component
 @FxmlView("/VizierCataloguesWindow.fxml")
+@lombok.Data
 public class VizierCataloguesController {
     @FXML
     public Button addCatalogueVizierButton;
@@ -42,6 +43,7 @@ public class VizierCataloguesController {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     private final HashMap<CheckBoxTreeItem<Data>, Stage> nodeFilters = new HashMap<>();
+    private String vizierServer;
 
     public List<Catalogue> getSelectedCatalogues() {
         var output = new ArrayList<Catalogue>();
@@ -149,7 +151,8 @@ public class VizierCataloguesController {
                 @Override
                 protected Void call() {
                     var requestService = new VizierService();
-                    var request = requestService.createMetaDataRequest(inputVizierCatalogue.getText());
+                    var request = requestService.createMetaDataRequest(inputVizierCatalogue.getText(),
+                            vizierServer);
                     String result;
                     try {
                         result = requestService.sendRequest(request);

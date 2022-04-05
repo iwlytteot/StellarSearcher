@@ -23,6 +23,7 @@ public class GetDataTask<T extends Request> implements Callable<List<String>> {
     private final String radius;
     private final Radius type;
     private final Class<T> serviceClass;
+    private final String server;
 
     /**
      * Wraps retrieving list of URIs and respective HTTP GET calls.
@@ -32,7 +33,7 @@ public class GetDataTask<T extends Request> implements Callable<List<String>> {
     public List<String> call() {
         var service = getInstanceOfService(serviceClass);
         var output = new ArrayList<String>();
-        var requests = service.createDataRequest(catalogues, input, radius, type);
+        var requests = service.createDataRequest(catalogues, input, radius, type, server);
         for (var request : requests) {
             output.add(service.sendRequest(request));
         }

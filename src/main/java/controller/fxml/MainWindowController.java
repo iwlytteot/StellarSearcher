@@ -12,10 +12,7 @@ import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
@@ -23,6 +20,9 @@ import javafx.stage.Stage;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.*;
+import model.mirror.MastServer;
+import model.mirror.SimbadServer;
+import model.mirror.VizierServer;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
@@ -83,6 +83,18 @@ public class MainWindowController {
     public TextField inputText;
     @FXML
     public TextField radiusInput;
+    @FXML
+    public RadioMenuItem vizierFrance;
+    @FXML
+    public RadioMenuItem vizierJapan;
+    @FXML
+    public RadioMenuItem vizierIndia;
+    @FXML
+    public RadioMenuItem vizierUsa;
+    @FXML
+    public RadioMenuItem simbadFrance;
+    @FXML
+    public RadioMenuItem simbadUsa;
 
     private boolean vizierSearch = false, simbadSearch = false, mastSearch = false;
     private final List<String> affectedTables = Collections.synchronizedList(new ArrayList<>());
@@ -136,6 +148,7 @@ public class MainWindowController {
         if (vizierWindowEventHandler.getStage() == null) {
             context.publishEvent(new VizierWindowEvent(new Stage()));
         }
+        vizierCataloguesController.setVizierServer(getVizierServer());
         vizierWindowEventHandler.getStage().show();
     }
 
@@ -217,6 +230,26 @@ public class MainWindowController {
         return new UserInput(inputText.getText(), radiusInput.getText(), radiusBox.getValue());
     }
 
+    public String getVizierServer() {
+        if (vizierFrance.isSelected()) {
+            return VizierServer.CDS_FRANCE;
+        }
+        else if (vizierJapan.isSelected()) {
+            return VizierServer.ADAC_TOKYO;
+        }
+        else if (vizierIndia.isSelected()) {
+            return VizierServer.IUCAA_PUNE;
+        }
+        return VizierServer.CFA_HARVARD;
+    }
+
+    public String getSimbadServer() {
+        if (simbadFrance.isSelected()) {
+            return SimbadServer.CDS_FRANCE;
+        }
+        return SimbadServer.CFA_HARVARD;
+    }
+
     /**
      * JavaFX Service, where search parameters are retrieved and where search action takes place.
      */
@@ -235,21 +268,24 @@ public class MainWindowController {
                         var catalogues = new ArrayList<Catalogue>();
                         catalogues.add(catalogue);
                         results.add(executorCompletionService.submit(new GetDataTask<>(catalogues,
-                                inputText.getText(), radiusInput.getText(), radiusBox.getValue(), MastService.class)));
+                                inputText.getText(), radiusInput.getText(), radiusBox.getValue(), MastService.class,
+                                MastServer.MAST_DEFAULT)));
                         ++threadCount;
                     }
 
                     //If VizieR button was activated
                     if (vizierSearch) {
                         results.add(executorCompletionService.submit(new GetDataTask<>(getVizierCatalogues(),
-                                inputText.getText(), radiusInput.getText(), radiusBox.getValue(), VizierService.class)));
+                                inputText.getText(), radiusInput.getText(), radiusBox.getValue(), VizierService.class,
+                                getVizierServer())));
                         ++threadCount;
                     }
 
                     //If SIMBAD button was activated
                     if (simbadSearch) {
                         results.add(executorCompletionService.submit(new GetDataTask<>(null,
-                                getResolvedInput(inputText.getText()), radiusInput.getText(), radiusBox.getValue(), SimbadService.class)));
+                                getResolvedInput(inputText.getText()), radiusInput.getText(), radiusBox.getValue(),
+                                SimbadService.class, getSimbadServer())));
                         ++threadCount;
                     }
 
@@ -319,7 +355,8 @@ public class MainWindowController {
         searchButton.getScene().setCursor(Cursor.WAIT);
 
         //Starts a new task for processing, so it doesn't block main JavaFX thread
-        var importTask = new FutureTask<>(new ImportControllerTask(selectedFile.getAbsolutePath()));
+        var importTask = new FutureTask<>(new ImportControllerTask(selectedFile.getAbsolutePath(),
+                getVizierServer(), getSimbadServer()));
         new Thread(importTask).start();
         HashMap<UserInput, List<String>> output = new HashMap<>();
         try {
