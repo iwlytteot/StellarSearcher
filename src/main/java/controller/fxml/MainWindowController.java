@@ -99,9 +99,7 @@ public class MainWindowController {
     private boolean vizierSearch = false, simbadSearch = false, mastSearch = false;
     private final List<String> affectedTables = Collections.synchronizedList(new ArrayList<>());
 
-    private final ExecutorService executorWrapper = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    private final ExecutorCompletionService<List<String>> executorCompletionService = new ExecutorCompletionService<>(executorWrapper);
-    private int threadCount = 0;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     @FXML
     public void initialize() {
@@ -114,7 +112,7 @@ public class MainWindowController {
     }
 
     public void exit() {
-        executorWrapper.shutdownNow();
+        executorService.shutdownNow();
     }
 
     public void enterVizier() {
@@ -221,9 +219,7 @@ public class MainWindowController {
     }
 
     private String getResolvedInput(String input) throws ExecutionException, InterruptedException {
-        var resolverTask = new FutureTask<>(new SesameResolver(input));
-        new Thread(resolverTask).start();
-        return resolverTask.get();
+        return executorService.submit(new SesameResolver(input)).get();
     }
 
     private UserInput getUserInput() {
@@ -259,7 +255,7 @@ public class MainWindowController {
             return new Task<>() {
                 @Override
                 protected List<List<String>> call() throws ExecutionException, InterruptedException {
-                    List<Future<List<String>>> results = new ArrayList<>();
+                    List<Callable<List<String>>> tasks = new ArrayList<>();
 
                     //If MAST button was activated
                     if (mastSearch) {
@@ -267,43 +263,29 @@ public class MainWindowController {
                         catalogue.setTables(getMastMissions());
                         var catalogues = new ArrayList<Catalogue>();
                         catalogues.add(catalogue);
-                        results.add(executorCompletionService.submit(new GetDataTask<>(catalogues,
+                        tasks.add(new GetDataTask<>(catalogues,
                                 inputText.getText(), radiusInput.getText(), radiusBox.getValue(), MastService.class,
-                                MastServer.MAST_DEFAULT)));
-                        ++threadCount;
+                                MastServer.MAST_DEFAULT));
                     }
 
                     //If VizieR button was activated
                     if (vizierSearch) {
-                        results.add(executorCompletionService.submit(new GetDataTask<>(getVizierCatalogues(),
+                        tasks.add(new GetDataTask<>(getVizierCatalogues(),
                                 inputText.getText(), radiusInput.getText(), radiusBox.getValue(), VizierService.class,
-                                getVizierServer())));
-                        ++threadCount;
+                                getVizierServer()));
                     }
 
                     //If SIMBAD button was activated
                     if (simbadSearch) {
-                        results.add(executorCompletionService.submit(new GetDataTask<>(null,
+                        tasks.add(new GetDataTask<>(null,
                                 getResolvedInput(inputText.getText()), radiusInput.getText(), radiusBox.getValue(),
-                                SimbadService.class, getSimbadServer())));
-                        ++threadCount;
+                                SimbadService.class, getSimbadServer()));
                     }
-
-                    //Waits for all threads to finish
-                    for (int i = 0; i < threadCount; ++i) {
-                        try {
-                            executorCompletionService.take();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    //Gets results
+                    var responses = executorService.invokeAll(tasks);
                     var output = new ArrayList<List<String>>();
-                    for (var result : results) {
-                        output.add(result.get());
+                    for (var response : responses) {
+                        output.add(response.get());
                     }
-                    threadCount = 0;
                     return output;
                 }
             };
@@ -354,16 +336,16 @@ public class MainWindowController {
         }
         searchButton.getScene().setCursor(Cursor.WAIT);
 
-        //Starts a new task for processing, so it doesn't block main JavaFX thread
-        var importTask = new FutureTask<>(new ImportControllerTask(selectedFile.getAbsolutePath(),
-                getVizierServer(), getSimbadServer()));
-        new Thread(importTask).start();
         HashMap<UserInput, List<String>> output = new HashMap<>();
+
+        //Starts a new task for processing, so it doesn't block main JavaFX thread
         try {
-            output = importTask.get();
+            output = executorService.submit(new ImportControllerTask(selectedFile.getAbsolutePath(),
+                    getVizierServer(), getSimbadServer())).get();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error while retrieving data from import: " + e.getMessage());
         }
+
         if (resultWindowEventHandler.getStage() == null) {
             context.publishEvent(new ResultWindowEvent(new Stage()));
         }
