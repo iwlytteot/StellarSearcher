@@ -116,7 +116,7 @@ public class MainWindowController {
     }
 
     public void exit() {
-        executorService.shutdownNow();
+        executorService.shutdown();
     }
 
     public void enterVizier() {
@@ -355,7 +355,7 @@ public class MainWindowController {
         protected Task<HashMap<UserInput, List<String>>> createTask() {
             return new Task<>() {
                 @Override
-                protected HashMap<UserInput, List<String>> call() throws ExecutionException, InterruptedException {
+                protected HashMap<UserInput, List<String>> call() {
                     HashMap<UserInput, List<String>> output = new HashMap<>();
                     Platform.runLater(() -> infoLabel.setText("Fetching data.."));
                     try {

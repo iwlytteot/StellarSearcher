@@ -95,9 +95,15 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                     for (var future : entry.getValue()) {
                         tempList.add(future.get());
                     }
+
+                    //in case there is same input and radius present (in different target object), then append to
+                    //existing result
+                    var newValue = output.getOrDefault(entry.getKey(), new ArrayList<>());
+
                     //flatting the result because it is not necessary to have deeper division in results
                     //as it is enough to divide it by input and radius
-                    output.put(entry.getKey(), tempList.stream().flatMap(List::stream).collect(Collectors.toList()));
+                    newValue.addAll(tempList.stream().flatMap(List::stream).collect(Collectors.toList()));
+                    output.put(entry.getKey(), newValue);
                 }
             }
         } catch (IOException | InterruptedException | ExecutionException e) {
