@@ -19,9 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
@@ -33,6 +31,8 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
     private final String absolutePath;
     private final String vizierServer;
     private final String simbadServer;
+
+    private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     /**
      * Method that parses JSON file from absolute path.
@@ -61,7 +61,8 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                 }
 
                 //Search part
-                var tempMap = new HashMap<UserInput, List<FutureTask<List<String>>>>();
+                var tempMap = new HashMap<UserInput, List<Future<List<String>>>>();
+
                 for (var position : input.getInput()) {
                     //Retrieves inputs and radius + radius type
                     var userInput = new UserInput(position, input.getRadius(), input.getUnit());
@@ -70,35 +71,29 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                     //Vizier task
                     var vizierCatalogues = new ArrayList<Catalogue>();
                     vizierCatalogues.add(vizierCatalogue);
-                    var vizierFutureTask = new FutureTask<>(new GetDataTask<>(vizierCatalogues,
-                            position, input.getRadius(), input.getUnit(), VizierService.class, vizierServer));
-                    new Thread(vizierFutureTask).start();
-                    tempMap.get(userInput).add(vizierFutureTask);
+                    tempMap.get(userInput).add(executorService.submit(new GetDataTask<>(vizierCatalogues,
+                            position, input.getRadius(), input.getUnit(), VizierService.class, vizierServer)));
 
                     //Mast task
                     var mastCatalogues = new ArrayList<Catalogue>();
                     mastCatalogues.add(mastCatalogue);
-                    var mastFutureTask = new FutureTask<>(new GetDataTask<>(mastCatalogues,
-                            position, input.getRadius(), input.getUnit(), MastService.class, MastServer.MAST_DEFAULT));
-                    new Thread(mastFutureTask).start();
-                    tempMap.get(userInput).add(mastFutureTask);
+
+                    tempMap.get(userInput).add(executorService.submit(new GetDataTask<>(mastCatalogues,
+                            position, input.getRadius(), input.getUnit(), MastService.class, MastServer.MAST_DEFAULT)));
 
                     //Simbad task
                     if (input.isSimbad()) {
-                        var resolverTask = new FutureTask<>(new SesameResolver(position));
-                        new Thread(resolverTask).start();
-                        var simbadFutureTask = new FutureTask<>(new GetDataTask<>(null,
-                                resolverTask.get(), input.getRadius(), input.getUnit(), SimbadService.class, simbadServer));
-                        new Thread(simbadFutureTask).start();
-                        tempMap.get(userInput).add(simbadFutureTask);
+                        var resolvedInput = executorService.submit(new SesameResolver(position)).get();
+                        tempMap.get(userInput).add(executorService.submit(new GetDataTask<>(null,
+                                resolvedInput, input.getRadius(), input.getUnit(), SimbadService.class, simbadServer)));
                     }
                 }
-                //Retrieving data from Future task and associating user input with results so that Result
+                //Retrieving data from Future and associating user input with results so that Result
                 //windows contains data that are in correct tab
                 for (var entry : tempMap.entrySet()) {
                     var tempList = new ArrayList<List<String>>();
-                    for (var futureTask : entry.getValue()) {
-                        tempList.add(futureTask.get());
+                    for (var future : entry.getValue()) {
+                        tempList.add(future.get());
                     }
                     //flatting the result because it is not necessary to have deeper division in results
                     //as it is enough to divide it by input and radius
@@ -108,6 +103,7 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
         } catch (IOException | InterruptedException | ExecutionException e) {
             log.error("Error while processing JSON file: " + e.getMessage());
         }
+        executorService.shutdown();
         return output;
     }
 }
