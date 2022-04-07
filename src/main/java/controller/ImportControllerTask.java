@@ -43,7 +43,7 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
     public HashMap<UserInput, List<String>> call() {
         var output = new HashMap<UserInput, List<String>>();
         try {
-            //Opens JSON file and parses it to InputDataCollector class
+            //Opens JSON file and parses it to InputDataCollector wrapper class
             ObjectMapper objectMapper = new ObjectMapper();
             InputDataCollector inputDataCollector = objectMapper.readValue(new File(absolutePath), InputDataCollector.class);
 
