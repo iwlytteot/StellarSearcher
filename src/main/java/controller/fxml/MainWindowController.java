@@ -34,6 +34,7 @@ import view.handler.MastWindowEventHandler;
 import view.handler.ResultWindowEventHandler;
 import view.handler.VizierWindowEventHandler;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -95,11 +96,14 @@ public class MainWindowController {
     public RadioMenuItem simbadFrance;
     @FXML
     public RadioMenuItem simbadUsa;
+    @FXML
+    public Label infoLabel;
 
     private boolean vizierSearch = false, simbadSearch = false, mastSearch = false;
     private final List<String> affectedTables = Collections.synchronizedList(new ArrayList<>());
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private File importFile;
 
     @FXML
     public void initialize() {
@@ -281,6 +285,7 @@ public class MainWindowController {
                                 getResolvedInput(inputText.getText()), radiusInput.getText(), radiusBox.getValue(),
                                 SimbadService.class, getSimbadServer()));
                     }
+                    Platform.runLater(() -> infoLabel.setText("Fetching data.."));
                     var responses = executorService.invokeAll(tasks);
                     var output = new ArrayList<List<String>>();
                     for (var response : responses) {
@@ -303,16 +308,17 @@ public class MainWindowController {
             var flatList = searchService.getValue().stream().flatMap(List::stream).collect(Collectors.toList());
             var result = new HashMap<UserInput, List<String>>();
             result.put(getUserInput(), flatList);
+
             resultWindowController.fill(result);
-
             searchButton.getScene().setCursor(Cursor.DEFAULT);
-
+            infoLabel.setText("");
             resultWindowEventHandler.getStage().show();
         }
 
         @Override
         protected void cancelled() {
             searchButton.getScene().setCursor(Cursor.DEFAULT);
+            infoLabel.setText("");
             log.warn("Search action was cancelled, the input was: "
                     + inputText.getText() + ", " + radiusInput.getText() + " " + radiusBox.getValue());
         }
@@ -320,6 +326,7 @@ public class MainWindowController {
         @Override
         protected void failed() {
             searchButton.getScene().setCursor(Cursor.DEFAULT);
+            infoLabel.setText("");
             log.error("Search action has failed, the input was: "
                     + inputText.getText() + ", " + radiusInput.getText() + " " + radiusBox.getValue());
         }
@@ -330,28 +337,52 @@ public class MainWindowController {
      */
     public void importData() {
         FileChooser fileChooser = new FileChooser();
-        var selectedFile = fileChooser.showOpenDialog(searchButton.getScene().getWindow());
-        if (selectedFile == null) {
+        importFile = fileChooser.showOpenDialog(searchButton.getScene().getWindow());
+        if (importFile == null) {
             return;
         }
         searchButton.getScene().setCursor(Cursor.WAIT);
 
-        HashMap<UserInput, List<String>> output = new HashMap<>();
-
-        //Starts a new task for processing, so it doesn't block main JavaFX thread
-        try {
-            output = executorService.submit(new ImportControllerTask(selectedFile.getAbsolutePath(),
-                    getVizierServer(), getSimbadServer())).get();
-        } catch (InterruptedException | ExecutionException e) {
-            log.error("Error while retrieving data from import: " + e.getMessage());
+        if (importService.getState() != Worker.State.READY) {
+            importService.cancel();
+            importService.reset();
         }
-
-        if (resultWindowEventHandler.getStage() == null) {
-            context.publishEvent(new ResultWindowEvent(new Stage()));
-        }
-        resultWindowController.fill(output);
-        searchButton.getScene().setCursor(Cursor.DEFAULT);
-
-        resultWindowEventHandler.getStage().show();
+        importService.start();
     }
+
+    private final Service<HashMap<UserInput, List<String>>> importService = new Service<>() {
+        @Override
+        protected Task<HashMap<UserInput, List<String>>> createTask() {
+            return new Task<>() {
+                @Override
+                protected HashMap<UserInput, List<String>> call() throws ExecutionException, InterruptedException {
+                    HashMap<UserInput, List<String>> output = new HashMap<>();
+                    Platform.runLater(() -> infoLabel.setText("Fetching data.."));
+                    try {
+                        output = executorService.submit(new ImportControllerTask(importFile.getAbsolutePath(),
+                                getVizierServer(), getSimbadServer())).get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        log.error("Error while retrieving data from import: " + e.getMessage());
+                    }
+                    return output;
+                }
+            };
+        }
+
+        /**
+         * If searching was successful and no error occurred during retrieving data, then
+         * Result Window is invoked and filled with respective data.
+         */
+        @Override
+        protected void succeeded() {
+            if (resultWindowEventHandler.getStage() == null) {
+                context.publishEvent(new ResultWindowEvent(new Stage()));
+            }
+            resultWindowController.fill(importService.getValue());
+            infoLabel.setText("");
+            searchButton.getScene().setCursor(Cursor.DEFAULT);
+            resultWindowEventHandler.getStage().show();
+        }
+    };
+
 }
