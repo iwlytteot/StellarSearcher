@@ -130,7 +130,7 @@ public class ResultWindowController {
                             rowCount += data.getTRs().getItemCount();
                         }
                         else {
-                            rowCount += numOfRows;
+                            rowCount += Math.min(numOfRows, data.getTRs().getItemCount());
                         }
                         int tableRowCount = 0;
                         if (data.getTRs().getItems() != null) {
