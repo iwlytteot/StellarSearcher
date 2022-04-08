@@ -34,9 +34,9 @@
             <Font size="21.0" />
          </font>
       </Button>
-      <TextField fx:id="inputText" layoutX="130.0" layoutY="286.0" prefHeight="31.0" prefWidth="140.0" promptText="ID or Coordinates" />
+      <TextField fx:id="inputText" layoutX="116.0" layoutY="286.0" prefHeight="31.0" prefWidth="154.0" promptText="ID or Coordinates" />
       <TextField fx:id="radiusInput" layoutX="284.0" layoutY="286.0" prefHeight="31.0" prefWidth="140.0" promptText="radius" />
-      <Button fx:id="searchButton" layoutX="284.0" layoutY="331.0" mnemonicParsing="false" onAction="#searchAction" text="Search">
+      <Button fx:id="searchButton" layoutX="272.0" layoutY="343.0" mnemonicParsing="false" onAction="#searchAction" prefHeight="31.0" prefWidth="89.0" text="Search">
          <font>
             <Font size="15.0" />
          </font>
@@ -83,6 +83,7 @@
                         <RadioMenuItem fx:id="simbadUsa" mnemonicParsing="false" text="CFA Harvard Cambridge, USA" toggleGroup="$simbadGroup" />
                      </items>
                   </Menu>
+                  <MenuItem mnemonicParsing="false" onAction="#openOutputSetting" text="Output settings" />
                </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Tutorial">
@@ -91,7 +92,7 @@
       </MenuBar>
       <ToggleButton fx:id="vizierToogleGroup" layoutX="42.0" layoutY="397.0" mnemonicParsing="false" text="ToggleButton" toggleGroup="$vizierGroup" visible="false" />
       <ToggleButton fx:id="simbadToogleGroup" layoutX="52.0" layoutY="407.0" mnemonicParsing="false" text="ToggleButton" toggleGroup="$simbadGroup" visible="false" />
-      <Label fx:id="infoLabel" alignment="CENTER" layoutX="153.0" layoutY="387.0" prefHeight="21.0" prefWidth="326.0" textAlignment="CENTER" textFill="#23462e">
+      <Label fx:id="infoLabel" alignment="CENTER" layoutX="153.0" layoutY="397.0" prefHeight="21.0" prefWidth="326.0" textAlignment="CENTER" textFill="#23462e">
          <font>
             <Font size="15.0" />
          </font>

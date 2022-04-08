@@ -47,21 +47,21 @@ public class ResultWindowController {
     private final ExportWindowController exportWindowController;
     @FXML
     public TabPane tabPane;
-    private int numOfCols = 10;
+    @FXML
+    public Label numRows;
 
     /**
      * Fills TabPane with Tabs. These tabs are results from searching in servers.
      * @param output result from searching
+     * @param numOfCols number of output columns
+     * @param numOfRows number of output rows
      */
-    public void fill(HashMap<UserInput, List<String>> output, int numOfCols) {
-        this.numOfCols = numOfCols;
-        fill(output);
-    }
 
-    public void fill(HashMap<UserInput, List<String>> output) {
+    public void fill(HashMap<UserInput, List<String>> output, int numOfCols, int numOfRows) {
         //If there was multiple searching
-        tabPane.getTabs().clear();
+        Platform.runLater(() -> tabPane.getTabs().clear());
 
+        int rowCount = 0;
         for (var entry : output.entrySet()) {
             //Retrieves input and radius and creates Tab
             var inputTab = new Tab(entry.getKey().toString());
@@ -126,10 +126,20 @@ public class ResultWindowController {
                             continue;
                         }
                         var data = t.getData().getTableData();
+                        if (numOfRows == -1) {
+                            rowCount += data.getTRs().getItemCount();
+                        }
+                        else {
+                            rowCount += numOfRows;
+                        }
+                        int tableRowCount = 0;
                         if (data.getTRs().getItems() != null) {
                             for (var trItem : data.getTRs().getItems()) {
                                 var tr = (SavotTR) trItem;
-                                tableView.getItems().add(tr);
+                                if (numOfRows == -1 || tableRowCount < numOfRows) {
+                                    tableView.getItems().add(tr);
+                                    ++tableRowCount;
+                                }
                             }
                         }
                         if (!tableView.getItems().isEmpty()) {
@@ -140,8 +150,10 @@ public class ResultWindowController {
                 }
             }
             inputTab.setContent(inputPane);
-            tabPane.getTabs().add(inputTab);
+            Platform.runLater(() -> tabPane.getTabs().add(inputTab));
         }
+        int finalRowCount = rowCount;
+        Platform.runLater(() -> numRows.setText("Fetched " + finalRowCount + " row(s)"));
     }
 
     /**

@@ -28,9 +28,11 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import view.event.MastWindowEvent;
+import view.event.OutputSettingWindowEvent;
 import view.event.ResultWindowEvent;
 import view.event.VizierWindowEvent;
 import view.handler.MastWindowEventHandler;
+import view.handler.OutputSettingWindowEventHandler;
 import view.handler.ResultWindowEventHandler;
 import view.handler.VizierWindowEventHandler;
 
@@ -55,10 +57,12 @@ public class MainWindowController {
     private final VizierWindowEventHandler vizierWindowEventHandler;
     private final MastWindowEventHandler mastWindowEventHandler;
     private final ResultWindowEventHandler resultWindowEventHandler;
+    private final OutputSettingWindowEventHandler outputSettingWindowEventHandler;
 
     private final VizierCataloguesController vizierCataloguesController;
     private final MastMissionController mastMissionController;
     private final ResultWindowController resultWindowController;
+    private final OutputSettingController outputSettingController;
 
     @FXML
     public Rectangle rectLeft;
@@ -309,7 +313,7 @@ public class MainWindowController {
             var result = new HashMap<UserInput, List<String>>();
             result.put(getUserInput(), flatList);
 
-            resultWindowController.fill(result);
+            resultWindowController.fill(result, outputSettingController.getNumOfCols(), outputSettingController.getNumOfRows());
             searchButton.getScene().setCursor(Cursor.DEFAULT);
             infoLabel.setText("");
             resultWindowEventHandler.getStage().show();
@@ -378,11 +382,18 @@ public class MainWindowController {
             if (resultWindowEventHandler.getStage() == null) {
                 context.publishEvent(new ResultWindowEvent(new Stage()));
             }
-            resultWindowController.fill(importService.getValue());
+            resultWindowController.fill(importService.getValue(),
+                    outputSettingController.getNumOfCols(), outputSettingController.getNumOfRows());
             infoLabel.setText("");
             searchButton.getScene().setCursor(Cursor.DEFAULT);
             resultWindowEventHandler.getStage().show();
         }
     };
 
+    public void openOutputSetting() {
+        if (outputSettingWindowEventHandler.getStage() == null) {
+            context.publishEvent(new OutputSettingWindowEvent(new Stage()));
+        }
+        outputSettingWindowEventHandler.getStage().show();
+    }
 }
