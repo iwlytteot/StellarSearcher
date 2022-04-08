@@ -45,15 +45,16 @@ public class DataExporter extends StdSerializer<OutputData> {
         jsonGenerator.writeStringField("catalogue", tab.getText());
         jsonGenerator.writeObjectField("columns", cols);
 
-        var row = new ArrayList<String>();
-        var rows = new ArrayList<ArrayList<String>>();
+        jsonGenerator.writeFieldName("rows");
+        jsonGenerator.writeStartArray();
         for (var value : tableView.getItems()) {
+            var row = new ArrayList<String>();
             for (var f : value.getTDSet().getItems()) {
                 row.add(((SavotTD) f).getContent());
             }
-            rows.add(row);
+            jsonGenerator.writeObject(row);
         }
-        jsonGenerator.writeObjectField("rows", rows);
+        jsonGenerator.writeEndArray();
 
         jsonGenerator.writeEndObject();
     }

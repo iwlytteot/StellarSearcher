@@ -8,6 +8,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -143,27 +146,44 @@ public class ResultWindowController {
             return;
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule("DataSerial", new Version(1, 0, 0, null, null, null));
-        module.addSerializer(OutputData.class, new DataExporter());
-        mapper.registerModule(module);
-
-        //Mapping Tab object into JSON object via ObjectMapper that uses DataExporter as its map.
-        int i = 0;
-        for (var inputTab : tabPane.getTabs()) {
-            var input = Arrays.stream(inputTab.getText().split(";")).collect(Collectors.toList());
-            for (var tab : ((TabPane) inputTab.getContent()).getTabs()) {
-                try {
-                    FileWriter myWriter = new FileWriter(exportWindowController.getSelectedDirectory().getAbsolutePath() + "/" + i + ".txt");
-                    var outputData = new OutputData(input.get(0), input.get(1));
-                    outputData.setTab(tab);
-                    myWriter.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(outputData));
-                    myWriter.close();
-                } catch (IOException e) {
-                    log.error("Error during exporting: " + e.getMessage());
-                }
-                ++i;
-            }
+        if (exportService.getState() != Worker.State.READY) {
+            exportService.cancel();
+            exportService.reset();
         }
+        exportService.start();
     }
+
+    private final Service<Void> exportService = new Service<>() {
+        @Override
+        protected Task<Void> createTask() {
+            return new Task<>() {
+                @Override
+                protected Void call() {
+                    ObjectMapper mapper = new ObjectMapper();
+                    SimpleModule module = new SimpleModule("DataSerial", new Version(1, 0, 0, null, null, null));
+                    module.addSerializer(OutputData.class, new DataExporter());
+                    mapper.registerModule(module);
+
+                    //Mapping Tab object into JSON object via ObjectMapper that uses DataExporter as its map.
+                    int i = 0;
+                    for (var inputTab : tabPane.getTabs()) {
+                        var input = Arrays.stream(inputTab.getText().split(";")).collect(Collectors.toList());
+                        for (var tab : ((TabPane) inputTab.getContent()).getTabs()) {
+                            try {
+                                FileWriter myWriter = new FileWriter(exportWindowController.getSelectedDirectory().getAbsolutePath() + "/" + i + ".txt");
+                                var outputData = new OutputData(input.get(0), input.get(1));
+                                outputData.setTab(tab);
+                                myWriter.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(outputData));
+                                myWriter.close();
+                            } catch (IOException e) {
+                                log.error("Error during exporting: " + e.getMessage());
+                            }
+                            ++i;
+                        }
+                    }
+                    return null;
+                }
+            };
+        }
+    };
 }
