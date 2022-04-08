@@ -131,7 +131,7 @@ public class ResultWindowController {
 
     /**
      * Method that opens the directory chooser and then proceeds to export data such that file name is enumerated as
-     * 'x.txt', where x is in range <0, p>, where 'p' is number of exported Tabs.
+     * 'x.txt', where x is in range <0, p> and 'p' is number Tabs to be exported.
      */
     public void exportData() {
         if (exportWindowEventHandler.getStage() == null) {
