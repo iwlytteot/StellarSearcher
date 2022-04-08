@@ -47,11 +47,17 @@ public class ResultWindowController {
     private final ExportWindowController exportWindowController;
     @FXML
     public TabPane tabPane;
+    private int numOfCols = 10;
 
     /**
      * Fills TabPane with Tabs. These tabs are results from searching in servers.
      * @param output result from searching
      */
+    public void fill(HashMap<UserInput, List<String>> output, int numOfCols) {
+        this.numOfCols = numOfCols;
+        fill(output);
+    }
+
     public void fill(HashMap<UserInput, List<String>> output) {
         //If there was multiple searching
         tabPane.getTabs().clear();
@@ -101,6 +107,7 @@ public class ResultWindowController {
                         var tableTab = new Tab(t.getName());
 
                         var tableView = new TableView<SavotTR>();
+                        var columnCount = 0;
                         for (int i = 0; i < t.getFields().getItemCount(); ++i) {
                             var field = (SavotField) t.getFields().getItemAt(i);
                             var column = new TableColumn<SavotTR, String>(field.getDescription());
@@ -108,6 +115,11 @@ public class ResultWindowController {
                             column.setCellValueFactory(v -> new SimpleStringProperty(v.getValue().getTDs().getContent(finalI)));
                             column.setSortable(false);
                             tableView.getColumns().add(column);
+                            if (columnCount >= numOfCols) {
+                                column.setVisible(false);
+                            } else {
+                                ++columnCount;
+                            }
                         }
 
                         if (t.getData() == null) {
