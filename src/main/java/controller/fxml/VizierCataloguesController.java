@@ -111,7 +111,7 @@ public class VizierCataloguesController {
         stage.hide();
     }
 
-    private static void dialoguePopup(String message, Alert.AlertType alertType) {
+    private void dialoguePopup(String message, Alert.AlertType alertType) {
         Platform.runLater(() -> {
             Alert alert = new Alert(alertType);
             alert.setTitle("Request failed");

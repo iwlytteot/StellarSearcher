@@ -121,6 +121,14 @@ public class MainWindowController {
 
     public void exit() {
         executorService.shutdown();
+        searchService.cancel();
+        importService.cancel();
+        if (resultWindowEventHandler.getStage() != null) {
+            resultWindowController.getExportService().cancel();
+        }
+        if (vizierWindowEventHandler.getStage() != null) {
+            vizierCataloguesController.getCatalogueRequestService().cancel();
+        }
     }
 
     public void enterVizier() {
