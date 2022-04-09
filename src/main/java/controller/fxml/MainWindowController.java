@@ -31,10 +31,7 @@ import view.event.MastWindowEvent;
 import view.event.OutputSettingWindowEvent;
 import view.event.ResultWindowEvent;
 import view.event.VizierWindowEvent;
-import view.handler.MastWindowEventHandler;
-import view.handler.OutputSettingWindowEventHandler;
-import view.handler.ResultWindowEventHandler;
-import view.handler.VizierWindowEventHandler;
+import view.handler.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -58,11 +55,13 @@ public class MainWindowController {
     private final MastWindowEventHandler mastWindowEventHandler;
     private final ResultWindowEventHandler resultWindowEventHandler;
     private final OutputSettingWindowEventHandler outputSettingWindowEventHandler;
+    private final ExportWindowEventHandler exportWindowEventHandler;
 
     private final VizierCataloguesController vizierCataloguesController;
     private final MastMissionController mastMissionController;
     private final ResultWindowController resultWindowController;
     private final OutputSettingController outputSettingController;
+    private final ExportWindowController exportWindowController;
 
     @FXML
     public Rectangle rectLeft;
@@ -123,10 +122,14 @@ public class MainWindowController {
         executorService.shutdown();
         searchService.cancel();
         importService.cancel();
-        if (resultWindowEventHandler.getStage() != null) {
-            resultWindowController.getExportService().cancel();
+
+        var exportServiceState = exportWindowController.getExportService().getState();
+        if (exportServiceState == Worker.State.RUNNING || exportServiceState == Worker.State.SCHEDULED) {
+            exportWindowController.getExportService().cancel();
         }
-        if (vizierWindowEventHandler.getStage() != null) {
+
+        var catalogueServiceState = vizierCataloguesController.getCatalogueRequestService().getState();
+        if (catalogueServiceState == Worker.State.RUNNING || exportServiceState == Worker.State.SCHEDULED) {
             vizierCataloguesController.getCatalogueRequestService().cancel();
         }
     }
@@ -217,7 +220,7 @@ public class MainWindowController {
             return;
         }
 
-        searchButton.getScene().setCursor(Cursor.WAIT);
+        Platform.runLater(() -> searchButton.getScene().setCursor(Cursor.WAIT));
 
         if (searchService.getState() != Worker.State.READY) {
             searchService.cancel();
