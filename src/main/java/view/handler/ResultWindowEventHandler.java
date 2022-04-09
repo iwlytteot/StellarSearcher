@@ -2,6 +2,7 @@ package view.handler;
 
 import controller.fxml.ResultWindowController;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.Data;
 import net.rgielen.fxweaver.core.FxWeaver;
@@ -22,6 +23,7 @@ public class ResultWindowEventHandler implements ApplicationListener<ResultWindo
         Stage stage = resultWindowEvent.getStage();
         stage.setScene(new Scene(fxWeaver.loadView(ResultWindowController.class)));
         stage.setTitle("Result window");
+        stage.initModality(Modality.APPLICATION_MODAL);
         this.stage = stage;
     }
 }

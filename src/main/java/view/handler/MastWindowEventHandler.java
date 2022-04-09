@@ -2,6 +2,7 @@ package view.handler;
 
 import controller.fxml.MastMissionController;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.Data;
 import net.rgielen.fxweaver.core.FxWeaver;
@@ -23,6 +24,6 @@ public class MastWindowEventHandler implements ApplicationListener<MastWindowEve
         stage.setScene(new Scene(fxWeaver.loadView(MastMissionController.class)));
         stage.setTitle("MAST window");
         this.stage = stage;
-        stage.show();
+        stage.initModality(Modality.APPLICATION_MODAL);
     }
 }

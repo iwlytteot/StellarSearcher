@@ -2,6 +2,7 @@ package view.handler;
 
 import controller.fxml.VizierCataloguesController;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.Data;
 import net.rgielen.fxweaver.core.FxWeaver;
@@ -23,6 +24,6 @@ public class VizierWindowEventHandler implements ApplicationListener<VizierWindo
         stage.setScene(new Scene(fxWeaver.loadView(VizierCataloguesController.class)));
         stage.setTitle("VizieR window");
         this.stage = stage;
-        stage.show();
+        stage.initModality(Modality.APPLICATION_MODAL);
     }
 }

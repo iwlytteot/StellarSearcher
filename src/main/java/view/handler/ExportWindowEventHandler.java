@@ -2,6 +2,7 @@ package view.handler;
 
 import controller.fxml.ExportWindowController;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.Data;
 import net.rgielen.fxweaver.core.FxWeaver;
@@ -23,5 +24,6 @@ public class ExportWindowEventHandler implements ApplicationListener<ExportWindo
         stage.setScene(new Scene(fxWeaver.loadView(ExportWindowController.class)));
         stage.setTitle("Export window");
         this.stage = stage;
+        stage.initModality(Modality.APPLICATION_MODAL);
     }
 }

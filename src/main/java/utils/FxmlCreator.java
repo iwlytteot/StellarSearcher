@@ -5,6 +5,7 @@ import controller.fxml.FilterWindowController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Table;
 
@@ -28,6 +29,7 @@ public class FxmlCreator {
 
             stage.setScene(scene);
             stage.setTitle(stageTitle);
+            stage.initModality(Modality.APPLICATION_MODAL);
             return stage;
 
         } catch (IOException e) {
@@ -50,6 +52,7 @@ public class FxmlCreator {
             stage.setUserData(constraintWindowController);
             stage.setScene(scene);
             stage.setTitle("Constraint window");
+            stage.initModality(Modality.APPLICATION_MODAL);
             return stage;
 
         } catch (IOException e) {
