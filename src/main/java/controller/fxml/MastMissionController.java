@@ -110,8 +110,7 @@ public class MastMissionController {
             entry.setValue(new SimpleBooleanProperty(setAll));
         }
         setAll = !setAll;
-        Platform.runLater(() ->
-                mastMissionList.setItems(FXCollections.observableList(new ArrayList<>(items.keySet())).sorted()));
+        mastMissionList.setItems(FXCollections.observableList(new ArrayList<>(items.keySet())).sorted());
     }
 
     /**
