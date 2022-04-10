@@ -20,7 +20,7 @@ public class MainWindowEventHandler implements ApplicationListener<MainWindowEve
     public void onApplicationEvent(MainWindowEvent mainWindowEvent) {
         Stage stage = mainWindowEvent.getStage();
         stage.setScene(new Scene(fxWeaver.loadView(MainWindowController.class)));
-        stage.setTitle("Main window");
+        stage.setTitle("Stellar Searcher");
         stage.setResizable(false);
         stage.show();
     }
