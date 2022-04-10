@@ -32,6 +32,7 @@ public class ConstraintWindowController {
     /**
      * Sets constraint and closes the window
      */
+    @FXML
     public void confirmAction() {
         constraint = input.getText();
         var stage = (Stage) confirmButton.getScene().getWindow();
@@ -42,6 +43,7 @@ public class ConstraintWindowController {
      * Sets constraint if enter was pressed and closes the window
      * @param keyEvent event
      */
+    @FXML
     public void keyPressedAction(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.ENTER) {
             constraint = input.getText();

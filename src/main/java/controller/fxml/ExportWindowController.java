@@ -43,6 +43,7 @@ public class ExportWindowController {
     /**
      * Opens directory chooser and then sets the directory and displays the path.
      */
+    @FXML
     public void directoryDialog() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         selectedDirectory = directoryChooser.showDialog(directoryLabel.getScene().getWindow());
@@ -53,6 +54,7 @@ public class ExportWindowController {
      * If no directory was chosen, displays error, else sets 'proceed' to true (for further processing)
      * and closes the window
      */
+    @FXML
     public void proceedAction() {
         if (selectedDirectory == null) {
             Alert alert = new Alert(Alert.AlertType.WARNING);

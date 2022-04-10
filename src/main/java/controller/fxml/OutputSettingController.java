@@ -23,6 +23,7 @@ public class OutputSettingController {
     private int numOfCols = 10;
     private int numOfRows = -1;
 
+    @FXML
     public void save() {
         if (!inputRows.getText().isEmpty()) {
             try {

@@ -135,6 +135,7 @@ public class MainWindowController {
         }
     }
 
+    @FXML
     public void enterVizier() {
         vizierSearch = !vizierSearch;
         rectLeft.setFill(vizierSearch ? Color.GREEN : Color.RED);
@@ -142,12 +143,14 @@ public class MainWindowController {
         SearchButtonCheck();
     }
 
+    @FXML
     public void enterSimbad() {
         simbadSearch = !simbadSearch;
         rectMid.setFill(simbadSearch ? Color.GREEN : Color.RED);
         SearchButtonCheck();
     }
 
+    @FXML
     public void enterMast() {
         mastSearch = !mastSearch;
         rectRight.setFill(mastSearch ? Color.GREEN : Color.RED);
@@ -155,6 +158,7 @@ public class MainWindowController {
         SearchButtonCheck();
     }
 
+    @FXML
     public void mastTableButtonAction() {
         if (mastWindowEventHandler.getStage() == null) {
             context.publishEvent(new MastWindowEvent(new Stage()));
@@ -162,6 +166,7 @@ public class MainWindowController {
         mastWindowEventHandler.getStage().show();
     }
 
+    @FXML
     public void vizierTableButtonAction() {
         if (vizierWindowEventHandler.getStage() == null) {
             context.publishEvent(new VizierWindowEvent(new Stage()));
@@ -177,6 +182,7 @@ public class MainWindowController {
     /**
      * Method that check the input and starts the searchService.
      */
+    @FXML
     public void searchAction() {
         if (inputText.getText().isEmpty() || radiusInput.getText().isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -360,6 +366,7 @@ public class MainWindowController {
     /**
      * Method that handles uppermost interaction with user when importing file.
      */
+    @FXML
     public void importData() {
         FileChooser fileChooser = new FileChooser();
         importFile = fileChooser.showOpenDialog(searchButton.getScene().getWindow());
@@ -411,6 +418,7 @@ public class MainWindowController {
         }
     };
 
+    @FXML
     public void openOutputSetting() {
         if (outputSettingWindowEventHandler.getStage() == null) {
             context.publishEvent(new OutputSettingWindowEvent(new Stage()));

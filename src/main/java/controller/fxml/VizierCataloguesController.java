@@ -92,6 +92,7 @@ public class VizierCataloguesController {
         treeView.setOnMouseClicked(eventHandler);
     }
 
+    @FXML
     public void addCatalogueVizier() {
         if (inputVizierCatalogue.getText().isEmpty()) {
             dialoguePopup("Input is empty", Alert.AlertType.INFORMATION);
@@ -106,6 +107,7 @@ public class VizierCataloguesController {
         catalogueRequestService.start();
     }
 
+    @FXML
     public void backVizier() {
         var stage = (Stage) addCatalogueVizierButton.getScene().getWindow();
         stage.hide();

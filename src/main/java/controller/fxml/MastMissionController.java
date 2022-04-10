@@ -80,6 +80,7 @@ public class MastMissionController {
 
     }
 
+    @FXML
     public void backMast() {
         var stage = (Stage) mastMissionList.getScene().getWindow();
         stage.close();
@@ -104,6 +105,7 @@ public class MastMissionController {
     /**
      * Selects or deselects all tables from list
      */
+    @FXML
     public void mButtonAction() {
         for (var entry : items.entrySet()) {
             entry.setValue(new SimpleBooleanProperty(setAll));
