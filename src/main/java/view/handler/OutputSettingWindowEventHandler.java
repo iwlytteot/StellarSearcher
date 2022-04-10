@@ -1,6 +1,5 @@
 package view.handler;
 
-import controller.fxml.ExportWindowController;
 import controller.fxml.OutputSettingController;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
@@ -10,7 +9,6 @@ import net.rgielen.fxweaver.core.FxWeaver;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
-import view.event.ExportWindowEvent;
 import view.event.OutputSettingWindowEvent;
 
 @Component
