@@ -57,16 +57,14 @@ public class ExportWindowController {
      */
     public void proceedAction() {
         if (selectedDirectory == null) {
-            Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Warning");
-                alert.setContentText("You must choose directory");
-                alert.showAndWait();
-            });
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setContentText("You must choose directory");
+            alert.showAndWait();
             return;
         }
 
-        Platform.runLater(() -> directoryLabel.getScene().setCursor(Cursor.WAIT));
+        directoryLabel.getScene().setCursor(Cursor.WAIT);
 
         if (exportService.getState() != Worker.State.READY) {
             exportService.cancel();
