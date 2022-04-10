@@ -23,7 +23,8 @@ public class MastWindowEventHandler implements ApplicationListener<MastWindowEve
         Stage stage = mastWindowEvent.getStage();
         stage.setScene(new Scene(fxWeaver.loadView(MastMissionController.class)));
         stage.setTitle("MAST window");
-        this.stage = stage;
         stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setResizable(false);
+        this.stage = stage;
     }
 }

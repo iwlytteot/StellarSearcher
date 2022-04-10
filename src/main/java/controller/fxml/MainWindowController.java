@@ -296,11 +296,12 @@ public class MainWindowController {
 
                     //If SIMBAD button was activated
                     if (simbadSearch) {
+                        Platform.runLater(() -> infoLabel.setText("Resolving input.."));
                         tasks.add(new GetDataTask<>(null,
                                 getResolvedInput(inputText.getText()), radiusInput.getText(), radiusBox.getValue(),
                                 SimbadService.class, getSimbadServer()));
                     }
-                    Platform.runLater(() -> infoLabel.setText("Fetching data.."));
+                    Platform.runLater(() -> infoLabel.setText("Downloading data.."));
                     var responses = executorService.invokeAll(tasks);
                     var output = new ArrayList<List<String>>();
                     for (var response : responses) {

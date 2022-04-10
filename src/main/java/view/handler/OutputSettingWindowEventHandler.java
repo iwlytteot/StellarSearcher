@@ -26,6 +26,7 @@ public class OutputSettingWindowEventHandler implements ApplicationListener<Outp
         stage.setScene(new Scene(fxWeaver.loadView(OutputSettingController.class)));
         stage.setTitle("Output settings");
         stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setResizable(false);
         this.stage = stage;
     }
 }

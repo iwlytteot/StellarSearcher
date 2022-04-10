@@ -24,6 +24,7 @@ public class ResultWindowEventHandler implements ApplicationListener<ResultWindo
         stage.setScene(new Scene(fxWeaver.loadView(ResultWindowController.class)));
         stage.setTitle("Result window");
         stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setResizable(false);
         this.stage = stage;
     }
 }

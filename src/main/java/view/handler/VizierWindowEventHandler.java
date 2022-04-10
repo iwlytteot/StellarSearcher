@@ -23,7 +23,8 @@ public class VizierWindowEventHandler implements ApplicationListener<VizierWindo
         Stage stage = vizierWindowEvent.getStage();
         stage.setScene(new Scene(fxWeaver.loadView(VizierCataloguesController.class)));
         stage.setTitle("VizieR window");
-        this.stage = stage;
         stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setResizable(false);
+        this.stage = stage;
     }
 }

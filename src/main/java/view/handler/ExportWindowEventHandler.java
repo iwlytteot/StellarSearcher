@@ -23,7 +23,8 @@ public class ExportWindowEventHandler implements ApplicationListener<ExportWindo
         Stage stage = exportWindowEvent.getStage();
         stage.setScene(new Scene(fxWeaver.loadView(ExportWindowController.class)));
         stage.setTitle("Export window");
-        this.stage = stage;
         stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setResizable(false);
+        this.stage = stage;
     }
 }

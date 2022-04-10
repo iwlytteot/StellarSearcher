@@ -21,6 +21,7 @@ public class MainWindowEventHandler implements ApplicationListener<MainWindowEve
         Stage stage = mainWindowEvent.getStage();
         stage.setScene(new Scene(fxWeaver.loadView(MainWindowController.class)));
         stage.setTitle("Main window");
+        stage.setResizable(false);
         stage.show();
     }
 }
