@@ -51,19 +51,6 @@ import java.util.stream.Collectors;
 @Data
 @Slf4j
 public class MainWindowController {
-    private final ConfigurableApplicationContext context;
-    private final VizierWindowEventHandler vizierWindowEventHandler;
-    private final MastWindowEventHandler mastWindowEventHandler;
-    private final ResultWindowEventHandler resultWindowEventHandler;
-    private final OutputSettingWindowEventHandler outputSettingWindowEventHandler;
-    private final ExportWindowEventHandler exportWindowEventHandler;
-
-    private final VizierCataloguesController vizierCataloguesController;
-    private final MastMissionController mastMissionController;
-    private final ResultWindowController resultWindowController;
-    private final OutputSettingController outputSettingController;
-    private final ExportWindowController exportWindowController;
-
     @FXML
     public Rectangle rectLeft;
     @FXML
@@ -103,9 +90,21 @@ public class MainWindowController {
     @FXML
     public Label infoLabel;
 
+    private final ConfigurableApplicationContext context;
+    private final VizierWindowEventHandler vizierWindowEventHandler;
+    private final MastWindowEventHandler mastWindowEventHandler;
+    private final ResultWindowEventHandler resultWindowEventHandler;
+    private final OutputSettingWindowEventHandler outputSettingWindowEventHandler;
+    private final ExportWindowEventHandler exportWindowEventHandler;
+
+    private final VizierCataloguesController vizierCataloguesController;
+    private final MastMissionController mastMissionController;
+    private final ResultWindowController resultWindowController;
+    private final OutputSettingController outputSettingController;
+    private final ExportWindowController exportWindowController;
+
     private boolean vizierSearch = false, simbadSearch = false, mastSearch = false;
     private final List<String> affectedTables = Collections.synchronizedList(new ArrayList<>());
-
     private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private File importFile;
 
@@ -117,22 +116,6 @@ public class MainWindowController {
         vizierTableButton.setDisable(true);
         mastTableButton.setDisable(true);
         searchButton.setDisable(true);
-    }
-
-    public void exit() {
-        executorService.shutdown();
-        searchService.cancel();
-        importService.cancel();
-
-        var exportServiceState = exportWindowController.getExportService().getState();
-        if (exportServiceState == Worker.State.RUNNING || exportServiceState == Worker.State.SCHEDULED) {
-            exportWindowController.getExportService().cancel();
-        }
-
-        var catalogueServiceState = vizierCataloguesController.getCatalogueRequestService().getState();
-        if (catalogueServiceState == Worker.State.RUNNING || exportServiceState == Worker.State.SCHEDULED) {
-            vizierCataloguesController.getCatalogueRequestService().cancel();
-        }
     }
 
     @FXML
@@ -175,8 +158,31 @@ public class MainWindowController {
         vizierWindowEventHandler.getStage().show();
     }
 
-    private void SearchButtonCheck() {
-        searchButton.setDisable(!mastSearch && !simbadSearch && !vizierSearch);
+    /**
+     * Method that handles uppermost interaction with user when importing file.
+     */
+    @FXML
+    public void importData() {
+        FileChooser fileChooser = new FileChooser();
+        importFile = fileChooser.showOpenDialog(searchButton.getScene().getWindow());
+        if (importFile == null) {
+            return;
+        }
+        searchButton.getScene().setCursor(Cursor.WAIT);
+
+        if (importService.getState() != Worker.State.READY) {
+            importService.cancel();
+            importService.reset();
+        }
+        importService.start();
+    }
+
+    @FXML
+    public void openOutputSetting() {
+        if (outputSettingWindowEventHandler.getStage() == null) {
+            context.publishEvent(new OutputSettingWindowEvent(new Stage()));
+        }
+        outputSettingWindowEventHandler.getStage().show();
     }
 
     /**
@@ -228,22 +234,6 @@ public class MainWindowController {
         searchService.start();
     }
 
-    private List<Catalogue> getVizierCatalogues() {
-        return vizierCataloguesController.getSelectedCatalogues();
-    }
-
-    private List<Table> getMastMissions() {
-        return mastMissionController.getSelectedMissions();
-    }
-
-    private String getResolvedInput(String input) throws ExecutionException, InterruptedException {
-        return executorService.submit(new SesameResolver(input)).get();
-    }
-
-    private UserInput getUserInput() {
-        return new UserInput(inputText.getText(), radiusInput.getText(), radiusBox.getValue());
-    }
-
     public String getVizierServer() {
         if (vizierFrance.isSelected()) {
             return VizierServer.CDS_FRANCE;
@@ -262,6 +252,46 @@ public class MainWindowController {
             return SimbadServer.CDS_FRANCE;
         }
         return SimbadServer.CFA_HARVARD;
+    }
+
+    public void exit() {
+        executorService.shutdown();
+        importService.cancel();
+
+        var importServiceState = searchService.getState();
+        if (importServiceState == Worker.State.RUNNING || importServiceState == Worker.State.SCHEDULED) {
+            searchService.cancel();
+        }
+
+        var exportServiceState = exportWindowController.getExportService().getState();
+        if (exportServiceState == Worker.State.RUNNING || exportServiceState == Worker.State.SCHEDULED) {
+            exportWindowController.getExportService().cancel();
+        }
+
+        var catalogueServiceState = vizierCataloguesController.getCatalogueRequestService().getState();
+        if (catalogueServiceState == Worker.State.RUNNING || exportServiceState == Worker.State.SCHEDULED) {
+            vizierCataloguesController.getCatalogueRequestService().cancel();
+        }
+    }
+
+    private void SearchButtonCheck() {
+        searchButton.setDisable(!mastSearch && !simbadSearch && !vizierSearch);
+    }
+
+    private List<Catalogue> getVizierCatalogues() {
+        return vizierCataloguesController.getSelectedCatalogues();
+    }
+
+    private List<Table> getMastMissions() {
+        return mastMissionController.getSelectedMissions();
+    }
+
+    private String getResolvedInput(String input) throws ExecutionException, InterruptedException {
+        return executorService.submit(new SesameResolver(input)).get();
+    }
+
+    private UserInput getUserInput() {
+        return new UserInput(inputText.getText(), radiusInput.getText(), radiusBox.getValue());
     }
 
     /**
@@ -363,25 +393,6 @@ public class MainWindowController {
         }
     };
 
-    /**
-     * Method that handles uppermost interaction with user when importing file.
-     */
-    @FXML
-    public void importData() {
-        FileChooser fileChooser = new FileChooser();
-        importFile = fileChooser.showOpenDialog(searchButton.getScene().getWindow());
-        if (importFile == null) {
-            return;
-        }
-        searchButton.getScene().setCursor(Cursor.WAIT);
-
-        if (importService.getState() != Worker.State.READY) {
-            importService.cancel();
-            importService.reset();
-        }
-        importService.start();
-    }
-
     private final Service<HashMap<UserInput, List<String>>> importService = new Service<>() {
         @Override
         protected Task<HashMap<UserInput, List<String>>> createTask() {
@@ -417,12 +428,4 @@ public class MainWindowController {
             resultWindowEventHandler.getStage().show();
         }
     };
-
-    @FXML
-    public void openOutputSetting() {
-        if (outputSettingWindowEventHandler.getStage() == null) {
-            context.publishEvent(new OutputSettingWindowEvent(new Stage()));
-        }
-        outputSettingWindowEventHandler.getStage().show();
-    }
 }

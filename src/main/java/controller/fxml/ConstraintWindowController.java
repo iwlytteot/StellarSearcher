@@ -22,14 +22,6 @@ public class ConstraintWindowController {
     private String constraint;
 
     /**
-     * Sets the name of window
-     * @param name name
-     */
-    public void init(String name) {
-        textLabel.setText("Constraint: " + name);
-    }
-
-    /**
      * Sets constraint and closes the window
      */
     @FXML
@@ -50,6 +42,14 @@ public class ConstraintWindowController {
             var stage = (Stage) confirmButton.getScene().getWindow();
             stage.hide();
         }
+    }
+
+    /**
+     * Sets the name of window
+     * @param name name
+     */
+    public void init(String name) {
+        textLabel.setText("Constraint: " + name);
     }
 
     public String getConstraint() {

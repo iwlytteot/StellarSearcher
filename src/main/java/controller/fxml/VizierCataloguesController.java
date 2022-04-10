@@ -11,16 +11,14 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 import model.Catalogue;
-import model.exception.CatalogueQueryException;
 import model.Data;
 import model.Table;
+import model.exception.CatalogueQueryException;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import utils.FxmlCreator;
-import view.Main;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +30,7 @@ import java.util.List;
 @Component
 @FxmlView("/VizierCataloguesWindow.fxml")
 @lombok.Data
+@Slf4j
 public class VizierCataloguesController {
     @FXML
     public Button addCatalogueVizierButton;
@@ -39,8 +38,6 @@ public class VizierCataloguesController {
     public TextField inputVizierCatalogue;
     @FXML
     public TreeView<Data> treeView;
-
-    private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     private final HashMap<CheckBoxTreeItem<Data>, Stage> nodeFilters = new HashMap<>();
     private String vizierServer;

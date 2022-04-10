@@ -25,32 +25,6 @@ public class FilterWindowController {
     private final HashMap<String, Stage> constraints = new HashMap<>();
 
     /**
-     * Initializes ListView such that user can choose available filters and open its relative Constraint Window.
-     * @param table Table object, where constraints (columns) are saved.
-     */
-    public void init(Table table) {
-        listViewAvailable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        listViewUsed.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        listViewAvailable.setOnMouseClicked(eventHandlerAvailable);
-        listViewUsed.setOnMouseClicked(eventHandlerUsed);
-
-        listViewAvailable.getItems().addAll(table.getColumns().keySet().stream().sorted().collect(Collectors.toList()));
-    }
-
-    /**
-     * Gets controller from Stage of respective Constraint Window and then retrieves constraints.
-     * @return HashMap of String:String, where key is constraint and value is the value of constraint.
-     */
-    public HashMap<String, String> getConstraints() {
-        var output = new HashMap<String, String>();
-        for (var item : listViewUsed.getItems()) {
-            var controller = (ConstraintWindowController) constraints.get(item).getUserData();
-            output.put(item, controller.getConstraint());
-        }
-        return output;
-    }
-
-    /**
      * Switches selected constraint from Available to Used filters.
      */
     @FXML
@@ -74,6 +48,32 @@ public class FilterWindowController {
     public void applyFilter() {
         var stage = (Stage) listViewAvailable.getScene().getWindow();
         stage.hide();
+    }
+
+    /**
+     * Initializes ListView such that user can choose available filters and open its relative Constraint Window.
+     * @param table Table object, where constraints (columns) are saved.
+     */
+    public void init(Table table) {
+        listViewAvailable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        listViewUsed.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        listViewAvailable.setOnMouseClicked(eventHandlerAvailable);
+        listViewUsed.setOnMouseClicked(eventHandlerUsed);
+
+        listViewAvailable.getItems().addAll(table.getColumns().keySet().stream().sorted().collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets controller from Stage of respective Constraint Window and then retrieves constraints.
+     * @return HashMap of String:String, where key is constraint and value is the value of constraint.
+     */
+    public HashMap<String, String> getConstraints() {
+        var output = new HashMap<String, String>();
+        for (var item : listViewUsed.getItems()) {
+            var controller = (ConstraintWindowController) constraints.get(item).getUserData();
+            output.put(item, controller.getConstraint());
+        }
+        return output;
     }
 
     /**

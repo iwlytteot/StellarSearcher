@@ -86,22 +86,6 @@ public class MastMissionController {
         stage.close();
     }
 
-    private final EventHandler<MouseEvent> eventHandler = new EventHandler<>() {
-        @Override
-        public void handle(MouseEvent event) {
-            if (event.getClickCount() == 2) {
-                var node = mastMissionList.getSelectionModel().getSelectedItem();
-                if (!nodeFilters.containsKey(node)) {
-                    nodeFilters.putIfAbsent(node,
-                            FxmlCreator.createFilterWindow(
-                                    "Filter window - " + node.getName(),
-                                    node));
-                }
-                nodeFilters.get(node).show();
-            }
-        }
-    };
-
     /**
      * Selects or deselects all tables from list
      */
@@ -143,5 +127,21 @@ public class MastMissionController {
         }
         return output;
     }
+
+    private final EventHandler<MouseEvent> eventHandler = new EventHandler<>() {
+        @Override
+        public void handle(MouseEvent event) {
+            if (event.getClickCount() == 2) {
+                var node = mastMissionList.getSelectionModel().getSelectedItem();
+                if (!nodeFilters.containsKey(node)) {
+                    nodeFilters.putIfAbsent(node,
+                            FxmlCreator.createFilterWindow(
+                                    "Filter window - " + node.getName(),
+                                    node));
+                }
+                nodeFilters.get(node).show();
+            }
+        }
+    };
 
 }

@@ -29,12 +29,25 @@ import java.util.List;
 @Data
 @Slf4j
 public class ResultWindowController {
-    private final ConfigurableApplicationContext context;
-    private final ExportWindowEventHandler exportWindowEventHandler;
     @FXML
     public TabPane tabPane;
     @FXML
     public Label numRows;
+
+    private final ConfigurableApplicationContext context;
+    private final ExportWindowEventHandler exportWindowEventHandler;
+
+    /**
+     * Method that opens the directory chooser and then proceeds to export data such that file name is enumerated as
+     * 'x.txt', where x is in range <0, p> and 'p' is number Tabs to be exported.
+     */
+    @FXML
+    public void exportData() {
+        if (exportWindowEventHandler.getStage() == null) {
+            context.publishEvent(new ExportWindowEvent(new Stage()));
+        }
+        exportWindowEventHandler.getStage().show();
+    }
 
     /**
      * Fills TabPane with Tabs. These tabs are results from searching in servers.
@@ -138,17 +151,5 @@ public class ResultWindowController {
         }
         int finalRowCount = rowCount;
         numRows.setText("Fetched " + finalRowCount + " row(s)");
-    }
-
-    /**
-     * Method that opens the directory chooser and then proceeds to export data such that file name is enumerated as
-     * 'x.txt', where x is in range <0, p> and 'p' is number Tabs to be exported.
-     */
-    @FXML
-    public void exportData() {
-        if (exportWindowEventHandler.getStage() == null) {
-            context.publishEvent(new ExportWindowEvent(new Stage()));
-        }
-        exportWindowEventHandler.getStage().show();
     }
 }
