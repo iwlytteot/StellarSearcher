@@ -5,10 +5,10 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="107.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/15" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.fxml.ConstraintWindowController">
-    <children>
-        <Label fx:id="textLabel" layoutX="73.0" layoutY="13.0" />
-        <TextField fx:id="input" layoutX="26.0" layoutY="36.0" onKeyPressed="#keyPressedAction" />
-      <Button fx:id="confirmButton" layoutX="84.0" layoutY="70.0" mnemonicParsing="false" onAction="#confirmAction" text="OK" />
-    </children>
+<AnchorPane prefHeight="107.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/15" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controller.fxml.ConstraintWindowController">
+    <Label fx:id="textLabel" layoutX="73.0" layoutY="13.0"/>
+    <TextField fx:id="input" layoutX="26.0" layoutY="36.0" onKeyPressed="#keyPressedAction"/>
+    <Button fx:id="confirmButton" layoutX="84.0" layoutY="70.0" mnemonicParsing="false" onAction="#confirmAction"
+            text="OK"/>
 </AnchorPane>
