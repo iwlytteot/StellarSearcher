@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.Catalogue;
 import model.Radius;
+import model.exception.CatalogueQueryException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -35,7 +36,12 @@ public class GetDataTask<T extends Request> implements Callable<List<String>> {
         var output = new ArrayList<String>();
         var requests = service.createDataRequest(catalogues, input, radius, type, server);
         for (var request : requests) {
-            output.add(service.sendRequest(request));
+            try {
+                output.add(service.sendRequest(request));
+            }
+            catch(CatalogueQueryException ex) {
+                log.error("Error during retrieving data: " + request.toString());
+            }
         }
         return output;
     }

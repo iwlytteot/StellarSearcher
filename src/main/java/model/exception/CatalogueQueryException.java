@@ -1,5 +1,7 @@
 package model.exception;
 
-public class CatalogueQueryException extends RuntimeException {
-    public CatalogueQueryException() {}
+public class CatalogueQueryException extends Exception {
+    public CatalogueQueryException() {
+        super();
+    }
 }

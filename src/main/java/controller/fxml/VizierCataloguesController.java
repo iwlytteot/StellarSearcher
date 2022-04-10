@@ -97,8 +97,8 @@ public class VizierCataloguesController {
             dialoguePopup("Input is empty", Alert.AlertType.INFORMATION);
             return;
         }
-        Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.WAIT));
-        Platform.runLater(() -> addCatalogueVizierButton.setDisable(true));
+        addCatalogueVizierButton.getScene().setCursor(Cursor.WAIT);
+        addCatalogueVizierButton.setDisable(true);
 
         if (!catalogueRequestService.isRunning()) {
             catalogueRequestService.reset();
@@ -189,8 +189,8 @@ public class VizierCataloguesController {
         @Override
         protected void succeeded() {
             super.succeeded();
-            Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.DEFAULT));
-            Platform.runLater(() -> addCatalogueVizierButton.setDisable(false));
+            addCatalogueVizierButton.getScene().setCursor(Cursor.DEFAULT);
+            addCatalogueVizierButton.setDisable(false);
 
         }
 
@@ -198,16 +198,16 @@ public class VizierCataloguesController {
         protected void cancelled() {
             super.cancelled();
             dialoguePopup("Task was cancelled", Alert.AlertType.ERROR);
-            Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.DEFAULT));
-            Platform.runLater(() -> addCatalogueVizierButton.setDisable(false));
+            addCatalogueVizierButton.getScene().setCursor(Cursor.DEFAULT);
+            addCatalogueVizierButton.setDisable(false);
         }
 
         @Override
         protected void failed() {
             super.failed();
             dialoguePopup("Task failed.", Alert.AlertType.ERROR);
-            Platform.runLater(() -> addCatalogueVizierButton.getScene().setCursor(Cursor.DEFAULT));
-            Platform.runLater(() -> addCatalogueVizierButton.setDisable(false));
+            addCatalogueVizierButton.getScene().setCursor(Cursor.DEFAULT);
+            addCatalogueVizierButton.setDisable(false);
         }
 
     };

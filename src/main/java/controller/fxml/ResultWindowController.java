@@ -59,7 +59,7 @@ public class ResultWindowController {
 
     public void fill(HashMap<UserInput, List<String>> output, int numOfCols, int numOfRows) {
         //If there was multiple searching
-        Platform.runLater(() -> tabPane.getTabs().clear());
+        tabPane.getTabs().clear();
 
         int rowCount = 0;
         for (var entry : output.entrySet()) {
@@ -84,12 +84,10 @@ public class ResultWindowController {
                 }
                 if (!stringBuilder.isEmpty()) {
                     stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-                    Platform.runLater(() -> {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("There has been an error during retrieving some data");
-                        alert.setContentText(stringBuilder.toString());
-                        alert.showAndWait();
-                    });
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("There has been an error during retrieving some data");
+                    alert.setContentText(stringBuilder.toString());
+                    alert.showAndWait();
                     continue;
                 }
 
@@ -150,10 +148,10 @@ public class ResultWindowController {
                 }
             }
             inputTab.setContent(inputPane);
-            Platform.runLater(() -> tabPane.getTabs().add(inputTab));
+            tabPane.getTabs().add(inputTab);
         }
         int finalRowCount = rowCount;
-        Platform.runLater(() -> numRows.setText("Fetched " + finalRowCount + " row(s)"));
+        numRows.setText("Fetched " + finalRowCount + " row(s)");
     }
 
     /**

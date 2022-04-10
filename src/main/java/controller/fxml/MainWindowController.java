@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.*;
+import model.exception.ResolverQueryException;
 import model.mirror.MastServer;
 import model.mirror.SimbadServer;
 import model.mirror.VizierServer;
@@ -178,22 +179,18 @@ public class MainWindowController {
      */
     public void searchAction() {
         if (inputText.getText().isEmpty() || radiusInput.getText().isEmpty()) {
-            Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Missing input");
-                alert.setContentText("Missing input");
-                alert.showAndWait();
-            });
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Missing input");
+            alert.setContentText("Missing input");
+            alert.showAndWait();
             return;
         }
         if (vizierSearch) {
             if (getVizierCatalogues().isEmpty()) {
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Missing catalogues");
-                    alert.setContentText("No catalogues from VizieR was selected");
-                    alert.showAndWait();
-                });
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Missing catalogues");
+                alert.setContentText("No catalogues from VizieR was selected");
+                alert.showAndWait();
                 return;
             }
         }
@@ -201,26 +198,22 @@ public class MainWindowController {
         try {
             var radius= Float.parseFloat(radiusInput.getText());
             if (radius <= 0) {
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Wrong radius");
-                    alert.setContentText("Radius must be non negative");
-                    alert.showAndWait();
-                });
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Wrong radius");
+                alert.setContentText("Radius must be non negative");
+                alert.showAndWait();
                 return;
             }
         } catch(NumberFormatException ex) {
-            Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Wrong radius");
-                alert.setContentText("Radius is not in correct format. Use dot (.) eg: 1.2");
-                alert.showAndWait();
-            });
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Wrong radius");
+            alert.setContentText("Radius is not in correct format. Use dot (.) eg: 1.2");
+            alert.showAndWait();
             log.error("Wrong radius input: " + radiusInput.getText());
             return;
         }
 
-        Platform.runLater(() -> searchButton.getScene().setCursor(Cursor.WAIT));
+        searchButton.getScene().setCursor(Cursor.WAIT);
 
         if (searchService.getState() != Worker.State.READY) {
             searchService.cancel();
@@ -297,10 +290,26 @@ public class MainWindowController {
                     //If SIMBAD button was activated
                     if (simbadSearch) {
                         Platform.runLater(() -> infoLabel.setText("Resolving input.."));
-                        tasks.add(new GetDataTask<>(null,
-                                getResolvedInput(inputText.getText()), radiusInput.getText(), radiusBox.getValue(),
-                                SimbadService.class, getSimbadServer()));
+                        try {
+                            tasks.add(new GetDataTask<>(null,
+                                    getResolvedInput(inputText.getText()), radiusInput.getText(), radiusBox.getValue(),
+                                    SimbadService.class, getSimbadServer()));
+                        } catch(ExecutionException | InterruptedException ex) {
+                            if (ex.getCause() instanceof ResolverQueryException) {
+                                Platform.runLater(() -> {
+                                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                                    alert.setTitle("Input");
+                                    alert.setContentText("Input \"" + inputText.getText() + "\" could not be resolved.");
+                                    alert.showAndWait();
+                                });
+                            }
+                        }
+
                     }
+                    if (tasks.isEmpty()) {
+                        searchService.cancel();
+                    }
+
                     Platform.runLater(() -> infoLabel.setText("Downloading data.."));
                     var responses = executorService.invokeAll(tasks);
                     var output = new ArrayList<List<String>>();

@@ -30,7 +30,7 @@ public class SesameResolver implements Callable<String> {
     private final String input;
 
     @Override
-    public String call() {
+    public String call() throws ResolverQueryException {
         return getPosition(request(input));
     }
 
@@ -58,7 +58,7 @@ public class SesameResolver implements Callable<String> {
      * @param input XML object as String
      * @return resolved coordinates
      */
-    private String getPosition(String input) {
+    private String getPosition(String input) throws ResolverQueryException{
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -67,11 +67,12 @@ public class SesameResolver implements Callable<String> {
             var el = doc.getElementsByTagName("jpos");
             if (el.getLength() == 0) {
                 log.warn("No result while parsing XML file: " + input);
+                throw new ResolverQueryException();
             }
             return el.item(0).getFirstChild().getNodeValue();
         } catch (ParserConfigurationException | SAXException | IOException e) {
             log.error("Exception while parsing XML file: " + input + "\n\n" + e.getMessage());
+            throw new ResolverQueryException();
         }
-        throw new ResolverQueryException();
     }
 }

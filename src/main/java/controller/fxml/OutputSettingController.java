@@ -29,24 +29,20 @@ public class OutputSettingController {
             try {
                 numOfRows = Integer.parseInt(inputRows.getText());
                 if (numOfRows <= 0) {
-                    Platform.runLater(() -> {
-                        Alert alert = new Alert(Alert.AlertType.WARNING);
-                        alert.setTitle("Wrong rows");
-                        alert.setContentText("Number of rows must be non negative");
-                        alert.showAndWait();
-                        inputRows.setText("");
-                    });
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Wrong rows");
+                    alert.setContentText("Number of rows must be non negative");
+                    alert.showAndWait();
+                    inputRows.setText("");
                     numOfRows = -1;
                     return;
                 }
             } catch(NumberFormatException ex) {
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Wrong rows");
-                    alert.setContentText("Number of rows is not an integer");
-                    alert.showAndWait();
-                    inputRows.setText("");
-                });
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Wrong rows");
+                alert.setContentText("Number of rows is not an integer");
+                alert.showAndWait();
+                inputRows.setText("");
                 numOfRows = -1;
                 return;
             }
@@ -59,24 +55,20 @@ public class OutputSettingController {
             try {
                 numOfCols = Integer.parseInt(inputCols.getText());
                 if (numOfCols <= 0) {
-                    Platform.runLater(() -> {
-                        Alert alert = new Alert(Alert.AlertType.WARNING);
-                        alert.setTitle("Wrong columns");
-                        alert.setContentText("Number of columns must be non negative");
-                        alert.showAndWait();
-                        inputCols.setText("10");
-                    });
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Wrong columns");
+                    alert.setContentText("Number of columns must be non negative");
+                    alert.showAndWait();
+                    inputCols.setText("10");
                     numOfCols = 10;
                     return;
                 }
             } catch(NumberFormatException ex) {
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Wrong columns");
-                    alert.setContentText("Number of columns is not an integer");
-                    alert.showAndWait();
-                    inputCols.setText("10");
-                });
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Wrong columns");
+                alert.setContentText("Number of columns is not an integer");
+                alert.showAndWait();
+                inputCols.setText("10");
                 numOfCols = 10;
                 return;
             }
