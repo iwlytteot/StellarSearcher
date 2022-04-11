@@ -11,100 +11,79 @@
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.shape.Ellipse?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="450.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/15" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="controller.fxml.MainWindowController">
-   <Rectangle fx:id="rectLeft" arcHeight="10.0" arcWidth="10.0" fill="RED" height="120.0" layoutX="76.0" layoutY="90.0"
-              stroke="#85515100" strokeType="INSIDE" strokeWidth="0.0" width="120.0"/>
-   <Button fx:id="vizierButton" layoutX="82.0" layoutY="96.0" mnemonicParsing="false" onMouseClicked="#enterVizier"
-           prefHeight="108.0" prefWidth="108.0" style="-fx-focus-color: transparent;" text="VizieR">
+<AnchorPane prefHeight="450.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.fxml.MainWindowController">
+   <Ellipse fx:id="vizierEllipse" fill="RED" layoutX="136.0" layoutY="150.0" radiusX="75.0" radiusY="59.0" stroke="TRANSPARENT" strokeType="INSIDE" />
+   <Ellipse fx:id="simbadEllipse" fill="RED" layoutX="316.0" layoutY="150.0" radiusX="75.0" radiusY="59.0" stroke="TRANSPARENT" strokeType="INSIDE" />
+   <Ellipse fx:id="mastEllipse" fill="RED" layoutX="498.0" layoutY="150.0" radiusX="75.0" radiusY="59.0" stroke="TRANSPARENT" strokeType="INSIDE" />
+   <Button fx:id="vizierButton" layoutX="66.0" layoutY="96.0" mnemonicParsing="false" onMouseClicked="#enterVizier" prefHeight="108.0" prefWidth="140.0" style="-fx-focus-color: transparent;" text="VizieR">
       <font>
-         <Font size="21.0"/>
+         <Font size="21.0" />
       </font>
    </Button>
-   <Rectangle fx:id="rectMid" arcHeight="10.0" arcWidth="10.0" fill="RED" height="120.0" layoutX="256.0" layoutY="90.0"
-              stroke="#85515100" strokeType="INSIDE" strokeWidth="0.0" width="120.0"/>
-   <Rectangle fx:id="rectRight" arcHeight="10.0" arcWidth="10.0" fill="RED" height="120.0" layoutX="438.0"
-              layoutY="90.0" stroke="#85515100" strokeType="INSIDE" strokeWidth="0.0" width="120.0"/>
-   <Button fx:id="simbadButton" layoutX="262.0" layoutY="96.0" mnemonicParsing="false" onMouseClicked="#enterSimbad"
-           prefHeight="108.0" prefWidth="108.0" style="-fx-focus-color: transparent;" text="Simbad">
+   <Button fx:id="simbadButton" layoutX="246.0" layoutY="96.0" mnemonicParsing="false" onMouseClicked="#enterSimbad" prefHeight="108.0" prefWidth="140.0" style="-fx-focus-color: transparent;" text="Simbad">
       <font>
-         <Font size="21.0"/>
+         <Font size="21.0" />
       </font>
    </Button>
-   <Button fx:id="mastButton" layoutX="444.0" layoutY="96.0" mnemonicParsing="false" onMouseClicked="#enterMast"
-           prefHeight="108.0" prefWidth="108.0" style="-fx-focus-color: transparent;" text="MAST">
+   <Button fx:id="mastButton" layoutX="428.0" layoutY="96.0" mnemonicParsing="false" onMouseClicked="#enterMast" prefHeight="108.0" prefWidth="140.0" style="-fx-focus-color: transparent;" text="MAST">
       <font>
-         <Font size="21.0"/>
+         <Font size="21.0" />
       </font>
    </Button>
-   <TextField fx:id="inputText" layoutX="116.0" layoutY="286.0" prefHeight="31.0" prefWidth="154.0"
-              promptText="ID or Coordinates"/>
-   <TextField fx:id="radiusInput" layoutX="284.0" layoutY="286.0" prefHeight="31.0" prefWidth="140.0"
-              promptText="radius"/>
-   <Button fx:id="searchButton" layoutX="272.0" layoutY="343.0" mnemonicParsing="false" onAction="#searchAction"
-           prefHeight="31.0" prefWidth="89.0" text="Search">
+   <TextField fx:id="inputText" layoutX="116.0" layoutY="286.0" prefHeight="31.0" prefWidth="154.0" promptText="ID or Coordinates" />
+   <TextField fx:id="radiusInput" layoutX="284.0" layoutY="286.0" prefHeight="31.0" prefWidth="140.0" promptText="radius" />
+   <Button fx:id="searchButton" layoutX="272.0" layoutY="343.0" mnemonicParsing="false" onAction="#searchAction" prefHeight="31.0" prefWidth="89.0" text="Search">
       <font>
-         <Font size="15.0"/>
+         <Font size="15.0" />
       </font>
    </Button>
-   <ComboBox fx:id="radiusBox" layoutX="424.0" layoutY="286.0" prefHeight="31.0" prefWidth="92.0"/>
-   <Button fx:id="mastTableButton" layoutX="456.0" layoutY="224.0" mnemonicParsing="false"
-           onAction="#mastTableButtonAction" text="catalogues">
+   <ComboBox fx:id="radiusBox" layoutX="424.0" layoutY="286.0" prefHeight="31.0" prefWidth="92.0" />
+   <Button fx:id="mastTableButton" layoutX="456.0" layoutY="224.0" mnemonicParsing="false" onAction="#mastTableButtonAction" text="catalogues">
       <font>
-         <Font size="14.0"/>
+         <Font size="14.0" />
       </font>
    </Button>
-   <Button fx:id="vizierTableButton" layoutX="94.0" layoutY="224.0" mnemonicParsing="false"
-           onAction="#vizierTableButtonAction" text="catalogues">
+   <Button fx:id="vizierTableButton" layoutX="94.0" layoutY="224.0" mnemonicParsing="false" onAction="#vizierTableButtonAction" text="catalogues">
       <font>
-         <Font size="14.0"/>
+         <Font size="14.0" />
       </font>
    </Button>
    <MenuBar layoutY="2.0" prefHeight="25.0" prefWidth="650.0">
       <Menu mnemonicParsing="false" text="App">
-         <MenuItem mnemonicParsing="false" onAction="#importData" text="Import"/>
+         <MenuItem mnemonicParsing="false" onAction="#importData" text="Import" />
       </Menu>
       <Menu mnemonicParsing="false" text="Settings">
          <Menu mnemonicParsing="false" text="VizieR server">
-            <RadioMenuItem fx:id="vizierFrance" mnemonicParsing="false" selected="true"
-                           text="CDS Strasbourg, France">
+            <RadioMenuItem fx:id="vizierFrance" mnemonicParsing="false" selected="true" text="CDS Strasbourg, France">
                <toggleGroup>
-                  <ToggleGroup fx:id="vizierGroup"/>
+                  <ToggleGroup fx:id="vizierGroup" />
                </toggleGroup>
             </RadioMenuItem>
-            <RadioMenuItem fx:id="vizierJapan" mnemonicParsing="false" text="ADAC Tokyo, Japan"
-                           toggleGroup="$vizierGroup"/>
-            <RadioMenuItem fx:id="vizierIndia" mnemonicParsing="false" text="IUCAA Pune, India"
-                           toggleGroup="$vizierGroup"/>
-            <RadioMenuItem fx:id="vizierUsa" mnemonicParsing="false" text="CFA Harvard Cambridge, USA"
-                           toggleGroup="$vizierGroup"/>
+            <RadioMenuItem fx:id="vizierJapan" mnemonicParsing="false" text="ADAC Tokyo, Japan" toggleGroup="$vizierGroup" />
+            <RadioMenuItem fx:id="vizierIndia" mnemonicParsing="false" text="IUCAA Pune, India" toggleGroup="$vizierGroup" />
+            <RadioMenuItem fx:id="vizierUsa" mnemonicParsing="false" text="CFA Harvard Cambridge, USA" toggleGroup="$vizierGroup" />
          </Menu>
          <Menu mnemonicParsing="false" text="Simbad server">
-            <RadioMenuItem fx:id="simbadFrance" mnemonicParsing="false" selected="true"
-                           text="CDS Strasbourg, France">
+            <RadioMenuItem fx:id="simbadFrance" mnemonicParsing="false" selected="true" text="CDS Strasbourg, France">
                <toggleGroup>
-                  <ToggleGroup fx:id="simbadGroup"/>
+                  <ToggleGroup fx:id="simbadGroup" />
                </toggleGroup>
             </RadioMenuItem>
-            <RadioMenuItem fx:id="simbadUsa" mnemonicParsing="false" text="CFA Harvard Cambridge, USA"
-                           toggleGroup="$simbadGroup"/>
+            <RadioMenuItem fx:id="simbadUsa" mnemonicParsing="false" text="CFA Harvard Cambridge, USA" toggleGroup="$simbadGroup" />
          </Menu>
-         <MenuItem mnemonicParsing="false" onAction="#openOutputSetting" text="Output settings"/>
+         <MenuItem mnemonicParsing="false" onAction="#openOutputSetting" text="Output settings" />
       </Menu>
       <Menu mnemonicParsing="false" text="Tutorial">
       </Menu>
    </MenuBar>
-   <ToggleButton fx:id="vizierToogleGroup" layoutX="42.0" layoutY="397.0" mnemonicParsing="false" text="ToggleButton"
-                 toggleGroup="$vizierGroup" visible="false"/>
-   <ToggleButton fx:id="simbadToogleGroup" layoutX="52.0" layoutY="407.0" mnemonicParsing="false" text="ToggleButton"
-                 toggleGroup="$simbadGroup" visible="false"/>
-   <Label fx:id="infoLabel" alignment="CENTER" layoutX="153.0" layoutY="397.0" prefHeight="21.0" prefWidth="326.0"
-          textAlignment="CENTER" textFill="#23462e">
+   <ToggleButton fx:id="vizierToogleGroup" layoutX="42.0" layoutY="397.0" mnemonicParsing="false" text="ToggleButton" toggleGroup="$vizierGroup" visible="false" />
+   <ToggleButton fx:id="simbadToogleGroup" layoutX="52.0" layoutY="407.0" mnemonicParsing="false" text="ToggleButton" toggleGroup="$simbadGroup" visible="false" />
+   <Label fx:id="infoLabel" alignment="CENTER" layoutX="153.0" layoutY="397.0" prefHeight="21.0" prefWidth="326.0" textAlignment="CENTER" textFill="#23462e">
       <font>
-         <Font size="15.0"/>
+         <Font size="15.0" />
       </font>
    </Label>
 </AnchorPane>

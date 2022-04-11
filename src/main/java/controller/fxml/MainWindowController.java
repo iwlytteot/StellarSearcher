@@ -14,12 +14,16 @@ import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import model.*;
+import model.Catalogue;
+import model.Radius;
+import model.Table;
+import model.UserInput;
 import model.exception.ResolverQueryException;
 import model.mirror.MastServer;
 import model.mirror.SimbadServer;
@@ -39,7 +43,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -89,6 +96,12 @@ public class MainWindowController {
     public RadioMenuItem simbadUsa;
     @FXML
     public Label infoLabel;
+    @FXML
+    public Ellipse vizierEllipse;
+    @FXML
+    public Ellipse simbadEllipse;
+    @FXML
+    public Ellipse mastEllipse;
 
     private final ConfigurableApplicationContext context;
     private final VizierWindowEventHandler vizierWindowEventHandler;
@@ -113,6 +126,10 @@ public class MainWindowController {
         radiusBox.getItems().setAll(Radius.values());
         radiusBox.getSelectionModel().select(Radius.ARCMIN);
 
+        vizierButton.setShape(new Ellipse(55, 45));
+        simbadButton.setShape(new Ellipse(55, 45));
+        mastButton.setShape(new Ellipse(55, 45));
+
         vizierTableButton.setDisable(true);
         mastTableButton.setDisable(true);
         searchButton.setDisable(true);
@@ -121,24 +138,24 @@ public class MainWindowController {
     @FXML
     public void enterVizier() {
         vizierSearch = !vizierSearch;
-        rectLeft.setFill(vizierSearch ? Color.GREEN : Color.RED);
+        vizierEllipse.setFill(vizierSearch ? Color.GREEN : Color.RED);
         vizierTableButton.setDisable(!vizierSearch);
-        SearchButtonCheck();
+        searchButtonCheck();
     }
 
     @FXML
     public void enterSimbad() {
         simbadSearch = !simbadSearch;
-        rectMid.setFill(simbadSearch ? Color.GREEN : Color.RED);
-        SearchButtonCheck();
+        simbadEllipse.setFill(simbadSearch ? Color.GREEN : Color.RED);
+        searchButtonCheck();
     }
 
     @FXML
     public void enterMast() {
         mastSearch = !mastSearch;
-        rectRight.setFill(mastSearch ? Color.GREEN : Color.RED);
+        mastEllipse.setFill(mastSearch ? Color.GREEN : Color.RED);
         mastTableButton.setDisable(!mastSearch);
-        SearchButtonCheck();
+        searchButtonCheck();
     }
 
     @FXML
@@ -274,7 +291,7 @@ public class MainWindowController {
         }
     }
 
-    private void SearchButtonCheck() {
+    private void searchButtonCheck() {
         searchButton.setDisable(!mastSearch && !simbadSearch && !vizierSearch);
     }
 
