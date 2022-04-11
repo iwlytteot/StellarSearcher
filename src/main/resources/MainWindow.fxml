@@ -10,6 +10,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Ellipse?>
 <?import javafx.scene.text.Font?>
@@ -53,7 +54,10 @@
    </Button>
    <MenuBar layoutY="2.0" prefHeight="25.0" prefWidth="650.0">
       <Menu mnemonicParsing="false" text="App">
-         <MenuItem mnemonicParsing="false" onAction="#importData" text="Import" />
+         <MenuItem mnemonicParsing="false" onAction="#importData" text="Import">
+            <accelerator>
+               <KeyCodeCombination alt="UP" code="I" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+            </accelerator></MenuItem>
       </Menu>
       <Menu mnemonicParsing="false" text="Settings">
          <Menu mnemonicParsing="false" text="VizieR server">
@@ -74,7 +78,10 @@
             </RadioMenuItem>
             <RadioMenuItem fx:id="simbadUsa" mnemonicParsing="false" text="CFA Harvard Cambridge, USA" toggleGroup="$simbadGroup" />
          </Menu>
-         <MenuItem mnemonicParsing="false" onAction="#openOutputSetting" text="Output settings" />
+         <MenuItem mnemonicParsing="false" onAction="#openOutputSetting" text="Output settings">
+            <accelerator>
+               <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+            </accelerator></MenuItem>
       </Menu>
       <Menu mnemonicParsing="false" text="Tutorial">
       </Menu>
