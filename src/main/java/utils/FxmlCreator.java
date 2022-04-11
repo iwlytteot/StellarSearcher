@@ -30,6 +30,7 @@ public class FxmlCreator {
             stage.setScene(scene);
             stage.setTitle(stageTitle);
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
             return stage;
 
         } catch (IOException e) {
@@ -53,6 +54,7 @@ public class FxmlCreator {
             stage.setScene(scene);
             stage.setTitle("Constraint window");
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
             return stage;
 
         } catch (IOException e) {

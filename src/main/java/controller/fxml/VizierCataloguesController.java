@@ -9,6 +9,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTreeCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
@@ -210,4 +212,10 @@ public class VizierCataloguesController {
         }
 
     };
+
+    public void addCataloguePress(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ENTER) {
+            addCatalogueVizier();
+        }
+    }
 }

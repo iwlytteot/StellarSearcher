@@ -30,8 +30,12 @@ public class FilterWindowController {
     @FXML
     public void addFilter() {
         var selected = listViewAvailable.getSelectionModel().getSelectedItems();
-        listViewUsed.getItems().addAll(selected);
-        listViewAvailable.getItems().removeAll(selected);
+        for (var filter : selected) {
+            if (constraints.containsKey(filter)) {
+                listViewUsed.getItems().add(filter);
+                listViewAvailable.getItems().remove(filter);
+            }
+        }
     }
 
     /**

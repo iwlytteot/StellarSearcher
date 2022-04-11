@@ -29,6 +29,7 @@ public class ConstraintWindowController {
         constraint = input.getText();
         var stage = (Stage) confirmButton.getScene().getWindow();
         stage.hide();
+
     }
 
     /**
@@ -38,9 +39,7 @@ public class ConstraintWindowController {
     @FXML
     public void keyPressedAction(KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.ENTER) {
-            constraint = input.getText();
-            var stage = (Stage) confirmButton.getScene().getWindow();
-            stage.hide();
+            confirmAction();
         }
     }
 
@@ -49,7 +48,7 @@ public class ConstraintWindowController {
      * @param name name
      */
     public void init(String name) {
-        textLabel.setText("Constraint: " + name);
+        textLabel.setText(name);
     }
 
     public String getConstraint() {
