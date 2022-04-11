@@ -218,7 +218,17 @@ public class MainWindowController {
             if (getVizierCatalogues().isEmpty()) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Missing catalogues");
-                alert.setContentText("No catalogues from VizieR was selected");
+                alert.setContentText("No catalogues from VizieR were selected");
+                alert.showAndWait();
+                return;
+            }
+        }
+
+        if (mastSearch) {
+            if (getMastMissions().isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Missing catalogues");
+                alert.setContentText("No missions from MAST were selected");
                 alert.showAndWait();
                 return;
             }
