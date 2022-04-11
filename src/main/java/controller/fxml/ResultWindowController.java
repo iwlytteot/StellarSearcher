@@ -112,7 +112,7 @@ public class ResultWindowController {
                             column.setCellValueFactory(v -> new SimpleStringProperty(v.getValue().getTDs().getContent(finalI)));
                             column.setSortable(false);
                             tableView.getColumns().add(column);
-                            if (columnCount >= numOfCols) {
+                            if (numOfCols != -1 && columnCount >= numOfCols) {
                                 column.setVisible(false);
                             } else {
                                 ++columnCount;
