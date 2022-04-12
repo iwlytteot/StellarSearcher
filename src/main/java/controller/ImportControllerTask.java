@@ -72,20 +72,20 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                     var vizierCatalogues = new ArrayList<Catalogue>();
                     vizierCatalogues.add(vizierCatalogue);
                     tempMap.get(userInput).add(executorService.submit(new GetDataTask<>(vizierCatalogues,
-                            position, input.getRadius(), input.getUnit(), VizierService.class, vizierServer)));
+                            position, input.getRadius(), input.getUnit(), VizierService.class, vizierServer, false)));
 
                     //Mast task
                     var mastCatalogues = new ArrayList<Catalogue>();
                     mastCatalogues.add(mastCatalogue);
 
                     tempMap.get(userInput).add(executorService.submit(new GetDataTask<>(mastCatalogues,
-                            position, input.getRadius(), input.getUnit(), MastService.class, MastServer.MAST_DEFAULT)));
+                            position, input.getRadius(), input.getUnit(), MastService.class, MastServer.MAST_DEFAULT, true)));
 
                     //Simbad task
                     if (input.isSimbad()) {
                         var resolvedInput = executorService.submit(new SesameResolver(position)).get();
                         tempMap.get(userInput).add(executorService.submit(new GetDataTask<>(null,
-                                resolvedInput, input.getRadius(), input.getUnit(), SimbadService.class, simbadServer)));
+                                resolvedInput, input.getRadius(), input.getUnit(), SimbadService.class, simbadServer, false)));
                     }
                 }
                 //Retrieving data from Future and associating user input with results so that Result

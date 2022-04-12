@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Component
 public class MastService implements Request {
-    private static final String BASE_PARAMS = "search.php?action=Search&outputformat=VOTable&";
+    private static final String BASE_PARAMS = "search.php?action=Search&outputformat=VOTable&max_records=99999";
 
     public List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius,
                                        Radius radiusType, String baseUrl) {

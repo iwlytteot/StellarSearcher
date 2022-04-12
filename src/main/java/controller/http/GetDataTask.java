@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import model.Catalogue;
 import model.Radius;
 import model.exception.CatalogueQueryException;
+import model.exception.TimeoutQueryException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -25,21 +26,22 @@ public class GetDataTask<T extends Request> implements Callable<List<String>> {
     private final Radius type;
     private final Class<T> serviceClass;
     private final String server;
+    private final boolean timeout;
 
     /**
      * Wraps retrieving list of URIs and respective HTTP GET calls.
      * @return List of strings such that a string is literal result from respective server.
      */
     @Override
-    public List<String> call() {
+    public List<String> call() throws TimeoutQueryException {
         var service = getInstanceOfService(serviceClass);
         var output = new ArrayList<String>();
         var requests = service.createDataRequest(catalogues, input, radius, type, server);
         for (var request : requests) {
             try {
-                output.add(service.sendRequest(request));
+                output.add(service.sendRequest(request, timeout));
             }
-            catch(CatalogueQueryException ex) {
+            catch (CatalogueQueryException ex) {
                 log.error("Error during retrieving data: " + request.toString());
             }
         }

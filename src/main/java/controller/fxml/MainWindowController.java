@@ -25,6 +25,7 @@ import model.Radius;
 import model.Table;
 import model.UserInput;
 import model.exception.ResolverQueryException;
+import model.exception.TimeoutQueryException;
 import model.mirror.MastServer;
 import model.mirror.SimbadServer;
 import model.mirror.VizierServer;
@@ -329,8 +330,42 @@ public class MainWindowController {
         protected Task<List<List<String>>> createTask() {
             return new Task<>() {
                 @Override
-                protected List<List<String>> call() throws ExecutionException, InterruptedException {
+                protected List<List<String>> call() throws InterruptedException, ExecutionException {
                     List<Callable<List<String>>> tasks = new ArrayList<>();
+
+                    Platform.runLater(() -> infoLabel.setText("Resolving input.."));
+                    String resolvedInput = "";
+
+                    try {
+                        resolvedInput = getResolvedInput(inputText.getText());
+                    } catch (ExecutionException | InterruptedException ex) {
+                        if (ex.getCause() instanceof ResolverQueryException) {
+                            Platform.runLater(() -> {
+                                Alert alert = new Alert(Alert.AlertType.WARNING);
+                                alert.setTitle("Input");
+                                alert.setContentText("Input \"" + inputText.getText() + "\" could not be resolved.");
+                                alert.showAndWait();
+                            });
+                        }
+                    }
+
+                    //If VizieR button was activated
+                    if (vizierSearch) {
+                        tasks.add(new GetDataTask<>(getVizierCatalogues(),
+                                inputText.getText(), radiusInput.getText(), radiusBox.getValue(), VizierService.class,
+                                getVizierServer(), false));
+                    }
+
+                    //If SIMBAD button was activated
+                    if (simbadSearch) {
+                    tasks.add(new GetDataTask<>(null,
+                            resolvedInput, radiusInput.getText(), radiusBox.getValue(),
+                            SimbadService.class, getSimbadServer(), false));
+                    }
+
+                    Platform.runLater(() -> infoLabel.setText("Downloading data.."));
+                    var responses = executorService.invokeAll(tasks); //start Vizier and Simbad tasks
+                    var output = new ArrayList<List<String>>();
 
                     //If MAST button was activated
                     if (mastSearch) {
@@ -338,44 +373,29 @@ public class MainWindowController {
                         catalogue.setTables(getMastMissions());
                         var catalogues = new ArrayList<Catalogue>();
                         catalogues.add(catalogue);
-                        tasks.add(new GetDataTask<>(catalogues,
-                                inputText.getText(), radiusInput.getText(), radiusBox.getValue(), MastService.class,
-                                MastServer.MAST_DEFAULT));
-                    }
 
-                    //If VizieR button was activated
-                    if (vizierSearch) {
-                        tasks.add(new GetDataTask<>(getVizierCatalogues(),
-                                inputText.getText(), radiusInput.getText(), radiusBox.getValue(), VizierService.class,
-                                getVizierServer()));
-                    }
-
-                    //If SIMBAD button was activated
-                    if (simbadSearch) {
-                        Platform.runLater(() -> infoLabel.setText("Resolving input.."));
+                        boolean mastTimeout = false;
                         try {
-                            tasks.add(new GetDataTask<>(null,
-                                    getResolvedInput(inputText.getText()), radiusInput.getText(), radiusBox.getValue(),
-                                    SimbadService.class, getSimbadServer()));
-                        } catch(ExecutionException | InterruptedException ex) {
-                            if (ex.getCause() instanceof ResolverQueryException) {
-                                Platform.runLater(() -> {
-                                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                                    alert.setTitle("Input");
-                                    alert.setContentText("Input \"" + inputText.getText() + "\" could not be resolved.");
-                                    alert.showAndWait();
-                                });
+                            output.add(executorService.submit(new GetDataTask<>(catalogues,
+                                    inputText.getText(), radiusInput.getText(), radiusBox.getValue(), MastService.class,
+                                    MastServer.MAST_DEFAULT, true)).get());
+                        }
+                        catch (ExecutionException | InterruptedException ex) {
+                            if (ex.getCause() instanceof TimeoutQueryException) {
+                                mastTimeout = true;
+                                log.error("MAST timeouted");
                             }
                         }
 
+                        if (mastTimeout && !resolvedInput.isEmpty()) {
+
+                        }
                     }
-                    if (tasks.isEmpty()) {
+
+                    if (responses.isEmpty() && output.isEmpty()) {
                         searchService.cancel();
                     }
 
-                    Platform.runLater(() -> infoLabel.setText("Downloading data.."));
-                    var responses = executorService.invokeAll(tasks);
-                    var output = new ArrayList<List<String>>();
                     for (var response : responses) {
                         output.add(response.get());
                     }

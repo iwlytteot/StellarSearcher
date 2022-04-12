@@ -18,6 +18,7 @@ import model.Catalogue;
 import model.Data;
 import model.Table;
 import model.exception.CatalogueQueryException;
+import model.exception.TimeoutQueryException;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
 import utils.FxmlCreator;
@@ -156,9 +157,9 @@ public class VizierCataloguesController {
                             vizierServer);
                     String result;
                     try {
-                        result = requestService.sendRequest(request);
+                        result = requestService.sendRequest(request, false);
                     }
-                    catch (CatalogueQueryException ex) {
+                    catch (TimeoutQueryException | CatalogueQueryException ex) {
                         dialoguePopup(ex.getMessage(), Alert.AlertType.ERROR);
                         log.error("Error during retrieving data: " + ex.getMessage());
                         return null;
