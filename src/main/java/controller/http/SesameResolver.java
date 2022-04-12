@@ -2,6 +2,7 @@ package controller.http;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import model.Coordinates;
 import model.exception.ResolverQueryException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -25,12 +26,12 @@ import java.util.concurrent.Callable;
  */
 @Data
 @Slf4j
-public class SesameResolver implements Callable<String> {
+public class SesameResolver implements Callable<Coordinates> {
     private static final String BASE_URL = "https://cdsweb.u-strasbg.fr/cgi-bin/nph-sesame/-oxp/SNV?";
     private final String input;
 
     @Override
-    public String call() throws ResolverQueryException {
+    public Coordinates call() throws ResolverQueryException {
         return getPosition(request(input));
     }
 
@@ -58,18 +59,20 @@ public class SesameResolver implements Callable<String> {
      * @param input XML object as String
      * @return resolved coordinates
      */
-    private String getPosition(String input) throws ResolverQueryException{
+    private Coordinates getPosition(String input) throws ResolverQueryException{
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(new ByteArrayInputStream(input.getBytes()));
             doc.getDocumentElement().normalize();
-            var el = doc.getElementsByTagName("jpos");
-            if (el.getLength() == 0) {
+            var raDeg = doc.getElementsByTagName("jradeg");
+            var decDeg = doc.getElementsByTagName("jdedeg");
+            if (raDeg.getLength() == 0 || decDeg.getLength() == 0) {
                 log.warn("No result while parsing XML file: " + input);
                 throw new ResolverQueryException();
             }
-            return el.item(0).getFirstChild().getNodeValue();
+
+            return new Coordinates(raDeg.item(0).getFirstChild().getNodeValue(), decDeg.item(0).getFirstChild().getNodeValue());
         } catch (ParserConfigurationException | SAXException | IOException e) {
             log.error("Exception while parsing XML file: " + input + "\n\n" + e.getMessage());
             throw new ResolverQueryException();

@@ -20,10 +20,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import model.Catalogue;
-import model.Radius;
-import model.Table;
-import model.UserInput;
+import model.*;
 import model.exception.ResolverQueryException;
 import model.exception.TimeoutQueryException;
 import model.mirror.MastServer;
@@ -314,7 +311,7 @@ public class MainWindowController {
         return mastMissionController.getSelectedMissions();
     }
 
-    private String getResolvedInput(String input) throws ExecutionException, InterruptedException {
+    private Coordinates getResolvedInput(String input) throws ExecutionException, InterruptedException {
         return executorService.submit(new SesameResolver(input)).get();
     }
 
@@ -334,7 +331,7 @@ public class MainWindowController {
                     List<Callable<List<String>>> tasks = new ArrayList<>();
 
                     Platform.runLater(() -> infoLabel.setText("Resolving input.."));
-                    String resolvedInput = "";
+                    Coordinates resolvedInput = null;
 
                     try {
                         resolvedInput = getResolvedInput(inputText.getText());
@@ -357,10 +354,13 @@ public class MainWindowController {
                     }
 
                     //If SIMBAD button was activated
-                    if (simbadSearch) {
-                    tasks.add(new GetDataTask<>(null,
-                            resolvedInput, radiusInput.getText(), radiusBox.getValue(),
-                            SimbadService.class, getSimbadServer(), false));
+                    if (simbadSearch && resolvedInput != null) {
+                        String coordInput = resolvedInput.getRa() + " " +
+                                (resolvedInput.isSign() ? "+" : "-") +
+                                resolvedInput.getDec();
+                        tasks.add(new GetDataTask<>(null,
+                                coordInput, radiusInput.getText(), radiusBox.getValue(),
+                                SimbadService.class, getSimbadServer(), false));
                     }
 
                     Platform.runLater(() -> infoLabel.setText("Downloading data.."));
@@ -387,7 +387,7 @@ public class MainWindowController {
                             }
                         }
 
-                        if (mastTimeout && !resolvedInput.isEmpty()) {
+                        if (mastTimeout && resolvedInput != null) {
 
                         }
                     }
