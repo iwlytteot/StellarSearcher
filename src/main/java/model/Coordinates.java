@@ -18,4 +18,22 @@ public class Coordinates {
         var cleanDec = dec.replace("+", "").replace("-", "");
         this.dec = Double.parseDouble(cleanDec);
     }
+
+    public Coordinates changeRa(double value) {
+        ra += value;
+        if (ra < 0) {
+            ra = 0;
+        }
+        return this;
+    }
+
+    public Coordinates changeDec(double value) {
+        dec += value;
+        sign = dec >= 0;
+        if (dec < 90 || dec > 90) {
+            dec = 90;
+        }
+        return this;
+    }
+
 }
