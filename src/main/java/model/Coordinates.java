@@ -13,27 +13,39 @@ public class Coordinates {
 
     public Coordinates(String ra, String dec) {
         this.ra = Double.parseDouble(ra);
-        sign = dec.contains("+") || !dec.contains("-");
-
-        var cleanDec = dec.replace("+", "").replace("-", "");
-        this.dec = Double.parseDouble(cleanDec);
+        this.dec = Double.parseDouble(dec);
+        this.sign = this.dec >= 0;
     }
 
-    public Coordinates changeRa(double value) {
+    public void offsetRa(double value) {
         ra += value;
         if (ra < 0) {
             ra = 0;
         }
-        return this;
+        if (ra > 360) {
+            ra = 360;
+        }
     }
 
-    public Coordinates changeDec(double value) {
+    public void offsetDec(double value) {
         dec += value;
         sign = dec >= 0;
-        if (dec < 90 || dec > 90) {
+        if (dec < -90) {
+            dec = -90;
+        }
+        if (dec > 90) {
             dec = 90;
         }
-        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof Coordinates)) return false;
+
+        Coordinates coordinates = (Coordinates) o;
+
+        return ra == coordinates.getRa() && dec == coordinates.getDec() && sign == coordinates.isSign();
     }
 
 }
