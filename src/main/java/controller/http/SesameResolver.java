@@ -42,7 +42,8 @@ public class SesameResolver implements Callable<Coordinates> {
      */
     private String request(String input) {
         var client = HttpClient.newHttpClient();
-        var request = HttpRequest.newBuilder(URI.create(BASE_URL + URLEncoder.encode(input, StandardCharsets.UTF_8))).GET().build();
+        var request = HttpRequest.newBuilder(URI.create(BASE_URL +
+                URLEncoder.encode(input, StandardCharsets.UTF_8).replace("+", "%20"))).GET().build();
         try {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
             return response.body();

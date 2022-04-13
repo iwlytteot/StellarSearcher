@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.*;
+import model.exception.CatalogueQueryException;
 import model.exception.ResolverQueryException;
 import model.exception.TimeoutQueryException;
 import model.mirror.MastServer;
@@ -319,6 +320,57 @@ public class MainWindowController {
         return new UserInput(inputText.getText(), radiusInput.getText(), radiusBox.getValue());
     }
 
+
+    private List<String> mastBinarySearch(Coordinates coordinatesMin, Coordinates coordinatesMax,
+                                          double radius, List<Catalogue> catalogues, int depth) {
+        List<String> output = new ArrayList<>();
+
+        var service = new MastService();
+
+        var coordinatesMid = new Coordinates(coordinatesMin);
+        coordinatesMid.offsetRaDec(radius);
+
+        var coordinatesLeftMid = new Coordinates(coordinatesMid);
+        coordinatesLeftMid.offsetRa(-radius);
+
+        var coordinatesRightMid = new Coordinates(coordinatesMid);
+        coordinatesRightMid.offsetRa(radius);
+
+        var coordinatesUpMid = new Coordinates(coordinatesMid);
+        coordinatesUpMid.offsetDec(radius);
+
+        var coordinatesDownMid = new Coordinates(coordinatesMid);
+        coordinatesDownMid.offsetDec(-radius);
+
+        log.warn("DEPTH: " + depth);
+        log.warn("Left side down: " + coordinatesMin + " to " + coordinatesMid + " of radius: " + radius);
+        log.warn("Left side up: " + coordinatesLeftMid + " to " + coordinatesUpMid + " of radius: " + radius);
+        log.warn("Right side down: " + coordinatesDownMid + " to " + coordinatesRightMid + " of radius: " + radius);
+        log.warn("Right side up: " + coordinatesMid + " to " + coordinatesMax + " of radius: " + radius);
+
+        var requests = service.createDataRequest(catalogues, coordinatesMin, coordinatesMid, MastServer.MAST_DEFAULT);
+        requests.addAll(service.createDataRequest(catalogues, coordinatesLeftMid, coordinatesUpMid, MastServer.MAST_DEFAULT));
+        requests.addAll(service.createDataRequest(catalogues, coordinatesDownMid, coordinatesRightMid, MastServer.MAST_DEFAULT));
+        requests.addAll(service.createDataRequest(catalogues, coordinatesMid, coordinatesMax, MastServer.MAST_DEFAULT));
+
+        for (var request : requests) {
+            try {
+                output.add(service.sendRequest(request, true));
+            }
+            catch (CatalogueQueryException | TimeoutQueryException ex) {
+                log.error("Error during retrieving data: " + request.toString());
+                output.addAll(mastBinarySearch(coordinatesMin, coordinatesMid, radius / 2, catalogues, depth + 1));
+                output.addAll(mastBinarySearch(coordinatesLeftMid, coordinatesUpMid, radius / 2, catalogues, depth + 1));
+                output.addAll(mastBinarySearch(coordinatesDownMid, coordinatesRightMid, radius / 2, catalogues, depth + 1));
+                output.addAll(mastBinarySearch(coordinatesMid, coordinatesMax, radius / 2, catalogues, depth + 1));
+                return output;
+            }
+        }
+        return output;
+    }
+
+
+
     /**
      * JavaFX Service, where search parameters are retrieved and where search action takes place.
      */
@@ -381,14 +433,24 @@ public class MainWindowController {
                                     MastServer.MAST_DEFAULT, true)).get());
                         }
                         catch (ExecutionException | InterruptedException ex) {
+                            System.out.println("HEREs");
                             if (ex.getCause() instanceof TimeoutQueryException) {
                                 mastTimeout = true;
-                                log.error("MAST timeouted");
+                                log.error("MAST timeouted, there will be now an attempt to download data" +
+                                        "of smaller parts.");
                             }
                         }
 
                         if (mastTimeout && resolvedInput != null) {
+                            //because input is always in acrmin (default by MAST) but resolved coordinates are
+                            //in decimal degrees and 1 degree = 60 arcmin
+                            var radius = Double.parseDouble(radiusInput.getText()) / 60;
+                            var coordinatesMin = new Coordinates(resolvedInput);
+                            var coordinatesMax = new Coordinates(resolvedInput);
+                            coordinatesMin.offsetRaDec(-radius);
+                            coordinatesMax.offsetRaDec(radius);
 
+                            output.add(mastBinarySearch(coordinatesMin, coordinatesMax, radius, catalogues, 0));
                         }
                     }
 

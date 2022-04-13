@@ -14,7 +14,6 @@ import java.util.List;
 /**
  * Service for Simbad database. For official API, check http://simbad.u-strasbg.fr/guide/sim-url.htx.
  */
-@Component
 public class SimbadService implements Request {
     private static final String BASE_PARAM = "/simbad/sim-coo?";
     private static final String SUFFIX_URL = "&output.format=VOTable";

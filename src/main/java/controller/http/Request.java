@@ -38,7 +38,7 @@ public interface Request {
         var client = HttpClient.newHttpClient();
         HttpRequest request;
         if (timeout) {
-            request = HttpRequest.newBuilder(uri).GET().timeout(Duration.ofSeconds(280)).build();
+            request = HttpRequest.newBuilder(uri).GET().timeout(Duration.ofMillis(2500)).build();
         }
         else {
             request = HttpRequest.newBuilder(uri).GET().build();

@@ -14,7 +14,6 @@ import java.util.List;
 /**
  * Service for VizieR catalogue. For official API, check https://cdsarc.u-strasbg.fr/doc/asu-summary.htx.
  */
-@Component
 public class VizierService implements Request {
     private static final String BASE_PARAM = "/viz-bin/votable?";
 

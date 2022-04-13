@@ -17,6 +17,12 @@ public class Coordinates {
         this.sign = this.dec >= 0;
     }
 
+    public Coordinates(Coordinates c) {
+        this.ra = c.getRa();
+        this.dec = c.getDec();
+        this.sign = c.isSign();
+    }
+
     public void offsetRa(double value) {
         ra += value;
         if (ra < 0) {
@@ -38,6 +44,11 @@ public class Coordinates {
         }
     }
 
+    public void offsetRaDec(double value) {
+        offsetRa(value);
+        offsetDec(value);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
@@ -46,6 +57,11 @@ public class Coordinates {
         Coordinates coordinates = (Coordinates) o;
 
         return ra == coordinates.getRa() && dec == coordinates.getDec() && sign == coordinates.isSign();
+    }
+
+    @Override
+    public String toString() {
+        return ra + " " + dec;
     }
 
 }
