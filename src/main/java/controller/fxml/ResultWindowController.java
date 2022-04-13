@@ -62,6 +62,7 @@ public class ResultWindowController {
 
         int rowCount = 0;
         for (var entry : output.entrySet()) {
+            HashMap<String, TableView<SavotTR>> outputTableViews = new HashMap<>();
             //Retrieves input and radius and creates Tab
             var inputTab = new Tab(entry.getKey().toString());
             var inputPane = new TabPane();
@@ -101,7 +102,6 @@ public class ResultWindowController {
                     var tables = s.getTables();
                     for (var table : tables.getItems()) {
                         var t = (SavotTable) table;
-                        var tableTab = new Tab(t.getName());
 
                         var tableView = new TableView<SavotTR>();
                         var columnCount = 0;
@@ -140,11 +140,19 @@ public class ResultWindowController {
                             }
                         }
                         if (!tableView.getItems().isEmpty()) {
-                            tableTab.setContent(tableView);
-                            inputPane.getTabs().add(tableTab);
+                            if (outputTableViews.containsKey(t.getName())) {
+                                outputTableViews.get(t.getName()).getItems().addAll(tableView.getItems());
+                            } else {
+                                outputTableViews.put(t.getName(), tableView);
+                            }
                         }
                     }
                 }
+            }
+            for (var tableView : outputTableViews.entrySet()) {
+                var tab = new Tab(tableView.getKey());
+                tab.setContent(tableView.getValue());
+                inputPane.getTabs().add(tab);
             }
             inputTab.setContent(inputPane);
             tabPane.getTabs().add(inputTab);
