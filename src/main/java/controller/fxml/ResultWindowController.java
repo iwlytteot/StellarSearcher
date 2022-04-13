@@ -18,7 +18,6 @@ import view.handler.ExportWindowEventHandler;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -61,7 +60,6 @@ public class ResultWindowController {
         //If there was multiple searching
         tabPane.getTabs().clear();
 
-        List<Tab> resultTabs = new ArrayList<>();
         int rowCount = 0;
         for (var entry : output.entrySet()) {
             //Retrieves input and radius and creates Tab
@@ -149,9 +147,8 @@ public class ResultWindowController {
                 }
             }
             inputTab.setContent(inputPane);
-            resultTabs.add(inputTab);
+            tabPane.getTabs().add(inputTab);
         }
-        tabPane.getTabs().addAll(resultTabs);
         numRows.setText("Fetched " + rowCount + " row(s)");
     }
 }
