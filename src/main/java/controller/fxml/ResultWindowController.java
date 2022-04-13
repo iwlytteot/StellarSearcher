@@ -149,7 +149,6 @@ public class ResultWindowController {
             inputTab.setContent(inputPane);
             tabPane.getTabs().add(inputTab);
         }
-        int finalRowCount = rowCount;
-        numRows.setText("Fetched " + finalRowCount + " row(s)");
+        numRows.setText("Fetched " + rowCount + " row(s)");
     }
 }

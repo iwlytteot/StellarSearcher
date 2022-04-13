@@ -4,6 +4,7 @@ import model.Catalogue;
 import model.exception.CatalogueQueryException;
 import model.Radius;
 import model.exception.TimeoutQueryException;
+import model.mirror.MastServer;
 
 import java.io.IOException;
 import java.net.URI;
@@ -38,7 +39,7 @@ public interface Request {
         var client = HttpClient.newHttpClient();
         HttpRequest request;
         if (timeout) {
-            request = HttpRequest.newBuilder(uri).GET().timeout(Duration.ofMillis(2500)).build();
+            request = HttpRequest.newBuilder(uri).GET().timeout(Duration.ofMillis(MastServer.TIMEOUT_LIMIT)).build();
         }
         else {
             request = HttpRequest.newBuilder(uri).GET().build();

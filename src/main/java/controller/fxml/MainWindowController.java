@@ -22,6 +22,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.*;
 import model.exception.CatalogueQueryException;
+import model.exception.RecursionDepthException;
 import model.exception.ResolverQueryException;
 import model.exception.TimeoutQueryException;
 import model.mirror.MastServer;
@@ -321,55 +322,76 @@ public class MainWindowController {
     }
 
 
-    private List<String> mastBinarySearch(Coordinates coordinatesMin, Coordinates coordinatesMax,
-                                          double radius, List<Catalogue> catalogues, int depth) {
-        List<String> output = new ArrayList<>();
+    /**
+     * Method that searches for results in boxes defined by RA and DEC.
+     * According to MAST, it is possible to search for results in range of RA/DEC values e.g.: 30.1..30.5 will search
+     * for all values from 30.1 to 30.5.
+     * In order to have boxes of same area, it is necessary to create a grid that contains 7 points. Grid is then
+     * divided into four boxes, in which recursive call happens.
+     *
+     * The easiest way to visualize it is XY plane where X = RA and Y = DEC and user input (point on plane) is at the
+     * center of XY plane (mid-point).
+     * Another 6 points are then created when radius is added/subtracted with respect to mid-point. A single box within
+     * grid is then defined by two points that are diagonally opposite.
+     *
+     * @param coordinatesMin the lowest point on plane with the smallest RA and DEC
+     * @param coordinatesMax the highest point on plane with the highest RA and DEC
+     * @param radius length of which boxes are shortened, parallel to X or Y axis
+     * @param catalogues catalogues to query
+     * @param depth current depth of recursion
+     * @return list of strings that contain output data
+     * @throws RecursionDepthException if recursion maximum depth is reached
+     */
+    private List<String> mastGridSearch(Coordinates coordinatesMin, Coordinates coordinatesMax,
+                                        double radius, List<Catalogue> catalogues, int depth) throws RecursionDepthException {
+        if (depth == 10) {
+            throw new RecursionDepthException();
+        }
 
+        List<String> output = new ArrayList<>();
         var service = new MastService();
 
+        //Creating mid-point. It is clear that mid-point is the lowest point with added radius to RA and DEC values
         var coordinatesMid = new Coordinates(coordinatesMin);
         coordinatesMid.offsetRaDec(radius);
 
+        //Creating rest of points. Each point is created with respect to mid-point.
         var coordinatesLeftMid = new Coordinates(coordinatesMid);
         coordinatesLeftMid.offsetRa(-radius);
-
         var coordinatesRightMid = new Coordinates(coordinatesMid);
         coordinatesRightMid.offsetRa(radius);
-
         var coordinatesUpMid = new Coordinates(coordinatesMid);
         coordinatesUpMid.offsetDec(radius);
-
         var coordinatesDownMid = new Coordinates(coordinatesMid);
         coordinatesDownMid.offsetDec(-radius);
 
-        log.warn("DEPTH: " + depth);
-        log.warn("Left side down: " + coordinatesMin + " to " + coordinatesMid + " of radius: " + radius);
-        log.warn("Left side up: " + coordinatesLeftMid + " to " + coordinatesUpMid + " of radius: " + radius);
-        log.warn("Right side down: " + coordinatesDownMid + " to " + coordinatesRightMid + " of radius: " + radius);
-        log.warn("Right side up: " + coordinatesMid + " to " + coordinatesMax + " of radius: " + radius);
-
-        var requests = service.createDataRequest(catalogues, coordinatesMin, coordinatesMid, MastServer.MAST_DEFAULT);
-        requests.addAll(service.createDataRequest(catalogues, coordinatesLeftMid, coordinatesUpMid, MastServer.MAST_DEFAULT));
-        requests.addAll(service.createDataRequest(catalogues, coordinatesDownMid, coordinatesRightMid, MastServer.MAST_DEFAULT));
-        requests.addAll(service.createDataRequest(catalogues, coordinatesMid, coordinatesMax, MastServer.MAST_DEFAULT));
-
-        for (var request : requests) {
-            try {
-                output.add(service.sendRequest(request, true));
-            }
-            catch (CatalogueQueryException | TimeoutQueryException ex) {
-                log.error("Error during retrieving data: " + request.toString());
-                output.addAll(mastBinarySearch(coordinatesMin, coordinatesMid, radius / 2, catalogues, depth + 1));
-                output.addAll(mastBinarySearch(coordinatesLeftMid, coordinatesUpMid, radius / 2, catalogues, depth + 1));
-                output.addAll(mastBinarySearch(coordinatesDownMid, coordinatesRightMid, radius / 2, catalogues, depth + 1));
-                output.addAll(mastBinarySearch(coordinatesMid, coordinatesMax, radius / 2, catalogues, depth + 1));
-                return output;
-            }
+        //For each box defined by two points, try query and if failed, call itself with smaller radius.
+        try {
+            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesMin, coordinatesMid, MastServer.MAST_DEFAULT).get(0), true));
+        } catch (CatalogueQueryException | TimeoutQueryException ex) {
+            output.addAll(mastGridSearch(coordinatesMin, coordinatesMid, radius / 2, catalogues, depth + 1));
         }
+
+        try {
+            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesLeftMid, coordinatesUpMid, MastServer.MAST_DEFAULT).get(0), true));
+        } catch (CatalogueQueryException | TimeoutQueryException ex) {
+            output.addAll(mastGridSearch(coordinatesLeftMid, coordinatesUpMid, radius / 2, catalogues, depth + 1));
+        }
+
+        try {
+            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesDownMid, coordinatesRightMid, MastServer.MAST_DEFAULT).get(0), true));
+        } catch (CatalogueQueryException | TimeoutQueryException ex) {
+            output.addAll(mastGridSearch(coordinatesDownMid, coordinatesRightMid, radius / 2, catalogues, depth + 1));
+        }
+
+        try {
+            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesMid, coordinatesMax, MastServer.MAST_DEFAULT).get(0), true));
+        } catch (CatalogueQueryException | TimeoutQueryException ex) {
+            output.addAll(mastGridSearch(coordinatesMid, coordinatesMax, radius / 2, catalogues, depth + 1));
+        }
+
         return output;
     }
-
-
 
     /**
      * JavaFX Service, where search parameters are retrieved and where search action takes place.
@@ -385,6 +407,7 @@ public class MainWindowController {
                     Platform.runLater(() -> infoLabel.setText("Resolving input.."));
                     Coordinates resolvedInput = null;
 
+                    //Resolving user input into coordinates into decimal degree notation
                     try {
                         resolvedInput = getResolvedInput(inputText.getText());
                     } catch (ExecutionException | InterruptedException ex) {
@@ -419,38 +442,61 @@ public class MainWindowController {
                     var responses = executorService.invokeAll(tasks); //start Vizier and Simbad tasks
                     var output = new ArrayList<List<String>>();
 
-                    //If MAST button was activated
+                    //Because MAST can have nested queries, it is when all searches from Vizier and Simbad are done
                     if (mastSearch) {
-                        var catalogue = new Catalogue();
-                        catalogue.setTables(getMastMissions());
+
+                        //Create a catalogue for each MAST mission
                         var catalogues = new ArrayList<Catalogue>();
-                        catalogues.add(catalogue);
-
-                        boolean mastTimeout = false;
-                        try {
-                            output.add(executorService.submit(new GetDataTask<>(catalogues,
-                                    inputText.getText(), radiusInput.getText(), radiusBox.getValue(), MastService.class,
-                                    MastServer.MAST_DEFAULT, true)).get());
+                        for (var mission : getMastMissions()) {
+                            var catalogue = new Catalogue();
+                            catalogue.addTable(mission);
+                            catalogues.add(catalogue);
                         }
-                        catch (ExecutionException | InterruptedException ex) {
-                            System.out.println("HEREs");
-                            if (ex.getCause() instanceof TimeoutQueryException) {
-                                mastTimeout = true;
-                                log.error("MAST timeouted, there will be now an attempt to download data" +
-                                        "of smaller parts.");
+
+                        /*
+                        For each catalogue then try to query.
+                        If there is a timeout, grid search is performed.
+                         */
+                        for (var catalogue : catalogues) {
+                            boolean mastTimeout = false;
+                            var tempCatList = new ArrayList<Catalogue>();
+                            tempCatList.add(catalogue);
+                            try {
+                                output.add(executorService.submit(new GetDataTask<>(tempCatList,
+                                        inputText.getText(), radiusInput.getText(), radiusBox.getValue(), MastService.class,
+                                        MastServer.MAST_DEFAULT, true)).get());
                             }
-                        }
+                            catch (ExecutionException | InterruptedException ex) {
+                                if (ex.getCause() instanceof TimeoutQueryException) {
+                                    mastTimeout = true;
+                                    log.error("MAST timeout for \"" + catalogue.getTables().get(0).getName() + "\"");
+                                }
+                            }
 
-                        if (mastTimeout && resolvedInput != null) {
-                            //because input is always in acrmin (default by MAST) but resolved coordinates are
-                            //in decimal degrees and 1 degree = 60 arcmin
-                            var radius = Double.parseDouble(radiusInput.getText()) / 60;
-                            var coordinatesMin = new Coordinates(resolvedInput);
-                            var coordinatesMax = new Coordinates(resolvedInput);
-                            coordinatesMin.offsetRaDec(-radius);
-                            coordinatesMax.offsetRaDec(radius);
+                            if (mastTimeout && resolvedInput != null) {
+                                /*
+                                Radius input is always in arcmin (default by MAST), but resolved coordinates are
+                                in decimal degrees. Transformation needed => 1 degree = 60 arcmin
+                                 */
+                                var radius = Double.parseDouble(radiusInput.getText()) / 60;
+                                var coordinatesMin = new Coordinates(resolvedInput);
+                                var coordinatesMax = new Coordinates(resolvedInput);
+                                coordinatesMin.offsetRaDec(-radius); //lowest point
+                                coordinatesMax.offsetRaDec(radius); //highest point
 
-                            output.add(mastBinarySearch(coordinatesMin, coordinatesMax, radius, catalogues, 0));
+                                try {
+                                    output.add(mastGridSearch(coordinatesMin, coordinatesMax, radius, tempCatList, 0));
+                                } catch (RecursionDepthException ex) {
+                                    Platform.runLater(() -> {
+                                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                                        alert.setTitle("Can't get results");
+                                        alert.setContentText("Catalogue \"" + catalogue.getTables().get(0).getName() +
+                                                "\" could not be queried anymore, because maximum recursion depth" +
+                                                " happened. Try smaller radius or contact MAST.");
+                                        alert.showAndWait();
+                                    });
+                                }
+                            }
                         }
                     }
 
