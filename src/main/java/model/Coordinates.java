@@ -9,18 +9,15 @@ import lombok.Data;
 public class Coordinates {
     private double ra;
     private double dec;
-    private boolean sign;
 
     public Coordinates(String ra, String dec) {
         this.ra = Double.parseDouble(ra);
         this.dec = Double.parseDouble(dec);
-        this.sign = this.dec >= 0;
     }
 
     public Coordinates(Coordinates c) {
         this.ra = c.getRa();
         this.dec = c.getDec();
-        this.sign = c.isSign();
     }
 
     public void offsetRa(double value) {
@@ -35,7 +32,6 @@ public class Coordinates {
 
     public void offsetDec(double value) {
         dec += value;
-        sign = dec >= 0;
         if (dec < -90) {
             dec = -90;
         }
@@ -56,7 +52,7 @@ public class Coordinates {
 
         Coordinates coordinates = (Coordinates) o;
 
-        return ra == coordinates.getRa() && dec == coordinates.getDec() && sign == coordinates.isSign();
+        return ra == coordinates.getRa() && dec == coordinates.getDec();
     }
 
     @Override

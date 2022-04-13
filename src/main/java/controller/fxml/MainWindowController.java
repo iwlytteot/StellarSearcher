@@ -430,9 +430,7 @@ public class MainWindowController {
 
                     //If SIMBAD button was activated
                     if (simbadSearch && resolvedInput != null) {
-                        String coordInput = resolvedInput.getRa() + " " +
-                                (resolvedInput.isSign() ? "+" : "-") +
-                                resolvedInput.getDec();
+                        String coordInput = resolvedInput.getRa() + " " + resolvedInput.getDec();
                         tasks.add(new GetDataTask<>(null,
                                 coordInput, radiusInput.getText(), radiusBox.getValue(),
                                 SimbadService.class, getSimbadServer(), false));
@@ -476,7 +474,7 @@ public class MainWindowController {
                             if (mastTimeout && resolvedInput != null) {
                                 /*
                                 Radius input is always in arcmin (default by MAST), but resolved coordinates are
-                                in decimal degrees. Transformation needed => 1 degree = 60 arcmin
+                                in decimal degrees. Transformation is needed => 1 degree equals to 60 arcmin
                                  */
                                 var radius = Double.parseDouble(radiusInput.getText()) / 60;
                                 var coordinatesMin = new Coordinates(resolvedInput);

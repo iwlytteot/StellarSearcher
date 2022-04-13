@@ -84,9 +84,7 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                     //Simbad task
                     if (input.isSimbad()) {
                         var resolvedInput = executorService.submit(new SesameResolver(position)).get();
-                        String coordInput = resolvedInput.getRa() + " " +
-                                (resolvedInput.isSign() ? "+" : "-") +
-                                resolvedInput.getDec();
+                        String coordInput = resolvedInput.getRa() + " " + resolvedInput.getDec();
                         tempMap.get(userInput).add(executorService.submit(new GetDataTask<>(null,
                                 coordInput, input.getRadius(), input.getUnit(), SimbadService.class, simbadServer, false)));
                     }

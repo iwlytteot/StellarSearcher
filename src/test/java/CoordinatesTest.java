@@ -10,13 +10,11 @@ public class CoordinatesTest {
 
         assertThat(coordinatesNoSign.getRa()).isEqualTo(1.2868356);
         assertThat(coordinatesNoSign.getDec()).isEqualTo(67.83999458);
-        assertThat(coordinatesNoSign.isSign()).isTrue();
 
         var coordinatesWithSign = new Coordinates("1.2868356", "+67.83999458");
 
         assertThat(coordinatesWithSign.getRa()).isEqualTo(1.2868356);
         assertThat(coordinatesWithSign.getDec()).isEqualTo(67.83999458);
-        assertThat(coordinatesWithSign.isSign()).isTrue();
     }
 
     @Test
@@ -25,7 +23,6 @@ public class CoordinatesTest {
 
         assertThat(coordinates.getRa()).isEqualTo(1.2868356);
         assertThat(coordinates.getDec()).isEqualTo(-67.83999458);
-        assertThat(coordinates.isSign()).isFalse();
     }
 
     @Test
@@ -70,11 +67,9 @@ public class CoordinatesTest {
 
         coordinates.offsetDec(12);
         assertThat(coordinates.getDec()).isEqualTo(67.83999458 + 12);
-        assertThat(coordinates.isSign()).isTrue();
 
         coordinates.offsetDec(30);
         assertThat(coordinates.getDec()).isEqualTo(90);
-        assertThat(coordinates.isSign()).isTrue();
     }
 
     @Test
@@ -83,15 +78,12 @@ public class CoordinatesTest {
 
         coordinates.offsetDec(-20);
         assertThat(coordinates.getDec()).isEqualTo(67.83999458 - 20);
-        assertThat(coordinates.isSign()).isTrue();
 
         coordinates.offsetDec(-60);
         assertThat(coordinates.getDec()).isEqualTo(67.83999458 - 20 - 60);
-        assertThat(coordinates.isSign()).isFalse();
 
         coordinates.offsetDec(-97);
         assertThat(coordinates.getDec()).isEqualTo(-90);
-        assertThat(coordinates.isSign()).isFalse();
     }
 
     @Test
@@ -100,6 +92,5 @@ public class CoordinatesTest {
 
         coordinates.offsetDec(97);
         assertThat(coordinates.getDec()).isEqualTo(-67.83999458 + 97);
-        assertThat(coordinates.isSign()).isTrue();
     }
 }
