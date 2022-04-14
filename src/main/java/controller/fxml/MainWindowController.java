@@ -286,6 +286,8 @@ public class MainWindowController {
         executorService.shutdown();
         importService.cancel();
 
+        mastSearcher.getExecutorService().shutdown();
+
         var importServiceState = searchService.getState();
         if (importServiceState == Worker.State.RUNNING || importServiceState == Worker.State.SCHEDULED) {
             searchService.cancel();
@@ -372,7 +374,7 @@ public class MainWindowController {
                     //Because MAST can have nested queries, it is when all searches from Vizier and Simbad are done
                     if (mastSearch) {
                         try {
-                            output.addAll(mastSearcher.start(getMastMissions(), inputText.getText(), radiusInput.getText(),
+                            output.add(mastSearcher.start(getMastMissions(), inputText.getText(), radiusInput.getText(),
                                     radiusBox.getValue(), resolvedInput));
                         } catch (RecursionDepthException e) {
                             Platform.runLater(() -> {
@@ -443,7 +445,7 @@ public class MainWindowController {
                     Platform.runLater(() -> infoLabel.setText("Processing input file and downloading data.."));
                     try {
                         output = executorService.submit(new ImportControllerTask(importFile.getAbsolutePath(),
-                                getVizierServer(), getSimbadServer())).get();
+                                getVizierServer(), getSimbadServer(), mastSearcher)).get();
                     } catch (InterruptedException | ExecutionException e) {
                         log.error("Error while retrieving data from import: " + e.getMessage());
                     }

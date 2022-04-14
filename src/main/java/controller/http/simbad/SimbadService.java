@@ -3,7 +3,6 @@ package controller.http.simbad;
 import controller.http.Request;
 import model.Catalogue;
 import model.Radius;
-import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -16,7 +15,7 @@ import java.util.List;
  */
 public class SimbadService implements Request {
     private static final String BASE_PARAM = "/simbad/sim-coo?";
-    private static final String SUFFIX_URL = "&output.format=VOTable";
+    private static final String SUFFIX_URL = "&output.max=999999&output.format=VOTable";
     @Override
     public List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius,
                                        Radius radiusType, String baseUrl) {

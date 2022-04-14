@@ -1,14 +1,14 @@
 package controller.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import controller.http.mast.MastService;
 import controller.http.simbad.SimbadService;
 import controller.http.vizier.VizierService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.*;
+import model.exception.RecursionDepthException;
 import model.exception.ResolverQueryException;
-import model.mirror.MastServer;
+import utils.MastSearch;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +27,7 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
     private final String absolutePath;
     private final String vizierServer;
     private final String simbadServer;
+    private final MastSearch mastSearcher;
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -44,20 +45,25 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
             InputDataCollector inputDataCollector = objectMapper.readValue(new File(absolutePath), InputDataCollector.class);
 
             for (var input : inputDataCollector.getTargets()) {
-                //Vizier part
+                //Retrieving input, Vizier part
                 var vizierCatalogue = new Catalogue();
-                for (var object : input.getVizier()) {
-                    vizierCatalogue.addTable(new Table(object));
+                for (var name : input.getVizier()) {
+                    if (!name.isEmpty()) {
+                        vizierCatalogue.addTable(new Table(name));
+                    }
                 }
 
-                //Mast part
-                var mastCatalogue = new Catalogue();
-                for (var object : input.getMast()) {
-                    mastCatalogue.addTable(new Table(object));
+                //Retrieving input, Mast part
+                List<Table> mastMissions = new ArrayList<>();
+                for (var name : input.getMast()) {
+                    if (!name.isEmpty()) {
+                        mastMissions.add(new Table(name));
+                    }
                 }
 
                 //Search part
                 var tempMap = new HashMap<UserInput, List<Future<List<String>>>>();
+                var tempMastMap = new HashMap<UserInput, List<List<String>>>();
 
                 for (var position : input.getInput()) {
 
@@ -76,6 +82,7 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                     var userInput = new UserInput(position, input.getRadius(), input.getUnit());
 
                     tempMap.put(userInput, new ArrayList<>());
+                    tempMastMap.put(userInput, new ArrayList<>());
 
                     //Vizier task
                     var vizierCatalogues = new ArrayList<Catalogue>();
@@ -83,19 +90,16 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                     tempMap.get(userInput).add(executorService.submit(new GetDataTask<>(vizierCatalogues,
                             position, input.getRadius(), input.getUnit(), VizierService.class, vizierServer, false)));
 
-                    //Mast task
-                    var mastCatalogues = new ArrayList<Catalogue>();
-                    mastCatalogues.add(mastCatalogue);
-
-                    tempMap.get(userInput).add(executorService.submit(new GetDataTask<>(mastCatalogues,
-                            position, input.getRadius(), input.getUnit(), MastService.class, MastServer.MAST_DEFAULT, true)));
-
                     //Simbad task
                     if (input.isSimbad() && resolvedInput != null) {
                         String coordInput = resolvedInput.getRa() + " " + resolvedInput.getDec();
                         tempMap.get(userInput).add(executorService.submit(new GetDataTask<>(null,
                                 coordInput, input.getRadius(), input.getUnit(), SimbadService.class, simbadServer, false)));
                     }
+
+                    //Mast task
+                    tempMastMap.get(userInput).add(mastSearcher.start(mastMissions, position, input.getRadius(),
+                            input.getUnit(), resolvedInput));
                 }
                 //Retrieving data from Future and associating user input with results so that Result
                 //windows contains data that are in correct tab
@@ -112,11 +116,19 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                     //flatting the result because it is not necessary to have deeper division in results
                     //as it is enough to divide it by input and radius
                     newValue.addAll(tempList.stream().flatMap(List::stream).collect(Collectors.toList()));
+
+                    var mastOutput = tempMastMap.get(entry.getKey());
+                    if (mastOutput != null) {
+                        newValue.addAll(mastOutput.stream().flatMap(List::stream).collect(Collectors.toList()));
+                    }
                     output.put(entry.getKey(), newValue);
                 }
             }
         } catch (IOException | InterruptedException | ExecutionException e) {
             log.error("Error while processing JSON file: " + e.getMessage());
+        } catch (RecursionDepthException e) {
+            log.error("MAST could not be queried anymore, because maximum recursion depth happened. " +
+                    "Try smaller radius or contact MAST");
         }
         executorService.shutdown();
         return output;

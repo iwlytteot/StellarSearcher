@@ -1,10 +1,7 @@
 package utils;
 
 import controller.http.mast.MastService;
-import controller.http.vizier.VizierService;
 import controller.task.GetDataTask;
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.Catalogue;
@@ -18,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,10 +26,10 @@ public class MastSearch {
     private final GridSearch gridSearcher;
     private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-    public List<List<String>> start(List<Table> missions, String input, String radiusInput, Radius radiusType,
+    public List<String> start(List<Table> missions, String input, String radiusInput, Radius radiusType,
                               Coordinates resolvedInput) throws RecursionDepthException {
 
-        List<List<String>> output = new ArrayList<>();
+        List<String> output = new ArrayList<>();
         //Create a catalogue for each MAST mission
         var catalogues = new ArrayList<Catalogue>();
         for (var mission : missions) {
@@ -51,7 +47,7 @@ public class MastSearch {
             var tempCatList = new ArrayList<Catalogue>();
             tempCatList.add(catalogue);
             try {
-                output.add(executorService.submit(new GetDataTask<>(tempCatList,
+                output.addAll(executorService.submit(new GetDataTask<>(tempCatList,
                         input, radiusInput, radiusType, MastService.class,
                         MastServer.MAST_DEFAULT, true)).get());
             }
@@ -73,7 +69,7 @@ public class MastSearch {
                 coordinatesMin.offsetRaDec(-radius); //lowest point
                 coordinatesMax.offsetRaDec(radius); //highest point
 
-                output.add(gridSearcher.start(coordinatesMin, coordinatesMax, radius, tempCatList, 0));
+                output.addAll(gridSearcher.start(coordinatesMin, resolvedInput, coordinatesMax, tempCatList, 0));
             }
         }
         return output;

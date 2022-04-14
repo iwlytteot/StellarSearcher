@@ -5,7 +5,6 @@ import lombok.Data;
 import model.Catalogue;
 import model.Coordinates;
 import model.Radius;
-import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -18,7 +17,7 @@ import java.util.List;
  */
 @Data
 public class MastService implements Request {
-    private static final String BASE_PARAMS = "search.php?action=Search&outputformat=VOTable&max_records=99999";
+    private static final String BASE_PARAMS = "search.php?action=Search&outputformat=VOTable&max_records=999999";
 
     public List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius,
                                        Radius radiusType, String baseUrl) {

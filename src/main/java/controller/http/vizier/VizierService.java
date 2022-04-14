@@ -3,7 +3,6 @@ package controller.http.vizier;
 import controller.http.Request;
 import model.Catalogue;
 import model.Radius;
-import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.net.URLEncoder;
