@@ -32,6 +32,7 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
+import utils.GridSearch;
 import view.event.MastWindowEvent;
 import view.event.OutputSettingWindowEvent;
 import view.event.ResultWindowEvent;
@@ -53,7 +54,7 @@ import java.util.stream.Collectors;
  * Class controller for "MainWindow.fxml".
  */
 @Component
-@ComponentScan("model")
+@ComponentScan("model, utils")
 @FxmlView("/MainWindow.fxml")
 @Data
 @Slf4j
@@ -115,6 +116,8 @@ public class MainWindowController {
     private final ResultWindowController resultWindowController;
     private final OutputSettingController outputSettingController;
     private final ExportWindowController exportWindowController;
+
+    private final GridSearch gridSearcher;
 
     private boolean vizierSearch = false, simbadSearch = false, mastSearch = false;
     private final List<String> affectedTables = Collections.synchronizedList(new ArrayList<>());
@@ -321,78 +324,6 @@ public class MainWindowController {
         return new UserInput(inputText.getText(), radiusInput.getText(), radiusBox.getValue());
     }
 
-
-    /**
-     * Method that searches for results in boxes defined by RA and DEC.
-     * According to MAST, it is possible to search for results in range of RA/DEC values e.g.: 30.1..30.5 will search
-     * for all values from 30.1 to 30.5.
-     * In order to have boxes of same area, it is necessary to create a grid that contains 7 points. Grid is then
-     * divided into four boxes, in which recursive call happens.
-     *
-     * The easiest way to visualize it is XY plane where X = RA and Y = DEC and user input (point on plane) is at the
-     * center of XY plane (mid-point).
-     * Another 6 points are then created when radius is added/subtracted with respect to mid-point. A single box within
-     * grid is then defined by two points that are diagonally opposite.
-     *
-     * @param coordinatesMin the lowest point on plane with the smallest RA and DEC
-     * @param coordinatesMax the highest point on plane with the highest RA and DEC
-     * @param radius length of which boxes are shortened, parallel to X or Y axis
-     * @param catalogues catalogues to query
-     * @param depth current depth of recursion
-     * @return list of strings that contain output data
-     * @throws RecursionDepthException if recursion maximum depth is reached
-     */
-    private List<String> mastGridSearch(Coordinates coordinatesMin, Coordinates coordinatesMax,
-                                        double radius, List<Catalogue> catalogues, int depth) throws RecursionDepthException {
-        if (depth == 10) {
-            throw new RecursionDepthException();
-        }
-
-        List<String> output = new ArrayList<>();
-        var service = new MastService();
-
-        //Creating mid-point. It is clear that mid-point is the lowest point with added radius to RA and DEC values
-        var coordinatesMid = new Coordinates(coordinatesMin);
-        coordinatesMid.offsetRaDec(radius);
-
-        //Creating rest of points. Each point is created with respect to mid-point.
-        var coordinatesLeftMid = new Coordinates(coordinatesMid);
-        coordinatesLeftMid.offsetRa(-radius);
-        var coordinatesRightMid = new Coordinates(coordinatesMid);
-        coordinatesRightMid.offsetRa(radius);
-        var coordinatesUpMid = new Coordinates(coordinatesMid);
-        coordinatesUpMid.offsetDec(radius);
-        var coordinatesDownMid = new Coordinates(coordinatesMid);
-        coordinatesDownMid.offsetDec(-radius);
-
-        //For each box defined by two points, try query and if failed, call itself with smaller radius.
-        try {
-            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesMin, coordinatesMid, MastServer.MAST_DEFAULT).get(0), true));
-        } catch (CatalogueQueryException | TimeoutQueryException ex) {
-            output.addAll(mastGridSearch(coordinatesMin, coordinatesMid, radius / 2, catalogues, depth + 1));
-        }
-
-        try {
-            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesLeftMid, coordinatesUpMid, MastServer.MAST_DEFAULT).get(0), true));
-        } catch (CatalogueQueryException | TimeoutQueryException ex) {
-            output.addAll(mastGridSearch(coordinatesLeftMid, coordinatesUpMid, radius / 2, catalogues, depth + 1));
-        }
-
-        try {
-            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesDownMid, coordinatesRightMid, MastServer.MAST_DEFAULT).get(0), true));
-        } catch (CatalogueQueryException | TimeoutQueryException ex) {
-            output.addAll(mastGridSearch(coordinatesDownMid, coordinatesRightMid, radius / 2, catalogues, depth + 1));
-        }
-
-        try {
-            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesMid, coordinatesMax, MastServer.MAST_DEFAULT).get(0), true));
-        } catch (CatalogueQueryException | TimeoutQueryException ex) {
-            output.addAll(mastGridSearch(coordinatesMid, coordinatesMax, radius / 2, catalogues, depth + 1));
-        }
-
-        return output;
-    }
-
     /**
      * JavaFX Service, where search parameters are retrieved and where search action takes place.
      */
@@ -483,7 +414,7 @@ public class MainWindowController {
                                 coordinatesMax.offsetRaDec(radius); //highest point
 
                                 try {
-                                    output.add(mastGridSearch(coordinatesMin, coordinatesMax, radius, tempCatList, 0));
+                                    output.add(gridSearcher.start(coordinatesMin, coordinatesMax, radius, tempCatList, 0));
                                 } catch (RecursionDepthException ex) {
                                     Platform.runLater(() -> {
                                         Alert alert = new Alert(Alert.AlertType.WARNING);

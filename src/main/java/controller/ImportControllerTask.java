@@ -1,18 +1,20 @@
 package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import controller.fxml.MainWindowController;
 import controller.http.GetDataTask;
 import controller.http.SesameResolver;
 import controller.http.mast.MastService;
 import controller.http.simbad.SimbadService;
 import controller.http.vizier.VizierService;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import model.Catalogue;
-import model.InputDataCollector;
-import model.Table;
-import model.UserInput;
+import model.*;
+import model.exception.ResolverQueryException;
 import model.mirror.MastServer;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,8 +66,21 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                 var tempMap = new HashMap<UserInput, List<Future<List<String>>>>();
 
                 for (var position : input.getInput()) {
+
+                    Coordinates resolvedInput = null;
+
+                    //Resolving user input into coordinates into decimal degree notation
+                    try {
+                        resolvedInput = executorService.submit(new SesameResolver(position)).get();
+                    } catch (ExecutionException | InterruptedException ex) {
+                        if (ex.getCause() instanceof ResolverQueryException) {
+                            log.error("Couldn't resolve input: " + position);
+                        }
+                    }
+
                     //Retrieves inputs and radius + radius type
                     var userInput = new UserInput(position, input.getRadius(), input.getUnit());
+
                     tempMap.put(userInput, new ArrayList<>());
 
                     //Vizier task
@@ -82,8 +97,7 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                             position, input.getRadius(), input.getUnit(), MastService.class, MastServer.MAST_DEFAULT, true)));
 
                     //Simbad task
-                    if (input.isSimbad()) {
-                        var resolvedInput = executorService.submit(new SesameResolver(position)).get();
+                    if (input.isSimbad() && resolvedInput != null) {
                         String coordInput = resolvedInput.getRa() + " " + resolvedInput.getDec();
                         tempMap.get(userInput).add(executorService.submit(new GetDataTask<>(null,
                                 coordInput, input.getRadius(), input.getUnit(), SimbadService.class, simbadServer, false)));
