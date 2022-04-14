@@ -95,7 +95,7 @@ public class GridSearch {
         } catch (CatalogueQueryException | TimeoutQueryException ex) {
             var midPoint = new Coordinates(coordinatesMid);
             midPoint.offsetRa(rightRaRadius / 2);
-            midPoint.offsetDec(-upDecRadius / 2);
+            midPoint.offsetDec(-downDecRadius / 2);
             output.addAll(start(coordinatesDownMid, midPoint, coordinatesRightMid, catalogues, depth + 1));
         }
 
