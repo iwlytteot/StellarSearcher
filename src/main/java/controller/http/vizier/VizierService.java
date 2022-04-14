@@ -49,7 +49,7 @@ public class VizierService implements Request {
         var uri = URI.create(baseUrl + BASE_PARAM
                 + URLEncoder.encode("-source=", StandardCharsets.UTF_8)
                 + sources
-                + URLEncoder.encode("-c=" + identification, StandardCharsets.UTF_8)
+                + URLEncoder.encode("-c=" + identification, StandardCharsets.UTF_8).replace("+", "%20")
                 + "&"
                 + params);
         var output = new ArrayList<URI>();

@@ -1,20 +1,14 @@
-package controller;
+package controller.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import controller.fxml.MainWindowController;
-import controller.http.GetDataTask;
-import controller.http.SesameResolver;
 import controller.http.mast.MastService;
 import controller.http.simbad.SimbadService;
 import controller.http.vizier.VizierService;
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.*;
 import model.exception.ResolverQueryException;
 import model.mirror.MastServer;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,7 +65,7 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
 
                     //Resolving user input into coordinates into decimal degree notation
                     try {
-                        resolvedInput = executorService.submit(new SesameResolver(position)).get();
+                        resolvedInput = executorService.submit(new SesameResolverTask(position)).get();
                     } catch (ExecutionException | InterruptedException ex) {
                         if (ex.getCause() instanceof ResolverQueryException) {
                             log.error("Couldn't resolve input: " + position);

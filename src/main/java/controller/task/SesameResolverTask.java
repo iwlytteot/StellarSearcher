@@ -1,4 +1,4 @@
-package controller.http;
+package controller.task;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ import java.util.concurrent.Callable;
  */
 @Data
 @Slf4j
-public class SesameResolver implements Callable<Coordinates> {
+public class SesameResolverTask implements Callable<Coordinates> {
     private static final String BASE_URL = "https://cdsweb.u-strasbg.fr/cgi-bin/nph-sesame/-oxp/SNV?";
     private final String input;
 

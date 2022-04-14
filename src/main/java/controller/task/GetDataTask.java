@@ -1,5 +1,6 @@
-package controller.http;
+package controller.task;
 
+import controller.http.Request;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.Catalogue;

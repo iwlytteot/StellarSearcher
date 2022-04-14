@@ -1,8 +1,8 @@
 package controller.fxml;
 
-import controller.ImportControllerTask;
-import controller.http.GetDataTask;
-import controller.http.SesameResolver;
+import controller.task.ImportControllerTask;
+import controller.task.GetDataTask;
+import controller.task.SesameResolverTask;
 import controller.http.mast.MastService;
 import controller.http.simbad.SimbadService;
 import controller.http.vizier.VizierService;
@@ -21,7 +21,6 @@ import javafx.stage.Stage;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.*;
-import model.exception.CatalogueQueryException;
 import model.exception.RecursionDepthException;
 import model.exception.ResolverQueryException;
 import model.exception.TimeoutQueryException;
@@ -33,6 +32,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import utils.GridSearch;
+import utils.MastSearch;
 import view.event.MastWindowEvent;
 import view.event.OutputSettingWindowEvent;
 import view.event.ResultWindowEvent;
@@ -44,10 +44,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
@@ -118,6 +115,7 @@ public class MainWindowController {
     private final ExportWindowController exportWindowController;
 
     private final GridSearch gridSearcher;
+    private final MastSearch mastSearcher;
 
     private boolean vizierSearch = false, simbadSearch = false, mastSearch = false;
     private final List<String> affectedTables = Collections.synchronizedList(new ArrayList<>());
@@ -317,7 +315,7 @@ public class MainWindowController {
     }
 
     private Coordinates getResolvedInput(String input) throws ExecutionException, InterruptedException {
-        return executorService.submit(new SesameResolver(input)).get();
+        return executorService.submit(new SesameResolverTask(input)).get();
     }
 
     private UserInput getUserInput() {
@@ -333,7 +331,7 @@ public class MainWindowController {
             return new Task<>() {
                 @Override
                 protected List<List<String>> call() throws InterruptedException, ExecutionException {
-                    List<Callable<List<String>>> tasks = new ArrayList<>();
+                    List<Future<List<String>>> results = new ArrayList<>();
 
                     Platform.runLater(() -> infoLabel.setText("Resolving input.."));
                     Coordinates resolvedInput = null;
@@ -352,88 +350,46 @@ public class MainWindowController {
                         }
                     }
 
+                    Platform.runLater(() -> infoLabel.setText("Downloading data.."));
+
                     //If VizieR button was activated
                     if (vizierSearch) {
-                        tasks.add(new GetDataTask<>(getVizierCatalogues(),
+                        results.add(executorService.submit(new GetDataTask<>(getVizierCatalogues(),
                                 inputText.getText(), radiusInput.getText(), radiusBox.getValue(), VizierService.class,
-                                getVizierServer(), false));
+                                getVizierServer(), false)));
                     }
 
                     //If SIMBAD button was activated
                     if (simbadSearch && resolvedInput != null) {
                         String coordInput = resolvedInput.getRa() + " " + resolvedInput.getDec();
-                        tasks.add(new GetDataTask<>(null,
+                        results.add(executorService.submit(new GetDataTask<>(null,
                                 coordInput, radiusInput.getText(), radiusBox.getValue(),
-                                SimbadService.class, getSimbadServer(), false));
+                                SimbadService.class, getSimbadServer(), false)));
                     }
 
-                    Platform.runLater(() -> infoLabel.setText("Downloading data.."));
-                    var responses = executorService.invokeAll(tasks); //start Vizier and Simbad tasks
                     var output = new ArrayList<List<String>>();
 
                     //Because MAST can have nested queries, it is when all searches from Vizier and Simbad are done
                     if (mastSearch) {
-
-                        //Create a catalogue for each MAST mission
-                        var catalogues = new ArrayList<Catalogue>();
-                        for (var mission : getMastMissions()) {
-                            var catalogue = new Catalogue();
-                            catalogue.addTable(mission);
-                            catalogues.add(catalogue);
-                        }
-
-                        /*
-                        For each catalogue then try to query.
-                        If there is a timeout, grid search is performed.
-                         */
-                        for (var catalogue : catalogues) {
-                            boolean mastTimeout = false;
-                            var tempCatList = new ArrayList<Catalogue>();
-                            tempCatList.add(catalogue);
-                            try {
-                                output.add(executorService.submit(new GetDataTask<>(tempCatList,
-                                        inputText.getText(), radiusInput.getText(), radiusBox.getValue(), MastService.class,
-                                        MastServer.MAST_DEFAULT, true)).get());
-                            }
-                            catch (ExecutionException | InterruptedException ex) {
-                                if (ex.getCause() instanceof TimeoutQueryException) {
-                                    mastTimeout = true;
-                                    log.error("MAST timeout for \"" + catalogue.getTables().get(0).getName() + "\"");
-                                }
-                            }
-
-                            if (mastTimeout && resolvedInput != null) {
-                                /*
-                                Radius input is always in arcmin (default by MAST), but resolved coordinates are
-                                in decimal degrees. Transformation is needed => 1 degree equals to 60 arcmin
-                                 */
-                                var radius = Double.parseDouble(radiusInput.getText()) / 60;
-                                var coordinatesMin = new Coordinates(resolvedInput);
-                                var coordinatesMax = new Coordinates(resolvedInput);
-                                coordinatesMin.offsetRaDec(-radius); //lowest point
-                                coordinatesMax.offsetRaDec(radius); //highest point
-
-                                try {
-                                    output.add(gridSearcher.start(coordinatesMin, coordinatesMax, radius, tempCatList, 0));
-                                } catch (RecursionDepthException ex) {
-                                    Platform.runLater(() -> {
-                                        Alert alert = new Alert(Alert.AlertType.WARNING);
-                                        alert.setTitle("Can't get results");
-                                        alert.setContentText("Catalogue \"" + catalogue.getTables().get(0).getName() +
-                                                "\" could not be queried anymore, because maximum recursion depth" +
-                                                " happened. Try smaller radius or contact MAST.");
-                                        alert.showAndWait();
-                                    });
-                                }
-                            }
+                        try {
+                            output.addAll(mastSearcher.start(getMastMissions(), inputText.getText(), radiusInput.getText(),
+                                    radiusBox.getValue(), resolvedInput));
+                        } catch (RecursionDepthException e) {
+                            Platform.runLater(() -> {
+                                Alert alert = new Alert(Alert.AlertType.WARNING);
+                                alert.setTitle("Can't get results");
+                                alert.setContentText("MAST could not be queried anymore, because maximum recursion depth" +
+                                        " happened. Try smaller radius or contact MAST.");
+                                alert.showAndWait();
+                            });
                         }
                     }
 
-                    if (responses.isEmpty() && output.isEmpty()) {
+                    if (results.isEmpty() && output.isEmpty()) {
                         searchService.cancel();
                     }
 
-                    for (var response : responses) {
+                    for (var response : results) {
                         output.add(response.get());
                     }
                     return output;
@@ -484,7 +440,7 @@ public class MainWindowController {
                 @Override
                 protected HashMap<UserInput, List<String>> call() {
                     HashMap<UserInput, List<String>> output = new HashMap<>();
-                    Platform.runLater(() -> infoLabel.setText("Fetching data.."));
+                    Platform.runLater(() -> infoLabel.setText("Processing input file and downloading data.."));
                     try {
                         output = executorService.submit(new ImportControllerTask(importFile.getAbsolutePath(),
                                 getVizierServer(), getSimbadServer())).get();
