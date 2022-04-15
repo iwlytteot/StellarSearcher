@@ -30,6 +30,7 @@ public class MastSearch {
                               Coordinates resolvedInput) throws RecursionDepthException {
 
         List<String> output = new ArrayList<>();
+
         //Create a catalogue for each MAST mission
         var catalogues = new ArrayList<Catalogue>();
         for (var mission : missions) {
