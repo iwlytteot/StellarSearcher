@@ -48,13 +48,13 @@ public class GridSearch {
         /*
         It is necessary to obtain both RA and DEC radius's for left and right part of planes, that is divided by mid-point.
         It is because RA is of <0, 360> and DEC is of <-90, 90>, e.g.: input, where RA = 1 and DEC = 10 and radius = 3,
-        it is impossible to get RA = -2, thus rectangle boxes are created on
+        hence it's impossible to get RA = -2. Therefore, rectangle boxes are created on
         left side => RA = 0 to 1, but DEC = 7 to 13
 
         and squares are created on
         right side => RA = 1 to 4 and DEC = 7 to 13
 
-        (Same principle applies to DEC)
+        (Same principle applies to DEC, but vertically as DEC lies on Y-axis)
          */
         var leftRaRadius = Math.abs(coordinatesMid.getRa() - coordinatesMin.getRa());
         var rightRaRadius = Math.abs(coordinatesMax.getRa() - coordinatesMid.getRa());
