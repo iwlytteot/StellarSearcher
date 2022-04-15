@@ -34,14 +34,12 @@ public class VizierService implements Request {
         params.append("&"); // in case no params were added, otherwise double '&' is workable
         if (radiusType == Radius.ARCMIN) {
             params.append(URLEncoder.encode("-c.rm=", StandardCharsets.UTF_8));
-        }
-        else if (radiusType == Radius.DEG) {
+        } else if (radiusType == Radius.DEG) {
             params.append(URLEncoder.encode("-c.rd=", StandardCharsets.UTF_8));
-        }
-        else {
+        } else {
             params.append(URLEncoder.encode("-c.rs=", StandardCharsets.UTF_8));
         }
-        params.append(URLEncoder.encode(radius,StandardCharsets.UTF_8));
+        params.append(URLEncoder.encode(radius, StandardCharsets.UTF_8));
         params.append("&");
         params.append("-out.max=unlimited");
 

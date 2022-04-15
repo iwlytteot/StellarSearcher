@@ -33,25 +33,14 @@ public interface Request {
     /**
      * Sends HTTP GET request and returns a string with data.
      * @param uri with specified catalogues (tables), radius and parameters
-     * @param timeout if there is a need to set a timeout
      */
     default String sendRequest(URI uri, boolean timeout) throws CatalogueQueryException, TimeoutQueryException {
         var client = HttpClient.newHttpClient();
-        HttpRequest request;
-        if (timeout) {
-            request = HttpRequest.newBuilder(uri).GET().timeout(Duration.ofSeconds(MastServer.TIMEOUT_LIMIT)).build();
-        }
-        else {
-            request = HttpRequest.newBuilder(uri).GET().build();
-        }
-
+        var request = HttpRequest.newBuilder(uri).GET().build();
         try {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
             return response.body();
-        } catch (InterruptedException | IOException ex) {
-            if (ex.getMessage().contains("timed out")) {
-                throw new TimeoutQueryException();
-            }
+        } catch (IOException | InterruptedException e) {
             throw new CatalogueQueryException();
         }
     }

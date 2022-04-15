@@ -5,10 +5,18 @@ import lombok.Data;
 import model.Catalogue;
 import model.Coordinates;
 import model.Radius;
+import model.exception.CatalogueQueryException;
+import model.exception.TimeoutQueryException;
+import model.mirror.MastServer;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +38,21 @@ public class MastService implements Request {
         base.append(URLEncoder.encode(identification, StandardCharsets.UTF_8));
 
         return getUris(catalogues, baseUrl, output, base);
+    }
+
+    @Override
+    public String sendRequest(URI uri, boolean timeout) throws CatalogueQueryException, TimeoutQueryException {
+        var client = HttpClient.newHttpClient();
+        var request = HttpRequest.newBuilder(uri).GET().timeout(Duration.ofSeconds(MastServer.TIMEOUT_LIMIT)).build();
+        try {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.body();
+        } catch (InterruptedException | IOException ex) {
+            if (ex.getMessage().contains("timed out")) {
+                throw new TimeoutQueryException();
+            }
+            throw new CatalogueQueryException();
+        }
     }
 
     public List<URI> createDataRequest(List<Catalogue> catalogues, Coordinates coordinatesMin,

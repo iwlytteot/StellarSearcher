@@ -27,8 +27,8 @@ public class SimbadService implements Request {
                 URLEncoder.encode(radius, StandardCharsets.UTF_8);
 
         var uri = URI.create(baseUrl + BASE_PARAM
-            + params
-            + SUFFIX_URL);
+                + params
+                + SUFFIX_URL);
         var output = new ArrayList<URI>();
         output.add(uri);
         return output;
