@@ -4,14 +4,12 @@ import model.Catalogue;
 import model.exception.CatalogueQueryException;
 import model.Radius;
 import model.exception.TimeoutQueryException;
-import model.mirror.MastServer;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.List;
 
 public interface Request {
