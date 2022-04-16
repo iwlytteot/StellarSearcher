@@ -88,10 +88,12 @@ public class ImportController {
                     tempMap.put(userInput, new ArrayList<>());
 
                     //Vizier task
-                    var vizierCatalogues = new ArrayList<Catalogue>();
-                    vizierCatalogues.add(vizierCatalogue);
-                    tempMap.get(userInput).add(searcher.start(vizierService, vizierCatalogues,
-                            position, input.getRadius(), input.getUnit(), vizierServer, false));
+                    if (!input.getVizier().isEmpty()) {
+                        var vizierCatalogues = new ArrayList<Catalogue>();
+                        vizierCatalogues.add(vizierCatalogue);
+                        tempMap.get(userInput).add(searcher.start(vizierService, vizierCatalogues,
+                                position, input.getRadius(), input.getUnit(), vizierServer, false));
+                    }
 
                     //Simbad task
                     if (input.isSimbad() && resolvedInput != null) {
@@ -101,8 +103,10 @@ public class ImportController {
                     }
 
                     //Mast task
-                    tempMap.get(userInput).add(mastSearcher.start(mastMissions, position, input.getRadius(),
-                            input.getUnit(), resolvedInput));
+                    if (!input.getMast().isEmpty()) {
+                        tempMap.get(userInput).add(mastSearcher.start(mastMissions, position, input.getRadius(),
+                                input.getUnit(), resolvedInput));
+                    }
                 }
                 //Retrieving data from Future and associating user input with results so that Result
                 //windows contains data that are in correct tab
