@@ -98,6 +98,7 @@ public class MainWindowController {
     public Ellipse mastEllipse;
 
     private final ConfigurableApplicationContext context;
+
     private final VizierWindowEventHandler vizierWindowEventHandler;
     private final MastWindowEventHandler mastWindowEventHandler;
     private final ResultWindowEventHandler resultWindowEventHandler;
@@ -185,7 +186,6 @@ public class MainWindowController {
         if (importFile == null) {
             return;
         }
-        searchButton.getScene().setCursor(Cursor.WAIT);
 
         if (importService.getState() != Worker.State.READY) {
             importService.cancel();
@@ -214,24 +214,20 @@ public class MainWindowController {
             alert.showAndWait();
             return;
         }
-        if (vizierSearch) {
-            if (getVizierCatalogues().isEmpty()) {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Missing catalogues");
-                alert.setContentText("No catalogues from VizieR were selected");
-                alert.showAndWait();
-                return;
-            }
-        }
 
-        if (mastSearch) {
-            if (getMastMissions().isEmpty()) {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Missing catalogues");
-                alert.setContentText("No missions from MAST were selected");
-                alert.showAndWait();
-                return;
-            }
+        if (vizierSearch && getVizierCatalogues().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Missing catalogues");
+            alert.setContentText("No catalogues from VizieR were selected");
+            alert.showAndWait();
+            return;
+        }
+        if (mastSearch && getMastMissions().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Missing catalogues");
+            alert.setContentText("No missions from MAST were selected");
+            alert.showAndWait();
+            return;
         }
 
         try {
@@ -246,13 +242,11 @@ public class MainWindowController {
         } catch(NumberFormatException ex) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Wrong radius");
-            alert.setContentText("Radius is not in correct format. Use dot (.) eg: 1.2");
+            alert.setContentText("Radius is not in correct format. You can use dot (.) eg: 1.2");
             alert.showAndWait();
             log.error("Wrong radius input: " + radiusInput.getText());
             return;
         }
-
-        searchButton.getScene().setCursor(Cursor.WAIT);
 
         if (searchService.getState() != Worker.State.READY) {
             searchService.cancel();
@@ -329,14 +323,17 @@ public class MainWindowController {
                 protected List<List<String>> call() throws InterruptedException, ExecutionException {
                     List<CompletableFuture<List<String>>> result = new ArrayList<>();
 
-                    Platform.runLater(() -> infoLabel.setText("Resolving input.."));
+                    Platform.runLater(() -> {
+                        searchButton.getScene().setCursor(Cursor.WAIT);
+                        infoLabel.setText("Resolving input..");
+                    });
                     Coordinates resolvedInput = null;
 
                     //Resolving user input into coordinates into decimal degree notation
                     try {
                         resolvedInput = getResolvedInput(inputText.getText());
                     } catch (ExecutionException | InterruptedException ex) {
-                        if (ex.getCause() instanceof ResolverQueryException) {
+                        if (ex.getCause() instanceof ResolverQueryException && simbadSearch) {
                             Platform.runLater(() -> {
                                 Alert alert = new Alert(Alert.AlertType.WARNING);
                                 alert.setTitle("Input");
@@ -361,8 +358,7 @@ public class MainWindowController {
                                 radiusInput.getText(), radiusBox.getValue(), getSimbadServer(), false));
                     }
 
-
-                    //Because MAST can have nested queries, it is when all searches from Vizier and Simbad are done
+                    //If MAST button was activated
                     if (mastSearch) {
                         try {
                             result.add(mastSearcher.start(getMastMissions(), inputText.getText(), radiusInput.getText(),
@@ -385,11 +381,12 @@ public class MainWindowController {
                         }
                     }
 
-                    //Retrieving results
+                    //Check if there is any query to be done
                     if (result.isEmpty()) {
                         searchService.cancel();
                     }
 
+                    //Retrieving results
                     List<List<String>> output = new ArrayList<>();
                     for (var response : result) {
                         output.add(response.get());
@@ -435,6 +432,7 @@ public class MainWindowController {
         }
     };
 
+
     private final Service<HashMap<UserInput, List<String>>> importService = new Service<>() {
         @Override
         protected Task<HashMap<UserInput, List<String>>> createTask() {
@@ -442,12 +440,22 @@ public class MainWindowController {
                 @Override
                 protected HashMap<UserInput, List<String>> call() {
                     HashMap<UserInput, List<String>> output = new HashMap<>();
-                    Platform.runLater(() -> infoLabel.setText("Processing input file and downloading data.."));
+                    Platform.runLater(() -> {
+                        searchButton.getScene().setCursor(Cursor.WAIT);
+                        infoLabel.setText("Processing input file and downloading data..");
+                    });
                     try {
                         output = importController.start(importFile.getAbsolutePath(),
                                 getVizierServer(), getSimbadServer()).get();
                     } catch (InterruptedException | ExecutionException | CatalogueQueryException e) {
                         log.error("Error while retrieving data from import: " + e.getMessage());
+                        Platform.runLater(() -> {
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Import failed");
+                            alert.setContentText("Error while importing data: " + e.getMessage());
+                            alert.showAndWait();
+                        });
+                        importService.cancel();
                     }
                     return output;
                 }
@@ -468,6 +476,20 @@ public class MainWindowController {
             infoLabel.setText("");
             searchButton.getScene().setCursor(Cursor.DEFAULT);
             resultWindowEventHandler.getStage().show();
+        }
+
+        @Override
+        protected void cancelled() {
+            infoLabel.setText("");
+            searchButton.getScene().setCursor(Cursor.DEFAULT);
+            log.error("Import search was cancelled.");
+        }
+
+        @Override
+        protected void failed() {
+            infoLabel.setText("");
+            searchButton.getScene().setCursor(Cursor.DEFAULT);
+            log.error("Import search has failed.");
         }
     };
 }

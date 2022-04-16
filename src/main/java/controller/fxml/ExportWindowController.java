@@ -37,7 +37,6 @@ public class ExportWindowController {
     public Label directoryLabel;
 
     private final ResultWindowController resultWindowController;
-    private boolean proceed = false;
     private File selectedDirectory;
 
     /**
