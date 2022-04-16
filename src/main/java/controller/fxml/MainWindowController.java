@@ -28,7 +28,7 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
-import utils.GridSearch;
+import controller.task.GridSearch;
 import controller.task.MastSearch;
 import view.event.MastWindowEvent;
 import view.event.OutputSettingWindowEvent;
