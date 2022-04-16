@@ -38,7 +38,6 @@ import view.handler.*;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.*;
@@ -120,8 +119,6 @@ public class MainWindowController {
     private final SesameResolver sesameResolver;
 
     private boolean vizierSearch = false, simbadSearch = false, mastSearch = false;
-    private final List<String> affectedTables = Collections.synchronizedList(new ArrayList<>());
-    private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private File importFile;
 
     @FXML
@@ -285,14 +282,14 @@ public class MainWindowController {
     }
 
     public void exit() {
-        executorService.shutdown();
-        importService.cancel();
-
-        mastSearcher.getExecutorService().shutdown();
+        var searchServiceState = searchService.getState();
+        if (searchServiceState == Worker.State.RUNNING || searchServiceState == Worker.State.SCHEDULED) {
+            searchService.cancel();
+        }
 
         var importServiceState = searchService.getState();
         if (importServiceState == Worker.State.RUNNING || importServiceState == Worker.State.SCHEDULED) {
-            searchService.cancel();
+            importService.cancel();
         }
 
         var exportServiceState = exportWindowController.getExportService().getState();

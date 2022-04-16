@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Component
 @Data
@@ -29,7 +27,6 @@ public class MastSearch {
     private final Searcher searcher;
     private final GridSearch gridSearcher;
     private final Request mastService;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     @Async
     public CompletableFuture<List<String>> start(List<Table> missions, String input, String radiusInput, Radius radiusType,
