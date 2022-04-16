@@ -2,7 +2,7 @@ package controller.fxml;
 
 import controller.http.Request;
 import controller.task.ImportController;
-import controller.task.SesameResolver;
+import controller.http.SesameResolver;
 import controller.task.Searcher;
 import javafx.application.Platform;
 import javafx.concurrent.Service;

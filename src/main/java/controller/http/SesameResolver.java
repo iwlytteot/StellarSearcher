@@ -1,4 +1,4 @@
-package controller.task;
+package controller.http;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
