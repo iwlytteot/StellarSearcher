@@ -1,4 +1,4 @@
-package controller.http.mast;
+package controller.http;
 
 import controller.http.Request;
 import model.Catalogue;

@@ -321,7 +321,7 @@ public class MainWindowController {
             return new Task<>() {
                 @Override
                 protected List<List<String>> call() throws InterruptedException, ExecutionException {
-                    List<CompletableFuture<List<String>>> result = new ArrayList<>();
+                    List<CompletableFuture<List<String>>> futures = new ArrayList<>();
 
                     Platform.runLater(() -> {
                         searchButton.getScene().setCursor(Cursor.WAIT);
@@ -347,21 +347,21 @@ public class MainWindowController {
 
                     //If VizieR button was activated
                     if (vizierSearch) {
-                        result.add(searcher.start(vizierService, getVizierCatalogues(), inputText.getText(),
+                        futures.add(searcher.start(vizierService, getVizierCatalogues(), inputText.getText(),
                                 radiusInput.getText(), radiusBox.getValue(), getVizierServer(), false));
                     }
 
                     //If SIMBAD button was activated
                     if (simbadSearch && resolvedInput != null) {
                         String coordInput = resolvedInput.getRa() + " " + resolvedInput.getDec();
-                        result.add(searcher.start(simbadService, null, coordInput,
+                        futures.add(searcher.start(simbadService, null, coordInput,
                                 radiusInput.getText(), radiusBox.getValue(), getSimbadServer(), false));
                     }
 
                     //If MAST button was activated
                     if (mastSearch) {
                         try {
-                            result.add(mastSearcher.start(getMastMissions(), inputText.getText(), radiusInput.getText(),
+                            futures.add(mastSearcher.start(getMastMissions(), inputText.getText(), radiusInput.getText(),
                                     radiusBox.getValue(), resolvedInput));
                         } catch (RecursionDepthException e) {
                             Platform.runLater(() -> {
@@ -382,13 +382,13 @@ public class MainWindowController {
                     }
 
                     //Check if there is any query to be done
-                    if (result.isEmpty()) {
+                    if (futures.isEmpty()) {
                         searchService.cancel();
                     }
 
                     //Retrieving results
                     List<List<String>> output = new ArrayList<>();
-                    for (var response : result) {
+                    for (var response : futures) {
                         output.add(response.get());
                     }
                     return output;

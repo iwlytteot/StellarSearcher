@@ -1,6 +1,6 @@
 package utils;
 
-import controller.http.mast.MastService;
+import controller.http.MastService;
 import model.Catalogue;
 import model.Coordinates;
 import model.exception.CatalogueQueryException;
