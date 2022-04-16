@@ -1,4 +1,4 @@
-package controller.http.simbad;
+package controller.http;
 
 import controller.http.Request;
 import model.Catalogue;
