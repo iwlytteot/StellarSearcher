@@ -29,7 +29,7 @@ import java.util.concurrent.CompletableFuture;
 @Component
 @Data
 @Slf4j
-public class SesameResolverTask {
+public class SesameResolver {
     private static final String BASE_URL = "https://cdsweb.u-strasbg.fr/cgi-bin/nph-sesame/-oxp/SNV?";
 
     @Async

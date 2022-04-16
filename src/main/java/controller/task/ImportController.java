@@ -25,13 +25,13 @@ import java.util.stream.Collectors;
 @Component
 @Data
 @Slf4j
-public class ImportControllerTask {
+public class ImportController {
     private final Searcher searcher;
     private final Request vizierService;
     private final Request simbadService;
     private final MastSearch mastSearcher;
 
-    private final SesameResolverTask sesameResolverTask;
+    private final SesameResolver sesameResolver;
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -74,7 +74,7 @@ public class ImportControllerTask {
 
                     //Resolving user input into coordinates into decimal degree notation
                     try {
-                        resolvedInput = sesameResolverTask.start(position).get();
+                        resolvedInput = sesameResolver.start(position).get();
                     } catch (ExecutionException | InterruptedException ex) {
                         if (ex.getCause() instanceof ResolverQueryException) {
                             log.error("Couldn't resolve input: " + position);

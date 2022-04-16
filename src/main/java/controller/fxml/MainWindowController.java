@@ -1,8 +1,8 @@
 package controller.fxml;
 
 import controller.http.Request;
-import controller.task.ImportControllerTask;
-import controller.task.SesameResolverTask;
+import controller.task.ImportController;
+import controller.task.SesameResolver;
 import controller.task.Searcher;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
@@ -116,8 +116,8 @@ public class MainWindowController {
     private final Request vizierService;
     private final Request simbadService;
     private final MastSearch mastSearcher;
-    private final ImportControllerTask importControllerTask;
-    private final SesameResolverTask sesameResolverTask;
+    private final ImportController importController;
+    private final SesameResolver sesameResolver;
 
     private boolean vizierSearch = false, simbadSearch = false, mastSearch = false;
     private final List<String> affectedTables = Collections.synchronizedList(new ArrayList<>());
@@ -314,7 +314,7 @@ public class MainWindowController {
     }
 
     private Coordinates getResolvedInput(String input) throws ExecutionException, InterruptedException {
-        return sesameResolverTask.start(input).get();
+        return sesameResolver.start(input).get();
     }
 
     private UserInput getUserInput() {
@@ -446,7 +446,7 @@ public class MainWindowController {
                     HashMap<UserInput, List<String>> output = new HashMap<>();
                     Platform.runLater(() -> infoLabel.setText("Processing input file and downloading data.."));
                     try {
-                        output = importControllerTask.start(importFile.getAbsolutePath(),
+                        output = importController.start(importFile.getAbsolutePath(),
                                 getVizierServer(), getSimbadServer()).get();
                     } catch (InterruptedException | ExecutionException | CatalogueQueryException e) {
                         log.error("Error while retrieving data from import: " + e.getMessage());
