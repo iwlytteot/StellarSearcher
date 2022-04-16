@@ -385,6 +385,7 @@ public class MainWindowController {
                         }
                     }
 
+                    //Retrieving results
                     if (result.isEmpty()) {
                         searchService.cancel();
                     }
