@@ -31,6 +31,7 @@ import java.util.concurrent.CompletableFuture;
 public class MastService implements Request {
     private static final String BASE_PARAMS = "search.php?action=Search&outputformat=VOTable&max_records=999999";
 
+    @Override
     public List<URI> createDataRequest(List<Catalogue> catalogues, String identification, String radius,
                                        Radius radiusType, String baseUrl) {
         var output = new ArrayList<URI>();
@@ -45,6 +46,7 @@ public class MastService implements Request {
     }
 
     @Async
+    @Override
     public CompletableFuture<String> sendRequest(URI uri, boolean timeout) {
         var client = HttpClient.newHttpClient();
         var request = HttpRequest.newBuilder(uri).GET().timeout(Duration.ofSeconds(MastServer.TIMEOUT_LIMIT)).build();
@@ -59,6 +61,14 @@ public class MastService implements Request {
         }
     }
 
+    /**
+     * Method that creates request for RA and DEC ranges.
+     * @param catalogues list of catalogues for searching
+     * @param coordinatesMin the lowest coordinate
+     * @param coordinatesMax the highest coordinate
+     * @param baseUrl path to queried server
+     * @return List of URIs
+     */
     public List<URI> createDataRequest(List<Catalogue> catalogues, Coordinates coordinatesMin,
                                        Coordinates coordinatesMax, String baseUrl) {
         var output = new ArrayList<URI>();
@@ -72,7 +82,15 @@ public class MastService implements Request {
         return getUris(catalogues, baseUrl, output, base);
     }
 
-    private List<URI> getUris(List<Catalogue> catalogues, String baseUrl, ArrayList<URI> output, StringBuilder base) {
+    /**
+     * Helper method for building arguments for the rest of URI address
+     * @param catalogues list of catalogues for searching
+     * @param baseUrl path to queried server
+     * @param output list to be appended to
+     * @param base first part of URI
+     * @return List of URIs
+     */
+    private List<URI> getUris(List<Catalogue> catalogues, String baseUrl, List<URI> output, StringBuilder base) {
         for (var table : catalogues.get(0).getTables()) {
             String source = table.getName() + "/";
             StringBuilder params = new StringBuilder();

@@ -83,9 +83,9 @@ public class VizierService implements Request {
      * Given the input, create URI that allows for further inspection of specified catalogue.
      * According to the ASU qualifications for VizieR, it is required to decode arguments,
      * more on https://cdsarc.u-strasbg.fr/doc/asu-summary.htx
-     *
      * @param catalogueName non-decoded input from user
-     * @return URI for further process
+     * @param baseUrl path to queried server
+     * @return URI object
      */
     public URI createMetaDataRequest(String catalogueName, String baseUrl) {
         return URI.create(baseUrl + BASE_PARAM

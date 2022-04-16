@@ -132,7 +132,7 @@ public class VizierCataloguesController {
     }
 
     /**
-     * EventHandler that handles creating of Filter Window for respective Table
+     * Creates Filter window for a VizieR table. In these windows columns of table are shown.
      */
     private final EventHandler<MouseEvent> eventHandler = new EventHandler<>() {
         @Override

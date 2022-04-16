@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * A class that is used for converting from named identification to coordinates. These coordinates are
- * in sexagesimal format. Furthermore, this class is a task that returns searched coordinates.
+ * in decimal degree format.
  */
 @Component
 @Data
@@ -32,6 +32,11 @@ import java.util.concurrent.CompletableFuture;
 public class SesameResolver {
     private static final String BASE_URL = "https://cdsweb.u-strasbg.fr/cgi-bin/nph-sesame/-oxp/SNV?";
 
+    /**
+     * Asynchronous method that starts the query.
+     * @param input user input, typically named identifier or coordinate
+     * @return CompletableFuture either of type Coordinates or of type ResolverQueryException if failed.
+     */
     @Async
     public CompletableFuture<Coordinates> start(String input) {
         try {
@@ -43,8 +48,8 @@ public class SesameResolver {
 
     /**
      * Creates and sends HTTP GET request to a server where Sesame resolver resides.
-     * @param input searched object, can be either named identification or coordinates
-     * @return resolved coordinates
+     * @param input searched object, can be either named identifier or coordinates
+     * @return server response, typically XML document
      */
     private String request(String input) {
         var client = HttpClient.newHttpClient();

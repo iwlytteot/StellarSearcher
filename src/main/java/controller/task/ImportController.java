@@ -30,15 +30,16 @@ public class ImportController {
     private final Request vizierService;
     private final Request simbadService;
     private final MastSearch mastSearcher;
-
     private final SesameResolver sesameResolver;
 
-    private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
     /**
-     * Method that parses JSON file from absolute path.
-     * @return HashMap, where key is UserInput and value is List of Strings, which are basically
-     * responses from respective servers.
+     * Asynchronous method that parses JSON file from absolute path.
+     * @param absolutePath path to import file
+     * @param vizierServer path to queried server
+     * @param simbadServer path to queried server
+     * @return CompletableFuture of type HashMap, where key is UserInput and value is List of Strings, which are
+     * responses from respective servers
+     * @throws CatalogueQueryException if some request was unsuccessful
      */
     @Async
     public CompletableFuture<HashMap<UserInput, List<String>>> start(String absolutePath, String vizierServer, String simbadServer) throws CatalogueQueryException {
@@ -128,7 +129,6 @@ public class ImportController {
             log.error("MAST could not be queried anymore, because maximum recursion depth happened. " +
                     "Try smaller radius or contact MAST");
         }
-        executorService.shutdown();
         return CompletableFuture.completedFuture(output);
     }
 }

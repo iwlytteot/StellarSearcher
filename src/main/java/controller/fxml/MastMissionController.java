@@ -128,6 +128,9 @@ public class MastMissionController {
         return output;
     }
 
+    /**
+     * Creates Filter window for a MAST mission. In these windows columns of table are shown.
+     */
     private final EventHandler<MouseEvent> eventHandler = new EventHandler<>() {
         @Override
         public void handle(MouseEvent event) {

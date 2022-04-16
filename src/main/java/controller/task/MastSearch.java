@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Class to wrap search at MAST. The search is different from Vizier and Simbad. In case of timeout, the grid
+ * search is performed.
+ */
 @Component
 @Data
 @Slf4j
@@ -28,6 +32,18 @@ public class MastSearch {
     private final GridSearch gridSearcher;
     private final Request mastService;
 
+    /**
+     * Asynchronous method that wraps searching in MAST into two parts: classic one with radius and grid search. Latter is executed
+     * if first one fails due to timeout.
+     * @param missions list of missions (tables) that should be queried
+     * @param input user input
+     * @param radiusInput user radius input
+     * @param radiusType type of radius
+     * @param resolvedInput resolved input of type Coordinates. Needed if grid search is performed
+     * @return CompletableFuture of type List<String>. List holds results from MAST server
+     * @throws RecursionDepthException if recursion depth is exceeded
+     * @throws CatalogueQueryException if error happened during querying
+     */
     @Async
     public CompletableFuture<List<String>> start(List<Table> missions, String input, String radiusInput, Radius radiusType,
                                                  Coordinates resolvedInput) throws RecursionDepthException, CatalogueQueryException {
