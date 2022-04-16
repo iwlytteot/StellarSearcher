@@ -1,7 +1,7 @@
 package controller.fxml;
 
 import controller.http.Request;
-import controller.http.vizier.VizierService;
+import controller.http.VizierService;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
