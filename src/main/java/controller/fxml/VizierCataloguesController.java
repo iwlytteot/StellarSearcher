@@ -1,5 +1,6 @@
 package controller.fxml;
 
+import controller.http.Request;
 import controller.http.vizier.VizierService;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
@@ -17,8 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import model.Catalogue;
 import model.Data;
 import model.Table;
-import model.exception.CatalogueQueryException;
-import model.exception.TimeoutQueryException;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
 import utils.FxmlCreator;
@@ -26,6 +25,7 @@ import utils.FxmlCreator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Class controller for "VizierCataloguesWindow.fxml".
@@ -41,6 +41,8 @@ public class VizierCataloguesController {
     public TextField inputVizierCatalogue;
     @FXML
     public TreeView<Data> treeView;
+
+    private final Request vizierService;
 
     private final HashMap<CheckBoxTreeItem<Data>, Stage> nodeFilters = new HashMap<>();
     private String vizierServer;
@@ -113,6 +115,13 @@ public class VizierCataloguesController {
         stage.hide();
     }
 
+    @FXML
+    public void addCataloguePress(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ENTER) {
+            addCatalogueVizier();
+        }
+    }
+
     private void dialoguePopup(String message, Alert.AlertType alertType) {
         Platform.runLater(() -> {
             Alert alert = new Alert(alertType);
@@ -152,14 +161,13 @@ public class VizierCataloguesController {
             return new Task<>() {
                 @Override
                 protected Void call() {
-                    var requestService = new VizierService();
-                    var request = requestService.createMetaDataRequest(inputVizierCatalogue.getText(),
-                            vizierServer);
+                    VizierService tempService = new VizierService();
+                    var request = tempService.createMetaDataRequest(inputVizierCatalogue.getText(), vizierServer);
                     String result;
                     try {
-                        result = requestService.sendRequest(request, false);
+                        result = vizierService.sendRequest(request, false).get();
                     }
-                    catch (TimeoutQueryException | CatalogueQueryException ex) {
+                    catch (InterruptedException | ExecutionException ex) {
                         dialoguePopup(ex.getMessage(), Alert.AlertType.ERROR);
                         log.error("Error during retrieving data: " + ex.getMessage());
                         return null;
@@ -213,10 +221,4 @@ public class VizierCataloguesController {
         }
 
     };
-
-    public void addCataloguePress(KeyEvent keyEvent) {
-        if (keyEvent.getCode() == KeyCode.ENTER) {
-            addCatalogueVizier();
-        }
-    }
 }

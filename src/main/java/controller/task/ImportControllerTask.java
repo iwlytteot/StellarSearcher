@@ -1,14 +1,15 @@
 package controller.task;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import controller.http.simbad.SimbadService;
-import controller.http.vizier.VizierService;
+import controller.http.Request;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.*;
+import model.exception.CatalogueQueryException;
 import model.exception.RecursionDepthException;
 import model.exception.ResolverQueryException;
-import utils.MastSearch;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,13 +22,16 @@ import java.util.stream.Collectors;
 /**
  * Class for handling and processing imported file in JSON format.
  */
+@Component
 @Data
 @Slf4j
-public class ImportControllerTask implements Callable<HashMap<UserInput, List<String>>> {
-    private final String absolutePath;
-    private final String vizierServer;
-    private final String simbadServer;
+public class ImportControllerTask {
+    private final Searcher searcher;
+    private final Request vizierService;
+    private final Request simbadService;
     private final MastSearch mastSearcher;
+
+    private final SesameResolverTask sesameResolverTask;
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -36,8 +40,8 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
      * @return HashMap, where key is UserInput and value is List of Strings, which are basically
      * responses from respective servers.
      */
-    @Override
-    public HashMap<UserInput, List<String>> call() {
+    @Async
+    public CompletableFuture<HashMap<UserInput, List<String>>> start(String absolutePath, String vizierServer, String simbadServer) throws CatalogueQueryException {
         var output = new HashMap<UserInput, List<String>>();
         try {
             //Opens JSON file and parses it to InputDataCollector wrapper class
@@ -62,8 +66,7 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                 }
 
                 //Search part
-                var tempMap = new HashMap<UserInput, List<Future<List<String>>>>();
-                var tempMastMap = new HashMap<UserInput, List<List<String>>>();
+                var tempMap = new HashMap<UserInput, List<CompletableFuture<List<String>>>>();
 
                 for (var position : input.getInput()) {
 
@@ -71,7 +74,7 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
 
                     //Resolving user input into coordinates into decimal degree notation
                     try {
-                        resolvedInput = executorService.submit(new SesameResolverTask(position)).get();
+                        resolvedInput = sesameResolverTask.start(position).get();
                     } catch (ExecutionException | InterruptedException ex) {
                         if (ex.getCause() instanceof ResolverQueryException) {
                             log.error("Couldn't resolve input: " + position);
@@ -82,23 +85,22 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                     var userInput = new UserInput(position, input.getRadius(), input.getUnit());
 
                     tempMap.put(userInput, new ArrayList<>());
-                    tempMastMap.put(userInput, new ArrayList<>());
 
                     //Vizier task
                     var vizierCatalogues = new ArrayList<Catalogue>();
                     vizierCatalogues.add(vizierCatalogue);
-                    tempMap.get(userInput).add(executorService.submit(new GetDataTask<>(vizierCatalogues,
-                            position, input.getRadius(), input.getUnit(), VizierService.class, vizierServer, false)));
+                    tempMap.get(userInput).add(searcher.start(vizierService, vizierCatalogues,
+                            position, input.getRadius(), input.getUnit(), vizierServer, false));
 
                     //Simbad task
                     if (input.isSimbad() && resolvedInput != null) {
                         String coordInput = resolvedInput.getRa() + " " + resolvedInput.getDec();
-                        tempMap.get(userInput).add(executorService.submit(new GetDataTask<>(null,
-                                coordInput, input.getRadius(), input.getUnit(), SimbadService.class, simbadServer, false)));
+                        tempMap.get(userInput).add(searcher.start(simbadService, null,
+                                coordInput, input.getRadius(), input.getUnit(), simbadServer, false));
                     }
 
                     //Mast task
-                    tempMastMap.get(userInput).add(mastSearcher.start(mastMissions, position, input.getRadius(),
+                    tempMap.get(userInput).add(mastSearcher.start(mastMissions, position, input.getRadius(),
                             input.getUnit(), resolvedInput));
                 }
                 //Retrieving data from Future and associating user input with results so that Result
@@ -117,10 +119,6 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                     //as it is enough to divide it by input and radius
                     newValue.addAll(tempList.stream().flatMap(List::stream).collect(Collectors.toList()));
 
-                    var mastOutput = tempMastMap.get(entry.getKey());
-                    if (mastOutput != null) {
-                        newValue.addAll(mastOutput.stream().flatMap(List::stream).collect(Collectors.toList()));
-                    }
                     output.put(entry.getKey(), newValue);
                 }
             }
@@ -131,6 +129,6 @@ public class ImportControllerTask implements Callable<HashMap<UserInput, List<St
                     "Try smaller radius or contact MAST");
         }
         executorService.shutdown();
-        return output;
+        return CompletableFuture.completedFuture(output);
     }
 }

@@ -1,16 +1,11 @@
 package controller.http;
 
 import model.Catalogue;
-import model.exception.CatalogueQueryException;
 import model.Radius;
-import model.exception.TimeoutQueryException;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface Request {
     /**
@@ -32,14 +27,5 @@ public interface Request {
      * Sends HTTP GET request and returns a string with data.
      * @param uri with specified catalogues (tables), radius and parameters
      */
-    default String sendRequest(URI uri, boolean timeout) throws CatalogueQueryException, TimeoutQueryException {
-        var client = HttpClient.newHttpClient();
-        var request = HttpRequest.newBuilder(uri).GET().build();
-        try {
-            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.body();
-        } catch (IOException | InterruptedException e) {
-            throw new CatalogueQueryException();
-        }
-    }
+    CompletableFuture<String> sendRequest(URI uri, boolean timeout);
 }

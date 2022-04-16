@@ -1,20 +1,23 @@
-package utils;
+package controller.task;
 
-import controller.http.mast.MastService;
-import controller.task.GetDataTask;
+import controller.http.Request;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.Catalogue;
 import model.Coordinates;
 import model.Radius;
 import model.Table;
+import model.exception.CatalogueQueryException;
 import model.exception.RecursionDepthException;
 import model.exception.TimeoutQueryException;
 import model.mirror.MastServer;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import utils.GridSearch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,11 +26,14 @@ import java.util.concurrent.Executors;
 @Data
 @Slf4j
 public class MastSearch {
+    private final Searcher searcher;
     private final GridSearch gridSearcher;
+    private final Request mastService;
     private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-    public List<String> start(List<Table> missions, String input, String radiusInput, Radius radiusType,
-                              Coordinates resolvedInput) throws RecursionDepthException {
+    @Async
+    public CompletableFuture<List<String>> start(List<Table> missions, String input, String radiusInput, Radius radiusType,
+                                                 Coordinates resolvedInput) throws RecursionDepthException, CatalogueQueryException {
 
         List<String> output = new ArrayList<>();
 
@@ -48,9 +54,9 @@ public class MastSearch {
             var tempCatList = new ArrayList<Catalogue>();
             tempCatList.add(catalogue);
             try {
-                output.addAll(executorService.submit(new GetDataTask<>(tempCatList,
-                        input, radiusInput, radiusType, MastService.class,
-                        MastServer.MAST_DEFAULT, true)).get());
+                output.addAll(searcher.start(mastService, tempCatList,
+                        input, radiusInput, radiusType,
+                        MastServer.MAST_DEFAULT, true).get());
             }
             catch (ExecutionException | InterruptedException ex) {
                 if (ex.getCause() instanceof TimeoutQueryException) {
@@ -73,6 +79,6 @@ public class MastSearch {
                 output.addAll(gridSearcher.start(coordinatesMin, resolvedInput, coordinatesMax, tempCatList, 0));
             }
         }
-        return output;
+        return CompletableFuture.completedFuture(output);
     }
 }

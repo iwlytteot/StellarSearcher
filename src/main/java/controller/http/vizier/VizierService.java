@@ -3,16 +3,27 @@ package controller.http.vizier;
 import controller.http.Request;
 import model.Catalogue;
 import model.Radius;
+import model.exception.CatalogueQueryException;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Service for VizieR catalogue. For official API, check https://cdsarc.u-strasbg.fr/doc/asu-summary.htx.
  */
+@Component
+@Qualifier("vizierService")
 public class VizierService implements Request {
     private static final String BASE_PARAM = "/viz-bin/votable?";
 
@@ -52,6 +63,19 @@ public class VizierService implements Request {
         var output = new ArrayList<URI>();
         output.add(uri);
         return output;
+    }
+
+    @Async
+    @Override
+    public CompletableFuture<String> sendRequest(URI uri, boolean timeout) {
+        var client = HttpClient.newHttpClient();
+        var request = HttpRequest.newBuilder(uri).GET().build();
+        try {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return CompletableFuture.completedFuture(response.body());
+        } catch (IOException | InterruptedException e) {
+            return CompletableFuture.failedFuture(new CatalogueQueryException());
+        }
     }
 
     /**
