@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.Coordinates;
 import model.exception.ResolverQueryException;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -18,21 +20,25 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * A class that is used for converting from named identification to coordinates. These coordinates are
  * in sexagesimal format. Furthermore, this class is a task that returns searched coordinates.
  */
+@Component
 @Data
 @Slf4j
-public class SesameResolverTask implements Callable<Coordinates> {
+public class SesameResolver {
     private static final String BASE_URL = "https://cdsweb.u-strasbg.fr/cgi-bin/nph-sesame/-oxp/SNV?";
-    private final String input;
 
-    @Override
-    public Coordinates call() throws ResolverQueryException {
-        return getPosition(request(input));
+    @Async
+    public CompletableFuture<Coordinates> start(String input) {
+        try {
+            return CompletableFuture.completedFuture(getPosition(request(input)));
+        } catch (ResolverQueryException e) {
+            return CompletableFuture.failedFuture(new ResolverQueryException());
+        }
     }
 
     /**

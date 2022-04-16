@@ -1,13 +1,15 @@
 package controller.http.mast;
 
 import controller.http.Request;
-import lombok.Data;
 import model.Catalogue;
 import model.Coordinates;
 import model.Radius;
 import model.exception.CatalogueQueryException;
 import model.exception.TimeoutQueryException;
 import model.mirror.MastServer;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
@@ -19,11 +21,13 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Service for MAST catalogue. For official API, check https://archive.stsci.edu/vo/mast_services.html.
  */
-@Data
+@Component
+@Qualifier("mastService")
 public class MastService implements Request {
     private static final String BASE_PARAMS = "search.php?action=Search&outputformat=VOTable&max_records=999999";
 
@@ -40,18 +44,18 @@ public class MastService implements Request {
         return getUris(catalogues, baseUrl, output, base);
     }
 
-    @Override
-    public String sendRequest(URI uri, boolean timeout) throws CatalogueQueryException, TimeoutQueryException {
+    @Async
+    public CompletableFuture<String> sendRequest(URI uri, boolean timeout) {
         var client = HttpClient.newHttpClient();
         var request = HttpRequest.newBuilder(uri).GET().timeout(Duration.ofSeconds(MastServer.TIMEOUT_LIMIT)).build();
         try {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.body();
+            return CompletableFuture.completedFuture(response.body());
         } catch (InterruptedException | IOException ex) {
             if (ex.getMessage().contains("timed out")) {
-                throw new TimeoutQueryException();
+                return CompletableFuture.failedFuture(new TimeoutQueryException());
             }
-            throw new CatalogueQueryException();
+            return CompletableFuture.failedFuture(new CatalogueQueryException());
         }
     }
 

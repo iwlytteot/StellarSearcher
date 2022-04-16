@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @Component
 public class GridSearch {
@@ -37,11 +38,12 @@ public class GridSearch {
      * @throws RecursionDepthException if recursion maximum depth is reached
      */
     public List<String> start(Coordinates coordinatesMin, Coordinates coordinatesMid, Coordinates coordinatesMax,
-                              List<Catalogue> catalogues, int depth) throws RecursionDepthException {
+                              List<Catalogue> catalogues, int depth) throws RecursionDepthException, CatalogueQueryException {
         if (depth == 10) {
             throw new RecursionDepthException();
         }
 
+        System.out.println("DEPTH: " + depth);
         List<String> output = new ArrayList<>();
         var service = new MastService();
 
@@ -73,39 +75,60 @@ public class GridSearch {
 
         //For each box defined by two points, try query and if failed, call itself with smaller radius.
         try {
-            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesMin, coordinatesMid, MastServer.MAST_DEFAULT).get(0), true));
-        } catch (CatalogueQueryException | TimeoutQueryException ex) {
-            var midPoint = new Coordinates(coordinatesMid);
-            midPoint.offsetRa(-leftRaRadius / 2);
-            midPoint.offsetDec(-downDecRadius / 2);
-            output.addAll(start(coordinatesMin, midPoint, coordinatesMid, catalogues, depth + 1));
+            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesMin, coordinatesMid,
+                    MastServer.MAST_DEFAULT).get(0), true).get());
+        } catch (ExecutionException | InterruptedException e) {
+            if (e.getCause() instanceof TimeoutQueryException) {
+                var midPoint = new Coordinates(coordinatesMid);
+                midPoint.offsetRa(-leftRaRadius / 2);
+                midPoint.offsetDec(-downDecRadius / 2);
+                output.addAll(start(coordinatesMin, midPoint, coordinatesMid, catalogues, depth + 1));
+            } else {
+                throw new CatalogueQueryException();
+            }
         }
 
         try {
-            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesLeftMid, coordinatesUpMid, MastServer.MAST_DEFAULT).get(0), true));
-        } catch (CatalogueQueryException | TimeoutQueryException ex) {
-            var midPoint = new Coordinates(coordinatesMid);
-            midPoint.offsetRa(-leftRaRadius / 2);
-            midPoint.offsetDec(upDecRadius / 2);
-            output.addAll(start(coordinatesLeftMid, midPoint, coordinatesUpMid, catalogues, depth + 1));
+            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesLeftMid, coordinatesUpMid,
+                    MastServer.MAST_DEFAULT).get(0), true).get());
+        } catch (ExecutionException | InterruptedException e) {
+            if (e.getCause() instanceof TimeoutQueryException) {
+                var midPoint = new Coordinates(coordinatesMid);
+                midPoint.offsetRa(-leftRaRadius / 2);
+                midPoint.offsetDec(upDecRadius / 2);
+                output.addAll(start(coordinatesLeftMid, midPoint, coordinatesUpMid, catalogues, depth + 1));
+            } else {
+                throw new CatalogueQueryException();
+            }
         }
 
         try {
-            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesDownMid, coordinatesRightMid, MastServer.MAST_DEFAULT).get(0), true));
-        } catch (CatalogueQueryException | TimeoutQueryException ex) {
-            var midPoint = new Coordinates(coordinatesMid);
-            midPoint.offsetRa(rightRaRadius / 2);
-            midPoint.offsetDec(-downDecRadius / 2);
-            output.addAll(start(coordinatesDownMid, midPoint, coordinatesRightMid, catalogues, depth + 1));
+            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesDownMid, coordinatesRightMid,
+                    MastServer.MAST_DEFAULT).get(0), true).get());
+        }  catch (ExecutionException | InterruptedException e) {
+            if (e.getCause() instanceof  TimeoutQueryException) {
+                var midPoint = new Coordinates(coordinatesMid);
+                midPoint.offsetRa(rightRaRadius / 2);
+                midPoint.offsetDec(-downDecRadius / 2);
+                output.addAll(start(coordinatesDownMid, midPoint, coordinatesRightMid, catalogues, depth + 1));
+            } else {
+                throw new CatalogueQueryException();
+            }
         }
 
         try {
-            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesMid, coordinatesMax, MastServer.MAST_DEFAULT).get(0), true));
-        } catch (CatalogueQueryException | TimeoutQueryException ex) {
-            var midPoint = new Coordinates(coordinatesMid);
-            midPoint.offsetRa(rightRaRadius / 2);
-            midPoint.offsetDec(upDecRadius / 2);
-            output.addAll(start(coordinatesMid, midPoint, coordinatesMax, catalogues, depth + 1));
+            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesMid, coordinatesMax,
+                    MastServer.MAST_DEFAULT).get(0), true).get());
+        } catch (ExecutionException | InterruptedException e) {
+            if (e.getCause() instanceof TimeoutQueryException) {
+                var midPoint = new Coordinates(coordinatesMid);
+                midPoint.offsetRa(rightRaRadius / 2);
+                midPoint.offsetDec(upDecRadius / 2);
+                output.addAll(start(coordinatesMid, midPoint, coordinatesMax, catalogues, depth + 1));
+            }
+            else {
+                throw new CatalogueQueryException();
+            }
         }
 
         return output;

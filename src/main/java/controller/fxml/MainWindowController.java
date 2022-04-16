@@ -1,10 +1,9 @@
 package controller.fxml;
 
-import controller.task.ImportControllerTask;
-import controller.task.GetDataTask;
-import controller.task.SesameResolverTask;
-import controller.http.simbad.SimbadService;
-import controller.http.vizier.VizierService;
+import controller.http.Request;
+import controller.task.ImportController;
+import controller.task.SesameResolver;
+import controller.task.Searcher;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -20,6 +19,7 @@ import javafx.stage.Stage;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.*;
+import model.exception.CatalogueQueryException;
 import model.exception.RecursionDepthException;
 import model.exception.ResolverQueryException;
 import model.mirror.SimbadServer;
@@ -29,7 +29,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import utils.GridSearch;
-import utils.MastSearch;
+import controller.task.MastSearch;
 import view.event.MastWindowEvent;
 import view.event.OutputSettingWindowEvent;
 import view.event.ResultWindowEvent;
@@ -38,7 +38,6 @@ import view.handler.*;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.*;
@@ -112,11 +111,14 @@ public class MainWindowController {
     private final ExportWindowController exportWindowController;
 
     private final GridSearch gridSearcher;
+    private final Searcher searcher;
+    private final Request vizierService;
+    private final Request simbadService;
     private final MastSearch mastSearcher;
+    private final ImportController importController;
+    private final SesameResolver sesameResolver;
 
     private boolean vizierSearch = false, simbadSearch = false, mastSearch = false;
-    private final List<String> affectedTables = Collections.synchronizedList(new ArrayList<>());
-    private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private File importFile;
 
     @FXML
@@ -280,24 +282,19 @@ public class MainWindowController {
     }
 
     public void exit() {
-        executorService.shutdown();
-        importService.cancel();
-
-        mastSearcher.getExecutorService().shutdown();
+        var searchServiceState = searchService.getState();
+        if (searchServiceState == Worker.State.RUNNING || searchServiceState == Worker.State.SCHEDULED) {
+            searchService.cancel();
+        }
 
         var importServiceState = searchService.getState();
         if (importServiceState == Worker.State.RUNNING || importServiceState == Worker.State.SCHEDULED) {
-            searchService.cancel();
+            importService.cancel();
         }
 
         var exportServiceState = exportWindowController.getExportService().getState();
         if (exportServiceState == Worker.State.RUNNING || exportServiceState == Worker.State.SCHEDULED) {
             exportWindowController.getExportService().cancel();
-        }
-
-        var catalogueServiceState = vizierCataloguesController.getCatalogueRequestService().getState();
-        if (catalogueServiceState == Worker.State.RUNNING || exportServiceState == Worker.State.SCHEDULED) {
-            vizierCataloguesController.getCatalogueRequestService().cancel();
         }
     }
 
@@ -314,7 +311,7 @@ public class MainWindowController {
     }
 
     private Coordinates getResolvedInput(String input) throws ExecutionException, InterruptedException {
-        return executorService.submit(new SesameResolverTask(input)).get();
+        return sesameResolver.start(input).get();
     }
 
     private UserInput getUserInput() {
@@ -330,7 +327,7 @@ public class MainWindowController {
             return new Task<>() {
                 @Override
                 protected List<List<String>> call() throws InterruptedException, ExecutionException {
-                    List<Future<List<String>>> results = new ArrayList<>();
+                    List<CompletableFuture<List<String>>> result = new ArrayList<>();
 
                     Platform.runLater(() -> infoLabel.setText("Resolving input.."));
                     Coordinates resolvedInput = null;
@@ -353,25 +350,22 @@ public class MainWindowController {
 
                     //If VizieR button was activated
                     if (vizierSearch) {
-                        results.add(executorService.submit(new GetDataTask<>(getVizierCatalogues(),
-                                inputText.getText(), radiusInput.getText(), radiusBox.getValue(), VizierService.class,
-                                getVizierServer(), false)));
+                        result.add(searcher.start(vizierService, getVizierCatalogues(), inputText.getText(),
+                                radiusInput.getText(), radiusBox.getValue(), getVizierServer(), false));
                     }
 
                     //If SIMBAD button was activated
                     if (simbadSearch && resolvedInput != null) {
                         String coordInput = resolvedInput.getRa() + " " + resolvedInput.getDec();
-                        results.add(executorService.submit(new GetDataTask<>(null,
-                                coordInput, radiusInput.getText(), radiusBox.getValue(),
-                                SimbadService.class, getSimbadServer(), false)));
+                        result.add(searcher.start(simbadService, null, coordInput,
+                                radiusInput.getText(), radiusBox.getValue(), getSimbadServer(), false));
                     }
 
-                    var output = new ArrayList<List<String>>();
 
                     //Because MAST can have nested queries, it is when all searches from Vizier and Simbad are done
                     if (mastSearch) {
                         try {
-                            output.add(mastSearcher.start(getMastMissions(), inputText.getText(), radiusInput.getText(),
+                            result.add(mastSearcher.start(getMastMissions(), inputText.getText(), radiusInput.getText(),
                                     radiusBox.getValue(), resolvedInput));
                         } catch (RecursionDepthException e) {
                             Platform.runLater(() -> {
@@ -381,14 +375,22 @@ public class MainWindowController {
                                         " happened. Try smaller radius or contact MAST.");
                                 alert.showAndWait();
                             });
+                        } catch (CatalogueQueryException e) {
+                            Platform.runLater(() -> {
+                                Alert alert = new Alert(Alert.AlertType.WARNING);
+                                alert.setTitle("Can't get results");
+                                alert.setContentText("Search failed");
+                                alert.showAndWait();
+                            });
                         }
                     }
 
-                    if (results.isEmpty() && output.isEmpty()) {
+                    if (result.isEmpty()) {
                         searchService.cancel();
                     }
 
-                    for (var response : results) {
+                    List<List<String>> output = new ArrayList<>();
+                    for (var response : result) {
                         output.add(response.get());
                     }
                     return output;
@@ -441,9 +443,9 @@ public class MainWindowController {
                     HashMap<UserInput, List<String>> output = new HashMap<>();
                     Platform.runLater(() -> infoLabel.setText("Processing input file and downloading data.."));
                     try {
-                        output = executorService.submit(new ImportControllerTask(importFile.getAbsolutePath(),
-                                getVizierServer(), getSimbadServer(), mastSearcher)).get();
-                    } catch (InterruptedException | ExecutionException e) {
+                        output = importController.start(importFile.getAbsolutePath(),
+                                getVizierServer(), getSimbadServer()).get();
+                    } catch (InterruptedException | ExecutionException | CatalogueQueryException e) {
                         log.error("Error while retrieving data from import: " + e.getMessage());
                     }
                     return output;

@@ -25,5 +25,6 @@ public class StellarSearcher extends Application {
     @Override
     public void stop() {
         applicationContext.getBean(MainWindowController.class).exit();
+        applicationContext.close();
     }
 }
