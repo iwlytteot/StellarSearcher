@@ -88,7 +88,7 @@
    </MenuBar>
    <ToggleButton fx:id="vizierToogleGroup" layoutX="42.0" layoutY="397.0" mnemonicParsing="false" text="ToggleButton" toggleGroup="$vizierGroup" visible="false" />
    <ToggleButton fx:id="simbadToogleGroup" layoutX="52.0" layoutY="407.0" mnemonicParsing="false" text="ToggleButton" toggleGroup="$simbadGroup" visible="false" />
-   <Label fx:id="infoLabel" alignment="CENTER" layoutX="153.0" layoutY="397.0" prefHeight="21.0" prefWidth="326.0" textAlignment="CENTER" textFill="#23462e">
+   <Label fx:id="infoLabel" alignment="CENTER" layoutX="63.0" layoutY="398.0" prefHeight="22.0" prefWidth="506.0" textAlignment="CENTER" textFill="#23462e">
       <font>
          <Font size="15.0" />
       </font>
