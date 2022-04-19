@@ -315,12 +315,12 @@ public class MainWindowController {
     /**
      * JavaFX Service, where search parameters are retrieved and where search action takes place.
      */
-    private final Service<List<List<String>>> searchService = new Service<>() {
+    private final Service<List<String>> searchService = new Service<>() {
         @Override
-        protected Task<List<List<String>>> createTask() {
+        protected Task<List<String>> createTask() {
             return new Task<>() {
                 @Override
-                protected List<List<String>> call() throws InterruptedException, ExecutionException {
+                protected List<String> call() throws InterruptedException, ExecutionException {
                     List<CompletableFuture<List<String>>> futures = new ArrayList<>();
 
                     Platform.runLater(() -> {
@@ -391,7 +391,7 @@ public class MainWindowController {
                     for (var response : futures) {
                         output.add(response.get());
                     }
-                    return output;
+                    return output.stream().flatMap(List::stream).collect(Collectors.toList());
                 }
             };
         }
@@ -405,9 +405,9 @@ public class MainWindowController {
             if (resultWindowEventHandler.getStage() == null) {
                 context.publishEvent(new ResultWindowEvent(new Stage()));
             }
-            var flatList = searchService.getValue().stream().flatMap(List::stream).collect(Collectors.toList());
+            var resultList = searchService.getValue();
             var result = new HashMap<UserInput, List<String>>();
-            result.put(getUserInput(), flatList);
+            result.put(getUserInput(), resultList);
 
             resultWindowController.fill(result, outputSettingController.getNumOfCols(), outputSettingController.getNumOfRows());
             searchButton.getScene().setCursor(Cursor.DEFAULT);
