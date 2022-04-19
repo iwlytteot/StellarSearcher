@@ -43,7 +43,6 @@ public class GridSearch {
             throw new RecursionDepthException();
         }
 
-        System.out.println("DEPTH: " + depth);
         List<String> output = new ArrayList<>();
         var service = new MastService();
 
