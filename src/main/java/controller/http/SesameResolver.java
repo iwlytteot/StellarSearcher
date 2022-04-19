@@ -70,6 +70,7 @@ public class SesameResolver {
      * which is an XML string that was obtained from Sesame resolver.
      * @param input XML object as String
      * @return resolved coordinates
+     * @throws ResolverQueryException if input cannot be resolved or there has been an error
      */
     private Coordinates getPosition(String input) throws ResolverQueryException{
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
