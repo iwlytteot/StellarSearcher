@@ -28,13 +28,12 @@ public class Searcher {
      * @param radius user radius input
      * @param type type of radius
      * @param server path to queried server
-     * @param timeout if timeout is needed to be set
      * @return CompletableFuture of type List<String> or CompletableFuture of type TimeoutQueryException.
      * Former is returned if search was successful, latter when timeout during querying.
      */
     @Async
     public CompletableFuture<List<String>> start(Request service, List<Catalogue> catalogues, String input,
-                                                 String radius, Radius type, String server, boolean timeout) {
+                                                 String radius, Radius type, String server) {
         List<String> output = new ArrayList<>();
         List<CompletableFuture<String>> tasks = new ArrayList<>();
 
@@ -42,7 +41,7 @@ public class Searcher {
 
         //Start all asynchronous methods
         for (var request : requests) {
-            tasks.add(service.sendRequest(request, timeout));
+            tasks.add(service.sendRequest(request));
         }
 
         //Retrieve all results

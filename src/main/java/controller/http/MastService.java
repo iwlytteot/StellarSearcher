@@ -47,7 +47,7 @@ public class MastService implements Request {
 
     @Async
     @Override
-    public CompletableFuture<String> sendRequest(URI uri, boolean timeout) {
+    public CompletableFuture<String> sendRequest(URI uri) {
         var client = HttpClient.newHttpClient();
         var request = HttpRequest.newBuilder(uri).GET().timeout(Duration.ofSeconds(MastServer.TIMEOUT_LIMIT)).build();
         try {

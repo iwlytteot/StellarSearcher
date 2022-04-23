@@ -348,14 +348,14 @@ public class MainWindowController {
                     //If VizieR button was activated
                     if (vizierSearch) {
                         futures.add(searcher.start(vizierService, getVizierCatalogues(), inputText.getText(),
-                                radiusInput.getText(), radiusBox.getValue(), getVizierServer(), false));
+                                radiusInput.getText(), radiusBox.getValue(), getVizierServer()));
                     }
 
                     //If SIMBAD button was activated
                     if (simbadSearch && resolvedInput != null) {
                         String coordInput = resolvedInput.getRa() + " " + resolvedInput.getDec();
                         futures.add(searcher.start(simbadService, null, coordInput,
-                                radiusInput.getText(), radiusBox.getValue(), getSimbadServer(), false));
+                                radiusInput.getText(), radiusBox.getValue(), getSimbadServer()));
                     }
 
                     //If MAST button was activated

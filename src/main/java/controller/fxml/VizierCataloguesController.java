@@ -165,7 +165,7 @@ public class VizierCataloguesController {
                     var request = tempService.createMetaDataRequest(inputVizierCatalogue.getText(), vizierServer);
                     String result;
                     try {
-                        result = vizierService.sendRequest(request, false).get();
+                        result = vizierService.sendRequest(request).get();
                     }
                     catch (InterruptedException | ExecutionException ex) {
                         dialoguePopup(ex.getMessage(), Alert.AlertType.ERROR);

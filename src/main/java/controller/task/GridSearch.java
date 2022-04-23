@@ -75,7 +75,7 @@ public class GridSearch {
         //For each box defined by two points, try query and if failed, call itself with smaller radius.
         try {
             output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesMin, coordinatesMid,
-                    MastServer.MAST_DEFAULT).get(0), true).get());
+                    MastServer.MAST_DEFAULT).get(0)).get());
         } catch (ExecutionException | InterruptedException e) {
             if (e.getCause() instanceof TimeoutQueryException) {
                 var midPoint = new Coordinates(coordinatesMid);
@@ -89,7 +89,7 @@ public class GridSearch {
 
         try {
             output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesLeftMid, coordinatesUpMid,
-                    MastServer.MAST_DEFAULT).get(0), true).get());
+                    MastServer.MAST_DEFAULT).get(0)).get());
         } catch (ExecutionException | InterruptedException e) {
             if (e.getCause() instanceof TimeoutQueryException) {
                 var midPoint = new Coordinates(coordinatesMid);
@@ -103,7 +103,7 @@ public class GridSearch {
 
         try {
             output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesDownMid, coordinatesRightMid,
-                    MastServer.MAST_DEFAULT).get(0), true).get());
+                    MastServer.MAST_DEFAULT).get(0)).get());
         }  catch (ExecutionException | InterruptedException e) {
             if (e.getCause() instanceof  TimeoutQueryException) {
                 var midPoint = new Coordinates(coordinatesMid);
@@ -117,7 +117,7 @@ public class GridSearch {
 
         try {
             output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesMid, coordinatesMax,
-                    MastServer.MAST_DEFAULT).get(0), true).get());
+                    MastServer.MAST_DEFAULT).get(0)).get());
         } catch (ExecutionException | InterruptedException e) {
             if (e.getCause() instanceof TimeoutQueryException) {
                 var midPoint = new Coordinates(coordinatesMid);

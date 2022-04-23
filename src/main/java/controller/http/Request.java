@@ -26,9 +26,8 @@ public interface Request {
     /**
      * Asynchronous method that tries to send an HTTP GET request and returns a CompletableFuture object of type String.
      * @param uri with specified catalogues (tables), radius and parameters
-     * @param timeout if timeout is needed to be set
      * @return CompletableFuture object of type String. If request is successful, then String represents
      * direct response from server. The response varies from HTML object to VOTable document.
      */
-    CompletableFuture<String> sendRequest(URI uri, boolean timeout);
+    CompletableFuture<String> sendRequest(URI uri);
 }

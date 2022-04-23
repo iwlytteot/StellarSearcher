@@ -68,7 +68,7 @@ public class MastSearch {
             try {
                 output.addAll(searcher.start(mastService, tempCatList,
                         input, radiusInput, radiusType,
-                        MastServer.MAST_DEFAULT, true).get());
+                        MastServer.MAST_DEFAULT).get());
             }
             catch (ExecutionException | InterruptedException ex) {
                 if (ex.getCause() instanceof TimeoutQueryException) {

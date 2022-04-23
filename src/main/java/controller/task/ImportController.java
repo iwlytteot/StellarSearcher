@@ -93,14 +93,14 @@ public class ImportController {
                         var vizierCatalogues = new ArrayList<Catalogue>();
                         vizierCatalogues.add(vizierCatalogue);
                         tempMap.get(userInput).add(searcher.start(vizierService, vizierCatalogues,
-                                position, input.getRadius(), input.getUnit(), vizierServer, false));
+                                position, input.getRadius(), input.getUnit(), vizierServer));
                     }
 
                     //Simbad task
                     if (input.isSimbad() && resolvedInput != null) {
                         String coordInput = resolvedInput.getRa() + " " + resolvedInput.getDec();
                         tempMap.get(userInput).add(searcher.start(simbadService, null,
-                                coordInput, input.getRadius(), input.getUnit(), simbadServer, false));
+                                coordInput, input.getRadius(), input.getUnit(), simbadServer));
                     }
 
                     //Mast task
