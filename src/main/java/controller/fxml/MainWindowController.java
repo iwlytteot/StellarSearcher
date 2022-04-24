@@ -53,12 +53,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MainWindowController {
     @FXML
-    public Rectangle rectLeft;
-    @FXML
-    public Rectangle rectMid;
-    @FXML
-    public Rectangle rectRight;
-    @FXML
     public Button vizierButton;
     @FXML
     public Button simbadButton;
