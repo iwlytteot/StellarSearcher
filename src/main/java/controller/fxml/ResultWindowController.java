@@ -57,9 +57,6 @@ public class ResultWindowController {
      */
 
     public void fill(HashMap<UserInput, List<String>> output, int numOfCols, int numOfRows) {
-        //If there was multiple searching
-        tabPane.getTabs().clear();
-
         int rowCount = 0;
         for (var entry : output.entrySet()) {
             HashMap<String, TableView<SavotTR>> outputTableViews = new HashMap<>();

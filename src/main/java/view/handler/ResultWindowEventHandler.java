@@ -1,6 +1,7 @@
 package view.handler;
 
 import controller.fxml.ResultWindowController;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -16,6 +17,7 @@ import view.event.ResultWindowEvent;
 @Data
 public class ResultWindowEventHandler implements ApplicationListener<ResultWindowEvent> {
     private final FxWeaver fxWeaver;
+    private final ResultWindowController resultWindowController;
     private Stage stage;
 
     @Override
@@ -25,6 +27,7 @@ public class ResultWindowEventHandler implements ApplicationListener<ResultWindo
         stage.setTitle("Result window");
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setResizable(false);
+        stage.setOnCloseRequest(event -> Platform.runLater(() -> resultWindowController.getTabPane().getTabs().clear()));
         this.stage = stage;
     }
 }
