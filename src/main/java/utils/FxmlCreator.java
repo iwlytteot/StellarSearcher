@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 import model.Table;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.io.IOException;
 /**
  * Class for creating JavaFX windows from FXML files.
  */
+@Slf4j
 public class FxmlCreator {
     public static Stage createFilterWindow(String stageTitle, Table table) {
         try {
@@ -34,7 +36,7 @@ public class FxmlCreator {
             return stage;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         return null;
     }
@@ -58,7 +60,7 @@ public class FxmlCreator {
             return stage;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         return null;
     }
