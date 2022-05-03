@@ -39,7 +39,7 @@ public class GridSearch {
      */
     public List<String> start(Coordinates coordinatesMin, Coordinates coordinatesMid, Coordinates coordinatesMax,
                               List<Catalogue> catalogues, int depth) throws RecursionDepthException, CatalogueQueryException {
-        if (depth == 10) {
+        if (depth == 3) {
             throw new RecursionDepthException();
         }
 
