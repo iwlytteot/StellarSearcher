@@ -14,10 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import model.Table;
 import model.TableListCell;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Controller;
 import utils.FxmlCreator;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,21 +49,11 @@ public class MastMissionController {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
-            var pathToMissions = getClass().getResource("/mast_tables");
-            if (pathToMissions == null) {
-                log.error("Path to mast_tables was not found");
-                return;
-            }
-            var files = new File(pathToMissions.getPath()).listFiles();
-            if (files == null) {
-                log.error("Empty mast_tables folder");
-                return;
-            }
-            for (File file : files) {
-                if (file.getName().startsWith(".")) {
-                    continue; //for macOS
-                }
-                var table = mapper.readValue(file, Table.class);
+            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+            var resources = resolver.getResources("mast_tables/*");
+
+            for (var resource : resources) {
+                var table = mapper.readValue(resource.getURL(), Table.class);
                 tables.add(table);
             }
         } catch (Exception ex) {
