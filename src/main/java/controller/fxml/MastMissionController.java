@@ -49,11 +49,14 @@ public class MastMissionController {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
-            String folderPath = new File("").getAbsolutePath() + File.separator + "mast_tables";
-
-            var files = new File(folderPath).listFiles();
-            if (files == null) {
+            var pathToMissions = getClass().getResource("/mast_tables");
+            if (pathToMissions == null) {
                 log.error("Path to mast_tables was not found");
+                return;
+            }
+            var files = new File(pathToMissions.getPath()).listFiles();
+            if (files == null) {
+                log.error("Empty mast_tables folder");
                 return;
             }
             for (File file : files) {
