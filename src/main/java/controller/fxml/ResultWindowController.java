@@ -25,7 +25,7 @@ import java.util.List;
  * Class controller for "ResultWindow.fxml".
  */
 @Component
-@FxmlView("/ResultWindow.fxml")
+@FxmlView("/fxml/ResultWindow.fxml")
 @Data
 @Slf4j
 public class ResultWindowController {

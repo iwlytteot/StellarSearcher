@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
  * Class controller for "OutputSettingWindow.fxml"
  */
 @Controller
-@FxmlView("/OutputSettingWindow.fxml")
+@FxmlView("/fxml/OutputSettingWindow.fxml")
 @Data
 public class OutputSettingController {
     @FXML

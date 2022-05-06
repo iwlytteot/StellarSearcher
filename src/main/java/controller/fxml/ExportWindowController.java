@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * Class controller for "ExportWindow.fxml"
  */
 @Component
-@FxmlView("/ExportWindow.fxml")
+@FxmlView("/fxml/ExportWindow.fxml")
 @Data
 @Slf4j
 public class ExportWindowController {

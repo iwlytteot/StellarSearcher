@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @ComponentScan("model, utils")
-@FxmlView("/MainWindow.fxml")
+@FxmlView("/fxml/MainWindow.fxml")
 @Data
 @Slf4j
 public class MainWindowController {

@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutionException;
  * Class controller for "VizierCataloguesWindow.fxml".
  */
 @Component
-@FxmlView("/VizierCataloguesWindow.fxml")
+@FxmlView("/fxml/VizierCataloguesWindow.fxml")
 @lombok.Data
 @Slf4j
 public class VizierCataloguesController {

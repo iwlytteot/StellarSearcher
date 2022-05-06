@@ -19,7 +19,7 @@ import java.io.IOException;
 public class FxmlCreator {
     public static Stage createFilterWindow(String stageTitle, Table table) {
         try {
-            FXMLLoader loader = new FXMLLoader(FxmlCreator.class.getResource("/FilterWindow.fxml"));
+            FXMLLoader loader = new FXMLLoader(FxmlCreator.class.getResource("/fxml/FilterWindow.fxml"));
             Parent root = loader.load();
 
             FilterWindowController filterWindowController = loader.getController();
@@ -43,7 +43,7 @@ public class FxmlCreator {
 
     public static Stage createConstraintWindow(String constraintName) {
         try {
-            FXMLLoader loader = new FXMLLoader(FxmlCreator.class.getResource("/ConstraintWindow.fxml"));
+            FXMLLoader loader = new FXMLLoader(FxmlCreator.class.getResource("/fxml/ConstraintWindow.fxml"));
             Parent root = loader.load();
 
             ConstraintWindowController constraintWindowController = loader.getController();

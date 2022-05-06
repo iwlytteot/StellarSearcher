@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * Class controller for "MastMissionWindow.fxml".
  */
 @Controller
-@FxmlView("/MastMissionWindow.fxml")
+@FxmlView("/fxml/MastMissionWindow.fxml")
 @Slf4j
 public class MastMissionController {
     @FXML
