@@ -334,6 +334,7 @@ public class MainWindowController {
                                 alert.showAndWait();
                             });
                         }
+                        searchService.cancel();
                     }
 
                     Platform.runLater(() -> infoLabel.setText("Downloading data.."));
