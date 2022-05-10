@@ -107,7 +107,7 @@ public class ExportWindowController {
                             try {
                                 FileWriter myWriter = new FileWriter(selectedDirectory.getAbsolutePath() + File.separator + "input-" + i +
                                         File.separator +
-                                        tab.getText().replaceAll("[^a-zA-Z0-9-_\\.]", "_") + ".txt");
+                                        tab.getText().replaceAll("[^a-zA-Z0-9-_.]", "_") + ".txt");
                                 var outputData = new OutputData(input.get(0), input.get(1));
                                 outputData.setTab(tab);
                                 myWriter.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(outputData));
