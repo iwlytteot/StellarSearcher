@@ -17,11 +17,14 @@ import lombok.extern.slf4j.Slf4j;
 import model.OutputData;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
+import org.springframework.util.FileSystemUtils;
 import utils.DataExporter;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -87,9 +90,24 @@ public class ExportWindowController {
                     int i = 0;
                     for (var inputTab : resultWindowController.getTabPane().getTabs()) {
                         var input = Arrays.stream(inputTab.getText().split(";")).collect(Collectors.toList());
+                        if (Files.exists(Path.of(selectedDirectory.getAbsolutePath() + File.separator + "input-" + i))) {
+                            try {
+                                FileSystemUtils.deleteRecursively(Path.of(selectedDirectory.getAbsolutePath() + File.separator + "input-" + i));
+                            } catch (IOException e) {
+                               log.error("Error during deleting folder " + selectedDirectory.getAbsolutePath() + File.separator + "input-" + i);
+                            }
+                        }
+                        var dir = new File(selectedDirectory.getAbsolutePath() + File.separator + "input-" + i);
+                        if(!dir.mkdir()) {
+                            log.error("Could not create directory " + selectedDirectory.getAbsolutePath() + File.separator + "input-" + i);
+                            exportService.cancel();
+                            return null;
+                        }
                         for (var tab : ((TabPane) inputTab.getContent()).getTabs()) {
                             try {
-                                FileWriter myWriter = new FileWriter(selectedDirectory.getAbsolutePath() + "/" + i + ".txt");
+                                FileWriter myWriter = new FileWriter(selectedDirectory.getAbsolutePath() + File.separator + "input-" + i +
+                                        File.separator +
+                                        tab.getText().replaceAll("[^a-zA-Z0-9-_\\.]", "_") + ".txt");
                                 var outputData = new OutputData(input.get(0), input.get(1));
                                 outputData.setTab(tab);
                                 myWriter.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(outputData));
@@ -97,8 +115,8 @@ public class ExportWindowController {
                             } catch (IOException e) {
                                 log.error("Error during exporting: " + e.getMessage());
                             }
-                            ++i;
                         }
+                        ++i;
                     }
                     return null;
                 }
@@ -112,6 +130,16 @@ public class ExportWindowController {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Export");
             alert.setContentText("Export was successful");
+            alert.showAndWait();
+        }
+
+        @Override
+        protected void cancelled() {
+            directoryLabel.getScene().setCursor(Cursor.DEFAULT);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Export");
+            alert.setContentText("Export has failed");
             alert.showAndWait();
         }
     };
