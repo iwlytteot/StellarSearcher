@@ -125,8 +125,7 @@
     </dependencies>
 
     <!-- mvn package -->
-    <!-- executable .jar file is available in /target directory,
-    do not forget to include mast_tables directory alongside .jar file when running the application-->
+    <!-- executable .jar file is available in working directory of project -->
     <build>
         <finalName>StellarSearcher</finalName>
         <defaultGoal>package</defaultGoal>
