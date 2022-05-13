@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="308.0" prefWidth="462.0" xmlns="http://javafx.com/javafx/15" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.fxml.HelpWindowController">
+    <AnchorPane prefHeight="316.0" prefWidth="462.0" VBox.vgrow="ALWAYS">
+        <Label alignment="TOP_CENTER" layoutX="58.0" layoutY="17.0" prefHeight="17.0" prefWidth="359.0" text="Searching in archives can be done in two ways:" textAlignment="CENTER">
+         <font>
+            <Font size="14.0" />
+         </font></Label>
+      <Label alignment="TOP_LEFT" layoutX="58.0" layoutY="52.0" prefHeight="17.0" prefWidth="359.0" text="1) manual search" textAlignment="CENTER">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label alignment="TOP_LEFT" layoutX="76.0" layoutY="72.0" prefHeight="17.0" prefWidth="359.0" text="-choose one of three archives" textAlignment="CENTER" />
+      <Label alignment="TOP_LEFT" layoutX="76.0" layoutY="92.0" prefHeight="17.0" prefWidth="359.0" text="-specify catalogue(s) and their tables" textAlignment="CENTER" />
+      <Label alignment="TOP_LEFT" layoutX="76.0" layoutY="132.0" prefHeight="17.0" prefWidth="73.0" text="(OPTIONAL)" textAlignment="CENTER" />
+      <Label alignment="TOP_LEFT" layoutX="88.0" layoutY="152.0" prefHeight="17.0" prefWidth="158.0" text="-set constraints on columns" textAlignment="CENTER" />
+      <Label alignment="TOP_LEFT" layoutX="100.0" layoutY="172.0" prefHeight="17.0" prefWidth="323.0" text="-accessible via doubleclick on table and then on column list" textAlignment="CENTER" />
+      <Label alignment="TOP_LEFT" layoutX="76.0" layoutY="112.0" prefHeight="17.0" prefWidth="359.0" text="-insert ID/coordinates of object and radius" textAlignment="CENTER" />
+      <Label alignment="TOP_LEFT" layoutX="58.0" layoutY="202.0" prefHeight="17.0" prefWidth="359.0" text="2) automated search" textAlignment="CENTER">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label alignment="TOP_LEFT" layoutX="76.0" layoutY="222.0" prefHeight="17.0" prefWidth="359.0" text="-accessible via App-&gt;Import or CTRL + I" textAlignment="CENTER" />
+      <Label alignment="TOP_LEFT" layoutX="76.0" layoutY="242.0" prefHeight="17.0" prefWidth="249.0" text="-an import file follows defined JSON structure" textAlignment="CENTER" wrapText="true" />
+      <Label alignment="TOP_LEFT" layoutX="88.0" layoutY="262.0" prefHeight="17.0" prefWidth="366.0" text="-example (json_example.txt) is attached to application" textAlignment="CENTER" wrapText="true" />
+    </AnchorPane>
+</VBox>

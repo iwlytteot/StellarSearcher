@@ -8,6 +8,7 @@ import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
@@ -29,10 +30,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import controller.task.GridSearch;
 import controller.task.MastSearch;
-import view.event.MastWindowEvent;
-import view.event.OutputSettingWindowEvent;
-import view.event.ResultWindowEvent;
-import view.event.VizierWindowEvent;
+import view.event.*;
 import view.handler.*;
 
 import java.io.File;
@@ -97,6 +95,7 @@ public class MainWindowController {
     private final ResultWindowEventHandler resultWindowEventHandler;
     private final OutputSettingWindowEventHandler outputSettingWindowEventHandler;
     private final ExportWindowEventHandler exportWindowEventHandler;
+    private final HelpWindowEventHandler helpWindowEventHandler;
 
     private final VizierCataloguesController vizierCataloguesController;
     private final MastMissionController mastMissionController;
@@ -248,24 +247,12 @@ public class MainWindowController {
         searchService.start();
     }
 
-    public String getVizierServer() {
-        if (vizierFrance.isSelected()) {
-            return VizierServer.CDS_FRANCE;
+    @FXML
+    public void openHelp() {
+        if (helpWindowEventHandler.getStage() == null) {
+            context.publishEvent(new HelpWindowEvent(new Stage()));
         }
-        else if (vizierJapan.isSelected()) {
-            return VizierServer.ADAC_TOKYO;
-        }
-        else if (vizierIndia.isSelected()) {
-            return VizierServer.IUCAA_PUNE;
-        }
-        return VizierServer.CFA_HARVARD;
-    }
-
-    public String getSimbadServer() {
-        if (simbadFrance.isSelected()) {
-            return SimbadServer.CDS_FRANCE;
-        }
-        return SimbadServer.CFA_HARVARD;
+        helpWindowEventHandler.getStage().show();
     }
 
     public void exit() {
@@ -283,6 +270,26 @@ public class MainWindowController {
         if (exportServiceState == Worker.State.RUNNING || exportServiceState == Worker.State.SCHEDULED) {
             exportWindowController.getExportService().cancel();
         }
+    }
+
+    private String getVizierServer() {
+        if (vizierFrance.isSelected()) {
+            return VizierServer.CDS_FRANCE;
+        }
+        else if (vizierJapan.isSelected()) {
+            return VizierServer.ADAC_TOKYO;
+        }
+        else if (vizierIndia.isSelected()) {
+            return VizierServer.IUCAA_PUNE;
+        }
+        return VizierServer.CFA_HARVARD;
+    }
+
+    private String getSimbadServer() {
+        if (simbadFrance.isSelected()) {
+            return SimbadServer.CDS_FRANCE;
+        }
+        return SimbadServer.CFA_HARVARD;
     }
 
     private void searchButtonCheck() {

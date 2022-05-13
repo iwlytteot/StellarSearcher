@@ -83,6 +83,9 @@
                <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
             </accelerator></MenuItem>
       </Menu>
+      <Menu mnemonicParsing="false" text="Help">
+         <MenuItem mnemonicParsing="false" onAction="#openHelp" text="How to search"/>
+      </Menu>
    </MenuBar>
    <ToggleButton fx:id="vizierToogleGroup" layoutX="42.0" layoutY="397.0" mnemonicParsing="false" text="ToggleButton" toggleGroup="$vizierGroup" visible="false" />
    <ToggleButton fx:id="simbadToogleGroup" layoutX="52.0" layoutY="407.0" mnemonicParsing="false" text="ToggleButton" toggleGroup="$simbadGroup" visible="false" />
