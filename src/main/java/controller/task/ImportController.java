@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.*;
 import model.exception.CatalogueQueryException;
+import model.exception.OutOfRangeException;
 import model.exception.RecursionDepthException;
 import model.exception.ResolverQueryException;
 import org.springframework.scheduling.annotation.Async;
@@ -133,6 +134,8 @@ public class ImportController {
         } catch (RecursionDepthException e) {
             log.error("MAST could not be queried anymore, because maximum recursion depth happened. " +
                     "Try smaller radius or contact MAST");
+        } catch (OutOfRangeException e) {
+            log.error("Radius of search is exceeding RA and DEC limit values.");
         }
         return CompletableFuture.completedFuture(output);
     }

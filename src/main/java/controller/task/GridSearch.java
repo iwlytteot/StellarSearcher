@@ -29,103 +29,85 @@ public class GridSearch {
      * Another 6 points are then created when radius is added/subtracted with respect to mid-point. A single box within
      * grid is then defined by two points that are diagonally opposite.
      *
-     * @param coordinatesMin the lowest point on plane with the smallest RA and DEC
-     * @param coordinatesMax the highest point on plane with the highest RA and DEC
-     * @param coordinatesMid mid-point on plane
+     * @param midPoint point where search begins
+     * @param radius radius of search
      * @param catalogues catalogues to query
      * @param depth current depth of recursion
      * @return list of strings that contain output data
      * @throws RecursionDepthException if recursion maximum depth is reached
      */
-    public List<String> start(Coordinates coordinatesMin, Coordinates coordinatesMid, Coordinates coordinatesMax,
-                              List<Catalogue> catalogues, int depth) throws RecursionDepthException, CatalogueQueryException {
-        if (depth == 3) {
+    public List<String> start(Coordinates midPoint, double radius, List<Catalogue> catalogues, int depth)
+            throws RecursionDepthException, CatalogueQueryException {
+        if (depth == 10) {
             throw new RecursionDepthException();
         }
+
+        System.out.println("DEPTH: " + depth);
 
         List<String> output = new ArrayList<>();
         var service = new MastService();
 
-        /*
-        It is necessary to obtain both RA and DEC radius's for left and right part of planes, that is divided by mid-point.
-        It is because RA is of <0, 360> and DEC is of <-90, 90>, e.g.: input, where RA = 1 and DEC = 10 and radius = 3,
-        hence it's impossible to get RA = -2. Therefore, rectangle boxes are created on
-        left side => RA = 0 to 1, but DEC = 7 to 13
-
-        and squares are created on
-        right side => RA = 1 to 4 and DEC = 7 to 13
-
-        (Same principle applies to DEC, but vertically as DEC lies on Y-axis)
-         */
-        var leftRaRadius = Math.abs(coordinatesMid.getRa() - coordinatesMin.getRa());
-        var rightRaRadius = Math.abs(coordinatesMax.getRa() - coordinatesMid.getRa());
-        var downDecRadius = Math.abs(coordinatesMid.getDec() - coordinatesMin.getDec());
-        var upDecRadius = Math.abs(coordinatesMax.getDec() - coordinatesMid.getDec());
-
-        //Creating rest of points. Each point is created with respect to mid-point.
-        var coordinatesLeftMid = new Coordinates(coordinatesMid);
-        coordinatesLeftMid.offsetRa(-leftRaRadius);
-        var coordinatesRightMid = new Coordinates(coordinatesMid);
-        coordinatesRightMid.offsetRa(rightRaRadius);
-        var coordinatesUpMid = new Coordinates(coordinatesMid);
-        coordinatesUpMid.offsetDec(upDecRadius);
-        var coordinatesDownMid = new Coordinates(coordinatesMid);
-        coordinatesDownMid.offsetDec(-downDecRadius);
-
         //For each box defined by two points, try query and if failed, call itself with smaller radius.
+
         try {
-            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesMin, coordinatesMid,
+            output.add(service.sendRequest(service.createDataRequest(catalogues,
+                    new Coordinates(midPoint.getRa() - radius, midPoint.getDec() - radius),
+                    midPoint,
                     MastServer.MAST_DEFAULT).get(0)).get());
         } catch (ExecutionException | InterruptedException e) {
             if (e.getCause() instanceof TimeoutQueryException) {
-                var midPoint = new Coordinates(coordinatesMid);
-                midPoint.offsetRa(-leftRaRadius / 2);
-                midPoint.offsetDec(-downDecRadius / 2);
-                output.addAll(start(coordinatesMin, midPoint, coordinatesMid, catalogues, depth + 1));
+                var newMid = new Coordinates(midPoint);
+                newMid.offsetRaDec(-radius / 2);
+                output.addAll(start(newMid, radius/2, catalogues, depth + 1));
             } else {
                 throw new CatalogueQueryException();
             }
         }
 
         try {
-            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesLeftMid, coordinatesUpMid,
+            output.add(service.sendRequest(service.createDataRequest(catalogues,
+                    new Coordinates(midPoint.getRa() - radius, midPoint.getDec()),
+                    new Coordinates(midPoint.getRa(), midPoint.getDec() + radius),
                     MastServer.MAST_DEFAULT).get(0)).get());
         } catch (ExecutionException | InterruptedException e) {
             if (e.getCause() instanceof TimeoutQueryException) {
-                var midPoint = new Coordinates(coordinatesMid);
-                midPoint.offsetRa(-leftRaRadius / 2);
-                midPoint.offsetDec(upDecRadius / 2);
-                output.addAll(start(coordinatesLeftMid, midPoint, coordinatesUpMid, catalogues, depth + 1));
+                var newMid = new Coordinates(midPoint);
+                newMid.offsetRa(-radius / 2);
+                newMid.offsetDec(radius / 2);
+                output.addAll(start(newMid, radius/2, catalogues, depth + 1));
             } else {
                 throw new CatalogueQueryException();
             }
         }
 
         try {
-            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesDownMid, coordinatesRightMid,
+            output.add(service.sendRequest(service.createDataRequest(catalogues,
+                    midPoint,
+                    new Coordinates(midPoint.getRa() + radius, midPoint.getDec() + radius),
                     MastServer.MAST_DEFAULT).get(0)).get());
-        }  catch (ExecutionException | InterruptedException e) {
-            if (e.getCause() instanceof  TimeoutQueryException) {
-                var midPoint = new Coordinates(coordinatesMid);
-                midPoint.offsetRa(rightRaRadius / 2);
-                midPoint.offsetDec(-downDecRadius / 2);
-                output.addAll(start(coordinatesDownMid, midPoint, coordinatesRightMid, catalogues, depth + 1));
+        } catch (ExecutionException | InterruptedException e) {
+            if (e.getCause() instanceof TimeoutQueryException) {
+                var newMid = new Coordinates(midPoint);
+                newMid.offsetRa(radius / 2);
+                newMid.offsetDec(radius / 2);
+                output.addAll(start(newMid, radius/2, catalogues, depth + 1));
             } else {
                 throw new CatalogueQueryException();
             }
         }
 
         try {
-            output.add(service.sendRequest(service.createDataRequest(catalogues, coordinatesMid, coordinatesMax,
+            output.add(service.sendRequest(service.createDataRequest(catalogues,
+                    new Coordinates(midPoint.getRa(), midPoint.getDec() - radius),
+                    new Coordinates(midPoint.getRa() + radius, midPoint.getDec()),
                     MastServer.MAST_DEFAULT).get(0)).get());
         } catch (ExecutionException | InterruptedException e) {
             if (e.getCause() instanceof TimeoutQueryException) {
-                var midPoint = new Coordinates(coordinatesMid);
-                midPoint.offsetRa(rightRaRadius / 2);
-                midPoint.offsetDec(upDecRadius / 2);
-                output.addAll(start(coordinatesMid, midPoint, coordinatesMax, catalogues, depth + 1));
-            }
-            else {
+                var newMid = new Coordinates(midPoint);
+                newMid.offsetRa(radius / 2);
+                newMid.offsetDec(-radius / 2);
+                output.addAll(start(newMid, radius/2, catalogues, depth + 1));
+            } else {
                 throw new CatalogueQueryException();
             }
         }

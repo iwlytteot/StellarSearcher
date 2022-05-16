@@ -435,6 +435,12 @@ public class MainWindowController {
         protected void failed() {
             searchButton.getScene().setCursor(Cursor.DEFAULT);
             infoLabel.setText("");
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Search action");
+            alert.setContentText("Search action has failed, the input was: "
+                    + inputText.getText() + ", " + radiusInput.getText() + " " + radiusBox.getValue());
+            alert.showAndWait();
+
             log.error("Search action has failed, the input was: "
                     + inputText.getText() + ", " + radiusInput.getText() + " " + radiusBox.getValue());
         }

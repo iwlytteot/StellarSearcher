@@ -15,6 +15,11 @@ public class Coordinates {
         this.dec = Double.parseDouble(dec);
     }
 
+    public Coordinates(double ra, double dec) {
+        offsetRa(ra);
+        offsetDec(dec);
+    }
+
     public Coordinates(Coordinates c) {
         this.ra = c.getRa();
         this.dec = c.getDec();

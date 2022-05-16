@@ -85,15 +85,12 @@ public class MastSearch {
                 in decimal degrees. Transformation is needed => 1 degree equals to 60 arcmin
                  */
                 var radius = Double.parseDouble(radiusInput) / 60;
-                if (resolvedInput.getDec() + radius > 90 || resolvedInput.getDec() - radius < -90) {
+                if (resolvedInput.getDec() + radius > 90 || resolvedInput.getDec() - radius < -90
+                        || resolvedInput.getRa() + radius > 360 || resolvedInput.getRa() - radius < 0) {
                     throw new OutOfRangeException();
                 }
-                var coordinatesMin = new Coordinates(resolvedInput);
-                var coordinatesMax = new Coordinates(resolvedInput);
-                coordinatesMin.offsetRaDec(-radius); //lowest point
-                coordinatesMax.offsetRaDec(radius); //highest point
 
-                output.addAll(gridSearcher.start(coordinatesMin, resolvedInput, coordinatesMax, tempCatList, 0));
+                output.addAll(gridSearcher.start(resolvedInput, radius, tempCatList, 0));
             }
         }
         return CompletableFuture.completedFuture(output);
