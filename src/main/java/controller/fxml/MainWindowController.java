@@ -19,6 +19,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.*;
 import model.exception.CatalogueQueryException;
+import model.exception.OutOfRangeException;
 import model.exception.RecursionDepthException;
 import model.exception.ResolverQueryException;
 import model.mirror.SimbadServer;
@@ -376,6 +377,13 @@ public class MainWindowController {
                                 Alert alert = new Alert(Alert.AlertType.WARNING);
                                 alert.setTitle("Can't get results");
                                 alert.setContentText("Search failed");
+                                alert.showAndWait();
+                            });
+                        } catch (OutOfRangeException e) {
+                            Platform.runLater(() -> {
+                                Alert alert = new Alert(Alert.AlertType.WARNING);
+                                alert.setTitle("Out of range");
+                                alert.setContentText("Out of range of declination while grid searching. Try smaller radius.");
                                 alert.showAndWait();
                             });
                         }

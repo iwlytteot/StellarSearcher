@@ -8,6 +8,7 @@ import model.Coordinates;
 import model.Radius;
 import model.Table;
 import model.exception.CatalogueQueryException;
+import model.exception.OutOfRangeException;
 import model.exception.RecursionDepthException;
 import model.exception.TimeoutQueryException;
 import model.mirror.MastServer;
@@ -45,7 +46,8 @@ public class MastSearch {
      */
     @Async
     public CompletableFuture<List<String>> start(List<Table> missions, String input, String radiusInput, Radius radiusType,
-                                                 Coordinates resolvedInput) throws RecursionDepthException, CatalogueQueryException {
+                                                 Coordinates resolvedInput) throws RecursionDepthException,
+            CatalogueQueryException, OutOfRangeException {
 
         List<String> output = new ArrayList<>();
 
@@ -83,6 +85,9 @@ public class MastSearch {
                 in decimal degrees. Transformation is needed => 1 degree equals to 60 arcmin
                  */
                 var radius = Double.parseDouble(radiusInput) / 60;
+                if (resolvedInput.getDec() + radius > 90 || resolvedInput.getDec() - radius < -90) {
+                    throw new OutOfRangeException();
+                }
                 var coordinatesMin = new Coordinates(resolvedInput);
                 var coordinatesMax = new Coordinates(resolvedInput);
                 coordinatesMin.offsetRaDec(-radius); //lowest point
