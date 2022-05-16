@@ -20,9 +20,8 @@ public class GridSearch {
      * Method that searches for results in boxes defined by RA and DEC.
      * According to MAST, it is possible to search for results in range of RA/DEC values e.g.: 30.1..30.5 will search
      * for all values from 30.1 to 30.5.
-     * In order to have boxes of same area (note that it is possible to get different areas, because there can be
-     * rectangles), it is necessary to create a grid that contains 7 points. Grid is then divided into four boxes,
-     * in which recursive call happens.
+     * In order to have boxes of same area, it is necessary to create a grid that contains 7 points.
+     * Grid is then divided into four boxes, in which recursive call happens.
      *
      * The easiest way to visualize it is XY plane where X-axis = <0, 360> for RA and Y-axis = <-90, 90> for DEC.
      * Mid-point (user's input) is at X = RA and Y = DEC.
@@ -37,12 +36,10 @@ public class GridSearch {
      * @throws RecursionDepthException if recursion maximum depth is reached
      */
     public List<String> start(Coordinates midPoint, double radius, List<Catalogue> catalogues, int depth)
-            throws RecursionDepthException, CatalogueQueryException {
-        if (depth == 10) {
+            throws RecursionDepthException {
+        if (depth == 3) {
             throw new RecursionDepthException();
         }
-
-        System.out.println("DEPTH: " + depth);
 
         List<String> output = new ArrayList<>();
         var service = new MastService();
@@ -59,8 +56,6 @@ public class GridSearch {
                 var newMid = new Coordinates(midPoint);
                 newMid.offsetRaDec(-radius / 2);
                 output.addAll(start(newMid, radius/2, catalogues, depth + 1));
-            } else {
-                throw new CatalogueQueryException();
             }
         }
 
@@ -75,8 +70,6 @@ public class GridSearch {
                 newMid.offsetRa(-radius / 2);
                 newMid.offsetDec(radius / 2);
                 output.addAll(start(newMid, radius/2, catalogues, depth + 1));
-            } else {
-                throw new CatalogueQueryException();
             }
         }
 
@@ -91,8 +84,6 @@ public class GridSearch {
                 newMid.offsetRa(radius / 2);
                 newMid.offsetDec(radius / 2);
                 output.addAll(start(newMid, radius/2, catalogues, depth + 1));
-            } else {
-                throw new CatalogueQueryException();
             }
         }
 
@@ -107,8 +98,6 @@ public class GridSearch {
                 newMid.offsetRa(radius / 2);
                 newMid.offsetDec(-radius / 2);
                 output.addAll(start(newMid, radius/2, catalogues, depth + 1));
-            } else {
-                throw new CatalogueQueryException();
             }
         }
 

@@ -40,14 +40,12 @@ public class MastSearch {
      * @param radiusInput user radius input
      * @param radiusType type of radius
      * @param resolvedInput resolved input of type Coordinates. Needed if grid search is performed
-     * @return CompletableFuture of type List<String>. List holds results from MAST server
-     * @throws RecursionDepthException if recursion depth is exceeded
-     * @throws CatalogueQueryException if error happened during querying
+     * @return CompletableFuture of type List<String>. List holds results from MAST server or exceptions
+     * RecursionDepthException if recursion depth is exceeded or CatalogueQueryException if error happened during querying
      */
     @Async
     public CompletableFuture<List<String>> start(List<Table> missions, String input, String radiusInput, Radius radiusType,
-                                                 Coordinates resolvedInput) throws RecursionDepthException,
-            CatalogueQueryException, OutOfRangeException {
+                                                 Coordinates resolvedInput) {
 
         List<String> output = new ArrayList<>();
 
@@ -87,10 +85,14 @@ public class MastSearch {
                 var radius = Double.parseDouble(radiusInput) / 60;
                 if (resolvedInput.getDec() + radius > 90 || resolvedInput.getDec() - radius < -90
                         || resolvedInput.getRa() + radius > 360 || resolvedInput.getRa() - radius < 0) {
-                    throw new OutOfRangeException();
+                    return CompletableFuture.failedFuture(new OutOfRangeException());
                 }
 
-                output.addAll(gridSearcher.start(resolvedInput, radius, tempCatList, 0));
+                try {
+                    output.addAll(gridSearcher.start(resolvedInput, radius, tempCatList, 0));
+                } catch (RecursionDepthException e) {
+                    return CompletableFuture.failedFuture(new RecursionDepthException());
+                }
             }
         }
         return CompletableFuture.completedFuture(output);

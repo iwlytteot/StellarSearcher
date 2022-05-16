@@ -320,7 +320,7 @@ public class MainWindowController {
         protected Task<List<String>> createTask() {
             return new Task<>() {
                 @Override
-                protected List<String> call() throws InterruptedException, ExecutionException {
+                protected List<String> call() {
                     List<CompletableFuture<List<String>>> futures = new ArrayList<>();
 
                     Platform.runLater(() -> {
@@ -361,32 +361,8 @@ public class MainWindowController {
 
                     //If MAST button was activated
                     if (mastSearch) {
-                        try {
-                            futures.add(mastSearcher.start(getMastMissions(), inputText.getText(), radiusInput.getText(),
-                                    radiusBox.getValue(), resolvedInput));
-                        } catch (RecursionDepthException e) {
-                            Platform.runLater(() -> {
-                                Alert alert = new Alert(Alert.AlertType.WARNING);
-                                alert.setTitle("Can't get results");
-                                alert.setContentText("MAST could not be queried anymore, because maximum recursion depth" +
-                                        " happened. Try smaller radius or contact MAST.");
-                                alert.showAndWait();
-                            });
-                        } catch (CatalogueQueryException e) {
-                            Platform.runLater(() -> {
-                                Alert alert = new Alert(Alert.AlertType.WARNING);
-                                alert.setTitle("Can't get results");
-                                alert.setContentText("Search failed");
-                                alert.showAndWait();
-                            });
-                        } catch (OutOfRangeException e) {
-                            Platform.runLater(() -> {
-                                Alert alert = new Alert(Alert.AlertType.WARNING);
-                                alert.setTitle("Out of range");
-                                alert.setContentText("Out of range of declination while grid searching. Try smaller radius.");
-                                alert.showAndWait();
-                            });
-                        }
+                        futures.add(mastSearcher.start(getMastMissions(), inputText.getText(), radiusInput.getText(),
+                                radiusBox.getValue(), resolvedInput));
                     }
 
                     //Check if there is any query to be done
@@ -397,7 +373,29 @@ public class MainWindowController {
                     //Retrieving results
                     List<List<String>> output = new ArrayList<>();
                     for (var response : futures) {
-                        output.add(response.get());
+                        try {
+                            output.add(response.get());
+                        } catch (InterruptedException | ExecutionException e) {
+                            if (e.getCause() instanceof RecursionDepthException) {
+                                Platform.runLater(() -> {
+                                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                                    alert.setTitle("Can't get results");
+                                    alert.setContentText("MAST could not be queried anymore, because maximum recursion depth" +
+                                            " happened. Try smaller radius or contact MAST.");
+                                    alert.showAndWait();
+                                });
+
+                            } else if (e.getCause() instanceof OutOfRangeException) {
+                                Platform.runLater(() -> {
+                                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                                    alert.setTitle("Can't get results");
+                                    alert.setContentText("Right ascension and declination out of ranges when searching. Try " +
+                                            "smaller radius.");
+                                    alert.showAndWait();
+                                });
+                            }
+                            searchService.cancel();
+                        }
                     }
                     return output.stream().flatMap(List::stream).collect(Collectors.toList());
                 }
@@ -435,12 +433,6 @@ public class MainWindowController {
         protected void failed() {
             searchButton.getScene().setCursor(Cursor.DEFAULT);
             infoLabel.setText("");
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Search action");
-            alert.setContentText("Search action has failed, the input was: "
-                    + inputText.getText() + ", " + radiusInput.getText() + " " + radiusBox.getValue());
-            alert.showAndWait();
-
             log.error("Search action has failed, the input was: "
                     + inputText.getText() + ", " + radiusInput.getText() + " " + radiusBox.getValue());
         }

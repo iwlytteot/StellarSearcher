@@ -3,6 +3,7 @@ package controller.task;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import controller.http.Request;
 import controller.http.SesameResolver;
+import javafx.scene.control.Alert;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import model.*;
@@ -130,12 +131,21 @@ public class ImportController {
                 }
             }
         } catch (IOException | InterruptedException | ExecutionException e) {
+            if (e.getCause() instanceof RecursionDepthException) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Can't get results");
+                alert.setContentText("MAST could not be queried anymore, because maximum recursion depth" +
+                        " happened. Try smaller radius or contact MAST.");
+                alert.showAndWait();
+            } else if (e.getCause() instanceof OutOfRangeException) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Can't get results");
+                alert.setContentText("Right ascension and declination out of ranges when searching. Try " +
+                        "smaller radius.");
+                alert.showAndWait();
+            }
             log.error("Error while processing JSON file: " + e.getMessage());
-        } catch (RecursionDepthException e) {
-            log.error("MAST could not be queried anymore, because maximum recursion depth happened. " +
-                    "Try smaller radius or contact MAST");
-        } catch (OutOfRangeException e) {
-            log.error("Radius of search is exceeding RA and DEC limit values.");
+
         }
         return CompletableFuture.completedFuture(output);
     }
