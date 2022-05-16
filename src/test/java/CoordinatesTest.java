@@ -1,4 +1,4 @@
-import model.Coordinates;
+import cz.muni.fi.tovarys.model.Coordinates;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

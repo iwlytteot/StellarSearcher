@@ -137,7 +137,7 @@
                 <configuration>
                     <!-- https://docs.spring.io/spring-boot/docs/current/reference/html/deployment.html#deployment.installing -->
                     <executable>true</executable>
-                    <mainClass>view.Main</mainClass>
+                    <mainClass>cz.muni.fi.tovarys.view.Main</mainClass>
                     <outputDirectory>${project.basedir}</outputDirectory>
                 </configuration>
                 <executions>

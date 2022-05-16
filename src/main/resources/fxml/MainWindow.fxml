@@ -15,7 +15,7 @@
 <?import javafx.scene.shape.Ellipse?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="450.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/15" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.fxml.MainWindowController">
+<AnchorPane prefHeight="450.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/15" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.muni.fi.tovarys.controller.fxml.MainWindowController">
    <Ellipse fx:id="vizierEllipse" fill="RED" layoutX="136.0" layoutY="150.0" radiusX="75.0" radiusY="59.0" stroke="TRANSPARENT" strokeType="INSIDE" />
    <Ellipse fx:id="simbadEllipse" fill="RED" layoutX="316.0" layoutY="150.0" radiusX="75.0" radiusY="59.0" stroke="TRANSPARENT" strokeType="INSIDE" />
    <Ellipse fx:id="mastEllipse" fill="RED" layoutX="498.0" layoutY="150.0" radiusX="75.0" radiusY="59.0" stroke="TRANSPARENT" strokeType="INSIDE" />
