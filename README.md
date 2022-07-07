@@ -1,6 +1,8 @@
 # StellarSearcher
 
-Simple and intuitive desktop tool for comprehensive search in catalogue archives and databases.
+Simple and intuitive desktop tool with GUI for comprehensive search in catalogue archives and databases.
+
+Written in Java together with JavaFX graphical framework. Supported on Linux, Windows, macOS.
 
 Supported catalogues and databases:
 * VizieR
