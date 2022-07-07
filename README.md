@@ -4,7 +4,7 @@ Simple and intuitive desktop tool with GUI for comprehensive search in catalogue
 
 Written in Java together with JavaFX graphical framework. Supported on Linux, Windows, macOS.
 
-Supported catalogues and databases:
+Supported archives and databases:
 * VizieR
 * MAST
 * SIMBAD
